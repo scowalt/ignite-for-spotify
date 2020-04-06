@@ -3,7 +3,9 @@
         "strict": true,
         "jsx": "react",
         "rootDir": "src",
-        "outDir": "./bin/",
-        "sourceMap": true
+        "outDir": "./dist/",
+        "sourceMap": true,
+        "esModuleInterop": true, // required for express,
+        "noImplicitAny": true
     }
 }
