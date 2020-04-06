@@ -5,12 +5,12 @@ on:
       - beta
 
 jobs:
-  publish:
+  build:
     runs-on: ubuntu-latest
 
     strategy:
       matrix:
-        node-version: [^13.12.0]
+        node-version: [^12.12.0]
 
     steps:
     - uses: actions/checkout@v2
