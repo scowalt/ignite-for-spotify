@@ -1,0 +1,9 @@
+{
+    "compilerOptions": {
+        "strict": true,
+        "jsx": "react",
+        "rootDir": "src",
+        "outDir": "./bin/",
+        "sourceMap": true
+    }
+}
