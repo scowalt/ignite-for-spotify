@@ -1,0 +1,13 @@
+name: Release
+on:
+  push:
+    branches:
+      - beta
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [^13.12.0]
