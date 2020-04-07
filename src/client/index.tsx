@@ -1,5 +1,6 @@
 import ReactDOM from 'react-dom';
 import React from 'react';
+import { Button } from 'react-bootstrap';
 
 class Index extends React.Component<{}, {}> {
 	constructor(props: React.Props<{}>) {
@@ -7,7 +8,9 @@ class Index extends React.Component<{}, {}> {
 	}
 
 	render() {
-		return "Hello world!";
+		return <Button>
+			Login through Spotify
+		</Button>;
 	}
 }
 
