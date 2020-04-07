@@ -18,12 +18,13 @@ app.use(express.static(path.join(__dirname, 'static')));
 app.use(cookieParser());
 
 // Client wants to start Spotify Auth flow
-app.get('/login', (req, res) => {
+app.get('/login', (request: ExpressRequest, response: ExpressResponse) => {
 	const state: string = chance.string({length: 16});
-	res.cookie(stateKey, state);
+	response.cookie(stateKey, state);
 
-	const scope: string = 'user-read-private user-read-email';
-	res.redirect(`https://accounts.spotify.com/authorize?${stringify({
+	// Redirect to Spotify to auth. Spotify will respond to redirectUri
+	const scope: string = 'user-read-private user-read-email playlist-read-private';
+	response.redirect(`https://accounts.spotify.com/authorize?${stringify({
 		response_type: 'code',
 		client_id: process.env.SPOTIFY_CLIENT_ID,
 		scope,
@@ -42,6 +43,7 @@ app.get('/spotifyAuthCallback', (request: ExpressRequest, response: ExpressRespo
 	if (state === null || state !== storedState) {
 		// TODO state mismatch
 	} else {
+		// Since the authentication has been finished, state is no longer necessary
 		response.clearCookie(stateKey);
 		const init: RequestInit = {
 			method: "POST",
@@ -57,26 +59,16 @@ app.get('/spotifyAuthCallback', (request: ExpressRequest, response: ExpressRespo
 			}).toString()
 		};
 		fetch('https://accounts.spotify.com/api/token', init).then((response2: FetchResponse) => {
+			// TODO handle errors here
 			return response2.json();
 		}).then((body) => {
 			const accessToken = body.access_token;
 			const refreshToken = body.refresh_token;
 
 			// the access token will be used by the client to query the Spotify API.
-
-			// use the access token to access the Spotify Web API
-			const init2: RequestInit = {
-				method: "GET",
-				headers: {
-					"Accept": "application/json",
-					'Authorization': 'Bearer ' + accessToken
-				}
-			};
-			fetch('https://api.spotify.com/v1/me', init2).then((response3: FetchResponse) => {
-				return response3.json();
-			}).then((meBody) => {
-				meBody.toString();
-			});
+			response.cookie("spotifyAccessToken", accessToken);
+			response.cookie("spotifyRefreshToken", refreshToken);
+			response.redirect("/");
 		});
 	}
 });
@@ -98,8 +90,7 @@ app.get('/spotifyRefreshToken', (req,res) => {
 	fetch("https://accounts.spotify.com/api/token", init).then((response: FetchResponse) => {
 		if (response.status === 200) {
 			return response.json();
-		}
-		else {
+		} else {
 			return Promise.reject();
 		}
 	}).then((body) => {
