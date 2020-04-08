@@ -27,7 +27,8 @@
         "qs": "^6.9.3",
         "react": "^16.13.1",
         "react-bootstrap": "^1.0.0",
-        "react-dom": "^16.13.1"
+        "react-dom": "^16.13.1",
+        "spotify-web-api-js": "^1.2.0"
     },
     "devDependencies": {
         "@types/chance": "^1.0.10",
