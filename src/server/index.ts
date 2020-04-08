@@ -25,16 +25,89 @@ app.get('/go', (request: ExpressRequest, response: ExpressResponse) => {
 			"Accept": "application/json",
 			"Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
 			"Cookie": `${process.env.IGNITION_COOKIE_KEY}=${process.env.IGNITION_COOKIE_VALUE}`,
-			"Host": 'ignition.customsforge.com',
-			"Origin": 'http://ignition.customsforge.com',
-			"Referer": "http://ignition.customsforge.com/"
 		},
-		body: "draw=5&columns%5B0%5D%5Bdata%5D%5B_%5D=19&columns%5B0%5D%5Bdata%5D%5Bdisplay%5D=undefined&columns%5B0%5D%5Bname%5D=&columns%5B0%5D%5Bsearchable%5D=true&columns%5B0%5D%5Borderable%5D=false&columns%5B0%5D%5Bsearch%5D%5Bvalue%5D=&columns%5B0%5D%5Bsearch%5D%5Bregex%5D=false&columns%5B1%5D%5Bdata%5D%5B_%5D=1&columns%5B1%5D%5Bdata%5D%5Bdisplay%5D=undefined&columns%5B1%5D%5Bname%5D=&columns%5B1%5D%5Bsearchable%5D=true&columns%5B1%5D%5Borderable%5D=true&columns%5B1%5D%5Bsearch%5D%5Bvalue%5D=&columns%5B1%5D%5Bsearch%5D%5Bregex%5D=false&columns%5B2%5D%5Bdata%5D%5B_%5D=2&columns%5B2%5D%5Bdata%5D%5Bdisplay%5D=undefined&columns%5B2%5D%5Bname%5D=&columns%5B2%5D%5Bsearchable%5D=true&columns%5B2%5D%5Borderable%5D=true&columns%5B2%5D%5Bsearch%5D%5Bvalue%5D=&columns%5B2%5D%5Bsearch%5D%5Bregex%5D=false&columns%5B3%5D%5Bdata%5D=3&columns%5B3%5D%5Bname%5D=&columns%5B3%5D%5Bsearchable%5D=true&columns%5B3%5D%5Borderable%5D=true&columns%5B3%5D%5Bsearch%5D%5Bvalue%5D=&columns%5B3%5D%5Bsearch%5D%5Bregex%5D=false&columns%5B4%5D%5Bdata%5D%5B_%5D=4&columns%5B4%5D%5Bdata%5D%5Bdisplay%5D=undefined&columns%5B4%5D%5Bname%5D=&columns%5B4%5D%5Bsearchable%5D=true&columns%5B4%5D%5Borderable%5D=true&columns%5B4%5D%5Bsearch%5D%5Bvalue%5D=&columns%5B4%5D%5Bsearch%5D%5Bregex%5D=false&columns%5B5%5D%5Bdata%5D=5&columns%5B5%5D%5Bname%5D=&columns%5B5%5D%5Bsearchable%5D=true&columns%5B5%5D%5Borderable%5D=true&columns%5B5%5D%5Bsearch%5D%5Bvalue%5D=&columns%5B5%5D%5Bsearch%5D%5Bregex%5D=false&columns%5B6%5D%5Bdata%5D=6&columns%5B6%5D%5Bname%5D=&columns%5B6%5D%5Bsearchable%5D=true&columns%5B6%5D%5Borderable%5D=true&columns%5B6%5D%5Bsearch%5D%5Bvalue%5D=&columns%5B6%5D%5Bsearch%5D%5Bregex%5D=false&columns%5B7%5D%5Bdata%5D%5B_%5D=7&columns%5B7%5D%5Bdata%5D%5Bdisplay%5D=undefined&columns%5B7%5D%5Bname%5D=&columns%5B7%5D%5Bsearchable%5D=true&columns%5B7%5D%5Borderable%5D=true&columns%5B7%5D%5Bsearch%5D%5Bvalue%5D=&columns%5B7%5D%5Bsearch%5D%5Bregex%5D=false&columns%5B8%5D%5Bdata%5D%5B_%5D=8&columns%5B8%5D%5Bdata%5D%5Bdisplay%5D=undefined&columns%5B8%5D%5Bname%5D=&columns%5B8%5D%5Bsearchable%5D=true&columns%5B8%5D%5Borderable%5D=true&columns%5B8%5D%5Bsearch%5D%5Bvalue%5D=&columns%5B8%5D%5Bsearch%5D%5Bregex%5D=false&columns%5B9%5D%5Bdata%5D=9&columns%5B9%5D%5Bname%5D=&columns%5B9%5D%5Bsearchable%5D=true&columns%5B9%5D%5Borderable%5D=true&columns%5B9%5D%5Bsearch%5D%5Bvalue%5D=&columns%5B9%5D%5Bsearch%5D%5Bregex%5D=false&columns%5B10%5D%5Bdata%5D%5B_%5D=10&columns%5B10%5D%5Bdata%5D%5Bdisplay%5D=undefined&columns%5B10%5D%5Bname%5D=&columns%5B10%5D%5Bsearchable%5D=true&columns%5B10%5D%5Borderable%5D=true&columns%5B10%5D%5Bsearch%5D%5Bvalue%5D=&columns%5B10%5D%5Bsearch%5D%5Bregex%5D=false&columns%5B11%5D%5Bdata%5D%5B_%5D=11&columns%5B11%5D%5Bdata%5D%5Bfilter%5D=11&columns%5B11%5D%5Bdata%5D%5Bdisplay%5D=undefined&columns%5B11%5D%5Bname%5D=&columns%5B11%5D%5Bsearchable%5D=true&columns%5B11%5D%5Borderable%5D=true&columns%5B11%5D%5Bsearch%5D%5Bvalue%5D=&columns%5B11%5D%5Bsearch%5D%5Bregex%5D=false&columns%5B12%5D%5Bdata%5D%5B_%5D=12&columns%5B12%5D%5Bdata%5D%5Bdisplay%5D=undefined&columns%5B12%5D%5Bname%5D=&columns%5B12%5D%5Bsearchable%5D=true&columns%5B12%5D%5Borderable%5D=true&columns%5B12%5D%5Bsearch%5D%5Bvalue%5D=&columns%5B12%5D%5Bsearch%5D%5Bregex%5D=false&columns%5B13%5D%5Bdata%5D=13&columns%5B13%5D%5Bname%5D=&columns%5B13%5D%5Bsearchable%5D=true&columns%5B13%5D%5Borderable%5D=true&columns%5B13%5D%5Bsearch%5D%5Bvalue%5D=&columns%5B13%5D%5Bsearch%5D%5Bregex%5D=false&columns%5B14%5D%5Bdata%5D=14&columns%5B14%5D%5Bname%5D=&columns%5B14%5D%5Bsearchable%5D=true&columns%5B14%5D%5Borderable%5D=true&columns%5B14%5D%5Bsearch%5D%5Bvalue%5D=&columns%5B14%5D%5Bsearch%5D%5Bregex%5D=false&columns%5B15%5D%5Bdata%5D=15&columns%5B15%5D%5Bname%5D=&columns%5B15%5D%5Bsearchable%5D=true&columns%5B15%5D%5Borderable%5D=true&columns%5B15%5D%5Bsearch%5D%5Bvalue%5D=&columns%5B15%5D%5Bsearch%5D%5Bregex%5D=false&columns%5B16%5D%5Bdata%5D=16&columns%5B16%5D%5Bname%5D=&columns%5B16%5D%5Bsearchable%5D=true&columns%5B16%5D%5Borderable%5D=true&columns%5B16%5D%5Bsearch%5D%5Bvalue%5D=&columns%5B16%5D%5Bsearch%5D%5Bregex%5D=false&columns%5B17%5D%5Bdata%5D=17&columns%5B17%5D%5Bname%5D=&columns%5B17%5D%5Bsearchable%5D=true&columns%5B17%5D%5Borderable%5D=true&columns%5B17%5D%5Bsearch%5D%5Bvalue%5D=&columns%5B17%5D%5Bsearch%5D%5Bregex%5D=false&columns%5B18%5D%5Bdata%5D=18&columns%5B18%5D%5Bname%5D=&columns%5B18%5D%5Bsearchable%5D=true&columns%5B18%5D%5Borderable%5D=true&columns%5B18%5D%5Bsearch%5D%5Bvalue%5D=&columns%5B18%5D%5Bsearch%5D%5Bregex%5D=false&columns%5B19%5D%5Bdata%5D=19&columns%5B19%5D%5Bname%5D=&columns%5B19%5D%5Bsearchable%5D=true&columns%5B19%5D%5Borderable%5D=true&columns%5B19%5D%5Bsearch%5D%5Bvalue%5D=&columns%5B19%5D%5Bsearch%5D%5Bregex%5D=false&columns%5B20%5D%5Bdata%5D=20&columns%5B20%5D%5Bname%5D=&columns%5B20%5D%5Bsearchable%5D=true&columns%5B20%5D%5Borderable%5D=true&columns%5B20%5D%5Bsearch%5D%5Bvalue%5D=&columns%5B20%5D%5Bsearch%5D%5Bregex%5D=false&order%5B0%5D%5Bcolumn%5D=8&order%5B0%5D%5Bdir%5D=asc&start=0&length=25&search%5Bvalue%5D=&search%5Bregex%5D=false"
+		body: new URLSearchParams({
+			"draw": "5",
+			// Sort results by date ascending (oldest first)
+			// This ensures that results won't jump pages if new songs get added during search
+			// HACK Will still break if old songs get deleted during search
+			"order[0][column]": "8",
+			"order[0][dir]": "asc",
+
+			// Start at the beginning and paginate results
+			"start": "0",
+			"length": "100", // I can mess with this, but setting it too high results in connection timeouts to the server, and isn't very nice
+			"search[value]": "",
+			"search[regex]": "false",
+
+			// The below data seems necessary for the API surface to not break
+			"columns[0][data][_]": "19",
+			"columns[0][data][display]": "undefined",
+			"columns[0][name]": "",
+			"columns[0][searchable]": "true",
+			"columns[0][orderable]": "false",
+			"columns[0][search][value]": "",
+			"columns[0][search][regex]": "false",
+			"columns[1][data][_]": "1",
+			"columns[1][data][display]": "undefined",
+			"columns[1][name]": "",
+			"columns[1][searchable]": "true",
+			"columns[1][orderable]": "true",
+			"columns[1][search][value]": "",
+			"columns[1][search][regex]": "false",
+			"columns[2][data][_]": "2",
+			"columns[2][data][display]": "undefined",
+			"columns[2][name]": "",
+			"columns[2][searchable]": "true",
+			"columns[2][orderable]": "true",
+			"columns[2][search][value]": "",
+			"columns[2][search][regex]": "false",
+			"columns[3][data]": "3",
+			"columns[3][name]": "",
+			"columns[3][searchable]": "true",
+			"columns[3][orderable]": "true",
+			"columns[3][search][value]": "",
+			"columns[3][search][regex]": "false",
+			"columns[4][data][_]": "4",
+			"columns[4][data][display]": "undefined",
+			"columns[4][name]": "",
+			"columns[4][searchable]": "true",
+			"columns[4][orderable]": "true",
+			"columns[4][search][value]": "",
+			"columns[4][search][regex]": "false",
+			"columns[5][data]": "5",
+			"columns[5][name]": "",
+			"columns[5][searchable]": "true",
+			"columns[5][orderable]": "true",
+			"columns[5][search][value]": "",
+			"columns[5][search][regex]": "false",
+			"columns[6][data]": "6",
+			"columns[6][name]": "",
+			"columns[6][searchable]": "true",
+			"columns[6][orderable]": "true",
+			"columns[6][search][value]": "",
+			"columns[6][search][regex]": "false",
+			"columns[7][data][_]": "7",
+			"columns[7][data][display]": "undefined",
+			"columns[7][name]": "",
+			"columns[7][searchable]": "true",
+			"columns[7][orderable]": "true",
+			"columns[7][search][value]": "",
+			"columns[7][search][regex]": "false",
+			"columns[8][data][_]": "8",
+			"columns[8][data][display]": "undefined",
+			"columns[8][name]": "",
+			"columns[8][searchable]": "true",
+			"columns[8][orderable]": "true",
+			"columns[8][search][value]": "",
+			"columns[8][search][regex]": "false",
+		}).toString()
 	};
 	fetch(ignitionDirectoryUrl, ignitionRequestInit).then((ignitionResponse: FetchResponse) => {
-		return ignitionResponse.text();
-	}).then((responseText: string) => {
-		response.send(responseText);
+		return ignitionResponse.json();
+	}).then((ignitionResult: any) => {
+		const data: any[] = ignitionResult.data as any[];
+		response.send(`${data.length}`);
 	}).catch((error: any) => {
 		response.send(error);
 	});
