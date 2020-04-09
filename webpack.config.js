@@ -1,4 +1,5 @@
 // webpack.config.js
+const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 module.exports = (env) => {
     let configs = [
@@ -8,7 +9,7 @@ module.exports = (env) => {
             target: 'node',
             devtool: 'source-map',
             resolve: {
-				extensions: [".ts", ".js"]
+				extensions: [".ts", ".tsx", ".js", ".jsx"]
 			},
             module: {
                 rules: [{
@@ -23,7 +24,10 @@ module.exports = (env) => {
             },
             node: {
                 __dirname: false, // required for __dirname to properly resolve
-            }
+            },
+            plugins: [
+                new webpack.DefinePlugin({ 'global.GENTLY': false }), // https://github.com/node-formidable/formidable/issues/452#issuecomment-587501695
+            ]
         },
         {
             mode: 'development',
@@ -51,6 +55,35 @@ module.exports = (env) => {
 				new HtmlWebpackPlugin({
 					template: './src/client/index.html',
 					filename: 'index.html'
+				})
+			]
+        },
+        {
+            mode: 'development',
+            entry: './src/admin/index.tsx',
+            target: 'web',
+            devtool: 'source-map',
+            resolve: {
+				extensions: [".ts", ".tsx", ".js", ".jsx"]
+            },
+            module: { rules: [
+            { // Include TypeScript files in the TypeScript loader
+                test: /\.ts(x?)$/,
+                include: /src/,
+                use: [{ loader: 'ts-loader' }]
+            },
+            { // Include css files in the css loader
+                test: /\.css$/i,
+                use: ['style-loader', 'css-loader'],
+            }] },
+            output: {
+                path: __dirname + '/dist/static',
+				filename: 'admin.js'
+            },
+            plugins: [
+				new HtmlWebpackPlugin({
+					template: './src/admin/index.html',
+					filename: 'admin.html'
 				})
 			]
         }

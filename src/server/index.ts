@@ -7,17 +7,57 @@ import cookieParser from 'cookie-parser';
 import Chance from 'chance';
 import { stringify } from 'qs';
 import fetch, {Response as FetchResponse, RequestInit} from 'node-fetch';
+import SpotifyWebApi from 'spotify-web-api-node';
 
+const redirectUri: string = process.env.BASE_URL! + "/spotifyAuthCallback";
 const chance: Chance.Chance = new Chance();
 const app: Express = express();
 const port: number = parseInt(process.env.PORT!);
 const stateKey: string = "spotify_auth_state";
-const redirectUri: string = process.env.BASE_URL! + "/spotifyAuthCallback";
+const HEARTBEAT_INTERVAL_MS: number = 15 * 1000;
 
 app.use(express.static(path.join(__dirname, 'static')));
 app.use(cookieParser());
 
-app.get('/go', (request: ExpressRequest, response: ExpressResponse) => {
+interface IgnitionApiResponse {
+	draw: number;
+	recordsTotal: number;
+	recordsFiltered: number;
+	data: dlcEntry[];
+}
+type dlcEntry = [number, string, string, string, string, string, string, number, number, number, string, boolean, string, string, number, boolean, string, string, null, null, null];
+
+app.get('/updatePlaylist', (request: ExpressRequest, response: ExpressResponse) => {
+	// Make sure that we have all of the info we need
+	if (!request.cookies.spotifyAccessToken ||
+		!request.cookies.spotifyRefreshToken) {
+		return response.status(400).send('Need access token');
+	}
+
+	// Establish the event stream connection with the client
+	response.writeHead(200, {
+		'Content-Type': 'text/event-stream',
+		'Cache-Control': 'no-cache',
+		Connection: 'keep-alive' // by default, Node keeps the connection alive. But the client must as well
+	});
+
+	// A newline must be sent to the client before events can safely be sent
+	response.write('\n');
+
+	const spotify: SpotifyWebApi = new SpotifyWebApi({
+		clientId: process.env.SPOTIFY_CLIENT_ID,
+		clientSecret: process.env.SPOTIFY_CLIENT_SECRET,
+		redirectUri
+	});
+	spotify.setAccessToken(request.cookies.spotifyAccessToken);
+
+	// Implement a heartbeat to keep the connection alive. Otherwise, the connection will eventually error with net::ERR_INCOMPLETE_CHUNKED_ENCODING
+	// "The Chrome browser will kill an inactive stream after two minutes of inactivity"  - https://stackoverflow.com/a/59689130/1222411
+	const heartbeat: NodeJS.Timeout = setInterval(() => {
+		// Lines beginning with ":" are ignored by EventSource. See http://www.programmingwithreason.com/using-sse.html
+		response.write(`:heartbeat \n\n`);
+	}, HEARTBEAT_INTERVAL_MS);
+
 	const ignitionDirectoryUrl: string = "http://ignition.customsforge.com/cfss";
 	const ignitionRequestInit: RequestInit = {
 		method: "POST",
@@ -36,7 +76,7 @@ app.get('/go', (request: ExpressRequest, response: ExpressResponse) => {
 
 			// Start at the beginning and paginate results
 			"start": "0",
-			"length": "100", // I can mess with this, but setting it too high results in connection timeouts to the server, and isn't very nice
+			"length": "25", // I can mess with this, but setting it too high results in connection timeouts to the server, and isn't very nice
 			"search[value]": "",
 			"search[regex]": "false",
 
@@ -105,11 +145,23 @@ app.get('/go', (request: ExpressRequest, response: ExpressResponse) => {
 	};
 	fetch(ignitionDirectoryUrl, ignitionRequestInit).then((ignitionResponse: FetchResponse) => {
 		return ignitionResponse.json();
-	}).then((ignitionResult: any) => {
-		const data: any[] = ignitionResult.data as any[];
-		response.send(`${data.length}`);
+	}).then((ignitionResult: IgnitionApiResponse) => {
+		ignitionResult.data.forEach((entry: dlcEntry) => {
+			const artist: string = entry[1];
+			const title: string = entry[2];
+			const album: string = entry[3];
+			spotify.searchTracks(`artist:${artist} album:${album} ${title}`).then((value) => {
+				response.write(`data: ${value.body.tracks?.items[0].album.name}\n\n`);
+			}).catch((error: any) => {
+				response.write(`error: ${error}\n\n`);
+			});
+		});
 	}).catch((error: any) => {
-		response.send(error);
+		response.write(`error: ${error}\n\n`);
+	});
+
+	request.on('close', () => {
+		clearInterval(heartbeat);
 	});
 });
 
@@ -137,7 +189,7 @@ app.get('/spotifyAuthCallback', (request: ExpressRequest, response: ExpressRespo
 	const storedState = request.cookies ? request.cookies[stateKey] : null;
 
 	if (state === null || state !== storedState) {
-		// TODO state mismatch
+		// TODO state mismatch, don't know how to recover
 	} else {
 		// Since the authentication has been finished, state is no longer necessary
 		response.clearCookie(stateKey);

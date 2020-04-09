@@ -4,6 +4,9 @@ import { Button } from 'react-bootstrap';
 import Cookie from 'js-cookie';
 import { Playlists } from './components/Playlists';
 
+import 'bootstrap/dist/css/bootstrap.min.css';
+import 'bootswatch/dist/darkly/bootstrap.min.css';
+
 class Index extends React.Component<{}, {}> {
 	constructor(props: React.Props<{}>) {
 		super(props);
@@ -18,7 +21,7 @@ class Index extends React.Component<{}, {}> {
 				Login through Spotify
 			</Button>;
 		} else {
-			return <Playlists spotifyAccessToken={spotifyAccessToken} />;
+			return <Playlists initialSpotifyAccessToken={spotifyAccessToken} spotifyRefreshToken={Cookie.get("spotifyRefreshToken")!} />;
 		}
 	}
 }

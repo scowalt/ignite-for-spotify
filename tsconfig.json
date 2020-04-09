@@ -5,7 +5,7 @@
         "rootDir": "src",
         "outDir": "./dist/",
         "sourceMap": true,
-        "esModuleInterop": true, // required for express,
+        "esModuleInterop": true, // required for express
         "noImplicitAny": true
     }
 }
