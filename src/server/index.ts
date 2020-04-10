@@ -7,7 +7,7 @@ import cookieParser from 'cookie-parser';
 import Chance from 'chance';
 import { stringify } from 'qs';
 import fetch, {Response as FetchResponse, RequestInit} from 'node-fetch';
-import SpotifyWebApi from 'spotify-web-api-node';
+import { MasterPlaylistUpdater } from './MasterPlaylistUpdater';
 
 const redirectUri: string = process.env.BASE_URL! + "/spotifyAuthCallback";
 const chance: Chance.Chance = new Chance();
@@ -18,14 +18,6 @@ const HEARTBEAT_INTERVAL_MS: number = 15 * 1000;
 
 app.use(express.static(path.join(__dirname, 'static')));
 app.use(cookieParser());
-
-interface IgnitionApiResponse {
-	draw: number;
-	recordsTotal: number;
-	recordsFiltered: number;
-	data: dlcEntry[];
-}
-type dlcEntry = [number, string, string, string, string, string, string, number, number, number, string, boolean, string, string, number, boolean, string, string, null, null, null];
 
 app.get('/updatePlaylist', (request: ExpressRequest, response: ExpressResponse) => {
 	// Make sure that we have all of the info we need
@@ -44,12 +36,13 @@ app.get('/updatePlaylist', (request: ExpressRequest, response: ExpressResponse) 
 	// A newline must be sent to the client before events can safely be sent
 	response.write('\n');
 
-	const spotify: SpotifyWebApi = new SpotifyWebApi({
-		clientId: process.env.SPOTIFY_CLIENT_ID,
-		clientSecret: process.env.SPOTIFY_CLIENT_SECRET,
-		redirectUri
-	});
-	spotify.setAccessToken(request.cookies.spotifyAccessToken);
+	const updater: MasterPlaylistUpdater = MasterPlaylistUpdater.start(request.cookies.spotifyAccessToken, request.cookies.spotifyRefreshToken, redirectUri);
+	updater.ondata = (data: string) => {
+		response.write(`data: ${data}\n\n`);
+	};
+	updater.onerror = (error: string) => {
+		response.write(`error: ${error}\n\n`);
+	};
 
 	// Implement a heartbeat to keep the connection alive. Otherwise, the connection will eventually error with net::ERR_INCOMPLETE_CHUNKED_ENCODING
 	// "The Chrome browser will kill an inactive stream after two minutes of inactivity"  - https://stackoverflow.com/a/59689130/1222411
@@ -57,108 +50,6 @@ app.get('/updatePlaylist', (request: ExpressRequest, response: ExpressResponse) 
 		// Lines beginning with ":" are ignored by EventSource. See http://www.programmingwithreason.com/using-sse.html
 		response.write(`:heartbeat \n\n`);
 	}, HEARTBEAT_INTERVAL_MS);
-
-	const ignitionDirectoryUrl: string = "http://ignition.customsforge.com/cfss";
-	const ignitionRequestInit: RequestInit = {
-		method: "POST",
-		headers: {
-			"Accept": "application/json",
-			"Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
-			"Cookie": `${process.env.IGNITION_COOKIE_KEY}=${process.env.IGNITION_COOKIE_VALUE}`,
-		},
-		body: new URLSearchParams({
-			"draw": "5",
-			// Sort results by date ascending (oldest first)
-			// This ensures that results won't jump pages if new songs get added during search
-			// HACK Will still break if old songs get deleted during search
-			"order[0][column]": "8",
-			"order[0][dir]": "asc",
-
-			// Start at the beginning and paginate results
-			"start": "0",
-			"length": "25", // I can mess with this, but setting it too high results in connection timeouts to the server, and isn't very nice
-			"search[value]": "",
-			"search[regex]": "false",
-
-			// The below data seems necessary for the API surface to not break
-			"columns[0][data][_]": "19",
-			"columns[0][data][display]": "undefined",
-			"columns[0][name]": "",
-			"columns[0][searchable]": "true",
-			"columns[0][orderable]": "false",
-			"columns[0][search][value]": "",
-			"columns[0][search][regex]": "false",
-			"columns[1][data][_]": "1",
-			"columns[1][data][display]": "undefined",
-			"columns[1][name]": "",
-			"columns[1][searchable]": "true",
-			"columns[1][orderable]": "true",
-			"columns[1][search][value]": "",
-			"columns[1][search][regex]": "false",
-			"columns[2][data][_]": "2",
-			"columns[2][data][display]": "undefined",
-			"columns[2][name]": "",
-			"columns[2][searchable]": "true",
-			"columns[2][orderable]": "true",
-			"columns[2][search][value]": "",
-			"columns[2][search][regex]": "false",
-			"columns[3][data]": "3",
-			"columns[3][name]": "",
-			"columns[3][searchable]": "true",
-			"columns[3][orderable]": "true",
-			"columns[3][search][value]": "",
-			"columns[3][search][regex]": "false",
-			"columns[4][data][_]": "4",
-			"columns[4][data][display]": "undefined",
-			"columns[4][name]": "",
-			"columns[4][searchable]": "true",
-			"columns[4][orderable]": "true",
-			"columns[4][search][value]": "",
-			"columns[4][search][regex]": "false",
-			"columns[5][data]": "5",
-			"columns[5][name]": "",
-			"columns[5][searchable]": "true",
-			"columns[5][orderable]": "true",
-			"columns[5][search][value]": "",
-			"columns[5][search][regex]": "false",
-			"columns[6][data]": "6",
-			"columns[6][name]": "",
-			"columns[6][searchable]": "true",
-			"columns[6][orderable]": "true",
-			"columns[6][search][value]": "",
-			"columns[6][search][regex]": "false",
-			"columns[7][data][_]": "7",
-			"columns[7][data][display]": "undefined",
-			"columns[7][name]": "",
-			"columns[7][searchable]": "true",
-			"columns[7][orderable]": "true",
-			"columns[7][search][value]": "",
-			"columns[7][search][regex]": "false",
-			"columns[8][data][_]": "8",
-			"columns[8][data][display]": "undefined",
-			"columns[8][name]": "",
-			"columns[8][searchable]": "true",
-			"columns[8][orderable]": "true",
-			"columns[8][search][value]": "",
-			"columns[8][search][regex]": "false",
-		}).toString()
-	};
-	fetch(ignitionDirectoryUrl, ignitionRequestInit).then((ignitionResponse: FetchResponse) => {
-		return ignitionResponse.json();
-	}).then((ignitionResult: IgnitionApiResponse) => {
-		ignitionResult.data.forEach((entry: dlcEntry) => {
-			const artist: string = entry[1];
-			const title: string = entry[2];
-			const album: string = entry[3];
-			spotify.searchTracks(`artist:${artist} album:${album} ${title}`).then((value) => {
-				response.write(`data: ${value.body.tracks?.items[0].album.name}\n\n`);
-			}).catch((error: any) => {
-				response.write(`error: ${error}\n\n`);
-			});
-		});
-	}).catch((error: any) => {
-		response.write(`error: ${error}\n\n`);
-	});
 
 	request.on('close', () => {
 		clearInterval(heartbeat);
@@ -171,7 +62,7 @@ app.get('/login', (request: ExpressRequest, response: ExpressResponse) => {
 	response.cookie(stateKey, state);
 
 	// Redirect to Spotify to auth. Spotify will respond to redirectUri
-	const scope: string = 'user-read-private user-read-email playlist-read-private';
+	const scope: string = 'user-read-private user-read-email playlist-read-private playlist-modify-private playlist-modify-public';
 	response.redirect(`https://accounts.spotify.com/authorize?${stringify({
 		response_type: 'code',
 		client_id: process.env.SPOTIFY_CLIENT_ID,
