@@ -27,7 +27,8 @@ module.exports = (env) => {
             },
             plugins: [
                 new webpack.DefinePlugin({ 'global.GENTLY': false }), // https://github.com/node-formidable/formidable/issues/452#issuecomment-587501695
-            ]
+            ],
+            externals: ['pg', 'sqlite3', 'tedious', 'pg-hstore'] // https://github.com/sequelize/sequelize/issues/7509
         },
         {
             mode: 'development',
@@ -56,7 +57,8 @@ module.exports = (env) => {
 					template: './src/client/index.html',
 					filename: 'index.html'
 				})
-			]
+            ],
+            externals: ['pg', 'sqlite3', 'tedious', 'pg-hstore'] // https://github.com/sequelize/sequelize/issues/7509
         },
         {
             mode: 'development',
@@ -85,7 +87,8 @@ module.exports = (env) => {
 					template: './src/admin/index.html',
 					filename: 'admin.html'
 				})
-			]
+            ],
+            externals: ['pg', 'sqlite3', 'tedious', 'pg-hstore'] // https://github.com/sequelize/sequelize/issues/7509
         }
     ];
 

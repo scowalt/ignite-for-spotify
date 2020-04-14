@@ -34,11 +34,11 @@ class Index extends React.Component<{}, AdminState> {
 		}));
 	}
 
-	startPlaylistUpdate() {
+	startIgnitionUpdate() {
 		const eventSourceInit: EventSourceInit = {
 			withCredentials: true
 		};
-		const eventSource: EventSource = new EventSource(window.location.origin + '/updatePlaylist');
+		const eventSource: EventSource = new EventSource(window.location.origin + '/ignitionUpdate');
 		const eventMessageHandler: (event: MessageEvent) => void = this.eventMessage.bind(this);
 
 		eventSource.onopen = this.eventConnectionOpen.bind(this);
@@ -61,7 +61,7 @@ class Index extends React.Component<{}, AdminState> {
 				Login through Spotify
 			</Button>;
 		} else if (this.state.eventSource === undefined) {
-			return <Button onClick={this.startPlaylistUpdate.bind(this)}>Start playlist update</Button>;
+			return <Button onClick={this.startIgnitionUpdate.bind(this)}>Start ignition update</Button>;
 		} else if (!this.state.eventConnectionOpen){
 			return <>Starting playlist update...</>;
 		} else {

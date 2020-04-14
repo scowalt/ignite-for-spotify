@@ -7,7 +7,8 @@ import cookieParser from 'cookie-parser';
 import Chance from 'chance';
 import { stringify } from 'qs';
 import fetch, {Response as FetchResponse, RequestInit} from 'node-fetch';
-import { MasterPlaylistUpdater } from './MasterPlaylistUpdater';
+import { IgnitionUpdater } from './IgnitionUpdater';
+import { SpotifyUpdater } from './SpotifyUpdater';
 
 const redirectUri: string = process.env.BASE_URL! + "/spotifyAuthCallback";
 const chance: Chance.Chance = new Chance();
@@ -19,7 +20,12 @@ const HEARTBEAT_INTERVAL_MS: number = 15 * 1000;
 app.use(express.static(path.join(__dirname, 'static')));
 app.use(cookieParser());
 
-app.get('/updatePlaylist', (request: ExpressRequest, response: ExpressResponse) => {
+app.get('/spotifyUpdate', async (request: ExpressRequest, response: ExpressResponse) => {
+	const updater: SpotifyUpdater = await SpotifyUpdater.start(request.cookies.spotifyAccessToken, request.cookies.spotifyRefreshToken, redirectUri);
+	response.send('ok');
+});
+
+app.get('/ignitionUpdate', async (request: ExpressRequest, response: ExpressResponse) => {
 	// Make sure that we have all of the info we need
 	if (!request.cookies.spotifyAccessToken ||
 		!request.cookies.spotifyRefreshToken) {
@@ -36,13 +42,7 @@ app.get('/updatePlaylist', (request: ExpressRequest, response: ExpressResponse) 
 	// A newline must be sent to the client before events can safely be sent
 	response.write('\n');
 
-	const updater: MasterPlaylistUpdater = MasterPlaylistUpdater.start(request.cookies.spotifyAccessToken, request.cookies.spotifyRefreshToken, redirectUri);
-	updater.ondata = (data: string) => {
-		response.write(`data: ${data}\n\n`);
-	};
-	updater.onerror = (error: string) => {
-		response.write(`error: ${error}\n\n`);
-	};
+	const updater: IgnitionUpdater = await IgnitionUpdater.start();
 
 	// Implement a heartbeat to keep the connection alive. Otherwise, the connection will eventually error with net::ERR_INCOMPLETE_CHUNKED_ENCODING
 	// "The Chrome browser will kill an inactive stream after two minutes of inactivity"  - https://stackoverflow.com/a/59689130/1222411
