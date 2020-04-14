@@ -1,6 +1,8 @@
 // webpack.config.js
 const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const TerserPlugin = require('terser-webpack-plugin');
+
 module.exports = (env) => {
     let configs = [
         {
@@ -88,7 +90,9 @@ module.exports = (env) => {
 					filename: 'admin.html'
 				})
             ],
-            externals: ['pg', 'sqlite3', 'tedious', 'pg-hstore'] // https://github.com/sequelize/sequelize/issues/7509
+            optimization: {
+                minimizer: [new TerserPlugin({ terserOptions: { mangle: false } })] // https://github.com/mysqljs/mysql/issues/1655#issuecomment-484530654
+            },
         }
     ];
 

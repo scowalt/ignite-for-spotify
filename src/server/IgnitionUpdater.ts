@@ -221,15 +221,16 @@ export class IgnitionUpdater {
 	}
 
 	private getSpotifyTrackIdsFromIgnitionResponse(ignitionResult: IgnitionApiResponse) {
-		const trackRetrievalPromises: Promise<void>[] = [];
+		const trackAdditionPromises: Promise<void>[] = [];
 		ignitionResult.data.forEach((entry: dlcEntry, index: number) => {
 			const artist: string = entry[1];
 			const title: string = entry[2];
 			const album: string = entry[3];
-			this.db!.tryAddSong(entry[0], album, artist, title);
+			const promise: Promise<void> = this.db!.tryAddSong(entry[0], album, artist, title);
+			trackAdditionPromises.push(promise);
 		});
 
-		return Promise.resolve();
+		return Promise.all(trackAdditionPromises);
 	}
 
 	private constructor() {
@@ -256,8 +257,6 @@ export class IgnitionUpdater {
 			for (let offset: number = 0; offset < ignitionResult.recordsFiltered; offset += IGNITION_PAGE_SIZE) {
 				// Queue a future request to Ignition
 				this.ignitionRequestQueue.add(async () => {
-					// Performing these requests in order to going to be important. Await the completion of the first
-					// ignition request before returning from this function. This will hold the start of the next request.
 					await this.performIgnitionRequest(offset);
 				});
 			}

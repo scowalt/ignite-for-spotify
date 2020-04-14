@@ -59,13 +59,13 @@ export class Database {
 	}
 
 	tryAddSong(id: number, album: string, artist: string, title: string) {
-		return new Promise<any>((resolve, reject) => {
-			this.pool!.query(INSERT_SONG_QUERY, [id,album,artist,title], (error, results?: any) => {
+		return new Promise<void>((resolve, reject) => {
+			this.pool!.query(INSERT_SONG_QUERY, [id,album,artist,title], (error) => {
 				if (error) {
 					return reject(error);
 				}
 
-				return resolve(results);
+				return resolve();
 			});
 		});
 	}
