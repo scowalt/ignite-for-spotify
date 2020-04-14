@@ -51,7 +51,6 @@ export class SpotifyUpdater {
 		return this.db!.getSongsThatNeedSpotifyTrackId((track: IgnitionTrackInfo) => {
 			return this.spotify.searchTracks(`artist:${track.artist} ${track.title}`).then((value) => {
 				if (!value.body.tracks || value.body.tracks.total === 0) {
-					// TODO Track not found
 					return Promise.reject("Track not found");
 				} else {
 					// Spotify track found, add it to the database

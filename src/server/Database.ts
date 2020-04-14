@@ -103,7 +103,7 @@ export class Database {
 
 	addSpotifyTrack(trackId: number, spotifyTrackId: string) {
 		return new Promise<void>((resolve, reject) => {
-			this.pool!.query(`UPDATE songs.songs SET spotifyTrackId = ? WHERE id = ?`,
+			this.pool!.query(`UPDATE ${process.env.MYSQL_DATABASE}.${TABLE_NAME} SET spotifyTrackId = ? WHERE id = ?`,
 				[spotifyTrackId, trackId],
 				(error) => {
 					if (error) {
