@@ -26,34 +26,8 @@ app.get('/spotifyUpdate', async (request: ExpressRequest, response: ExpressRespo
 });
 
 app.get('/ignitionUpdate', async (request: ExpressRequest, response: ExpressResponse) => {
-	// Make sure that we have all of the info we need
-	if (!request.cookies.spotifyAccessToken ||
-		!request.cookies.spotifyRefreshToken) {
-		return response.status(400).send('Need access token');
-	}
-
-	// Establish the event stream connection with the client
-	response.writeHead(200, {
-		'Content-Type': 'text/event-stream',
-		'Cache-Control': 'no-cache',
-		Connection: 'keep-alive' // by default, Node keeps the connection alive. But the client must as well
-	});
-
-	// A newline must be sent to the client before events can safely be sent
-	response.write('\n');
-
 	const updater: IgnitionUpdater = await IgnitionUpdater.start();
-
-	// Implement a heartbeat to keep the connection alive. Otherwise, the connection will eventually error with net::ERR_INCOMPLETE_CHUNKED_ENCODING
-	// "The Chrome browser will kill an inactive stream after two minutes of inactivity"  - https://stackoverflow.com/a/59689130/1222411
-	const heartbeat: NodeJS.Timeout = setInterval(() => {
-		// Lines beginning with ":" are ignored by EventSource. See http://www.programmingwithreason.com/using-sse.html
-		response.write(`:heartbeat \n\n`);
-	}, HEARTBEAT_INTERVAL_MS);
-
-	request.on('close', () => {
-		clearInterval(heartbeat);
-	});
+	response.send('ok');
 });
 
 // Client wants to start Spotify Auth flow

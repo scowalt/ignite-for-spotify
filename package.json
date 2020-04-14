@@ -9,9 +9,7 @@
         "heroku-postbuild": "webpack --config ./webpack.config.js --env.production",
         "start": "node ./dist/server.js",
         "clean": "node ./node_modules/trash-cli/cli.js dist/**",
-        "watch": "concurrently \"webpack --config ./webpack.config.js --env.development --watch\" \"nodemon --inspect ./dist/server.js 80\" --prefix time",
-        "startMySQLdev": "dotenv \"docker run -p 3306:3306 --name some-mariadb -e MYSQL_ROOT_PASSWORD=my-secret-pw -e MYSQL_ROOT_HOST=% -d mariadb:latest\"",
-        "dotenv": "dotenv docker help"
+        "watch": "concurrently \"webpack --config ./webpack.config.js --env.development --watch\" \"nodemon --inspect ./dist/server.js 80\" --prefix time"
     },
     "engines": {
         "node": "^12.12.0"
