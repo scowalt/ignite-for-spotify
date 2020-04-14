@@ -245,7 +245,6 @@ export class IgnitionUpdater {
 		// TODO for now, this logic assumes that no songs are removed from Ignition at any time. This isn't true,
 		// since dead links are removed from Ignition. This logic will need to be updated to account for that
 
-
 		this.db = await Database.getInstance();
 
 		// TODO Ignore all songs that have already been added
