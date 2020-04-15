@@ -35,7 +35,6 @@ type dlcEntry = [
 const ignitionDirectoryUrl: string = "http://ignition.customsforge.com/cfss";
 const IGNITION_PAGE_SIZE: number = 25; // I can mess with this, but setting it too high results in connection timeouts to the server, and isn't very nice
 
-
 export class IgnitionUpdater {
 	static singleton: IgnitionUpdater;
 	static start = async () => {

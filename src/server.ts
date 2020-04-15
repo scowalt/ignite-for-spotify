@@ -1,7 +1,6 @@
 import dotenv from 'dotenv';
 dotenv.config();
 
-import path from 'path';
 import express, { Express, Request as ExpressRequest, Response as ExpressResponse } from 'express';
 import BodyParser from 'body-parser';
 import cookieParser from 'cookie-parser';
