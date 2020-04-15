@@ -14,7 +14,8 @@
         "whitespace": [true, "check-type"],
         "no-shadowed-variable": true,
         "triple-equals": true,
-        "radix": false
+        "radix": false,
+        "no-empty-interface": false
     },
     "rulesDirectory": []
 }

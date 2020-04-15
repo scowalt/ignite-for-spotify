@@ -3,31 +3,69 @@ dotenv.config();
 
 import path from 'path';
 import express, { Express, Request as ExpressRequest, Response as ExpressResponse } from 'express';
+import BodyParser from 'body-parser';
 import cookieParser from 'cookie-parser';
 import Chance from 'chance';
 import { stringify } from 'qs';
 import fetch, {Response as FetchResponse, RequestInit} from 'node-fetch';
-import { IgnitionUpdater } from './IgnitionUpdater';
-import { SpotifyUpdater } from './SpotifyUpdater';
+import Bull from 'bull';
+import { JobType, IgnitionQueue, SpotifyUpdateQueue } from './shared/types';
+import HttpStatus from 'http-status-codes';
+import { createIgnitionUpdateQueue, createSpotifyUpdateQueue } from './shared/queues';
 
+const ignitionQueue: IgnitionQueue = createIgnitionUpdateQueue();
+const spotifyUpdateQueue: SpotifyUpdateQueue = createSpotifyUpdateQueue();
 const redirectUri: string = process.env.BASE_URL! + "/spotifyAuthCallback";
 const chance: Chance.Chance = new Chance();
 const app: Express = express();
 const port: number = parseInt(process.env.PORT!);
 const stateKey: string = "spotify_auth_state";
-const HEARTBEAT_INTERVAL_MS: number = 15 * 1000;
 
-app.use(express.static(path.join(__dirname, 'static')));
 app.use(cookieParser());
+app.use(BodyParser.json());
 
-app.get('/spotifyUpdate', async (request: ExpressRequest, response: ExpressResponse) => {
-	const updater: SpotifyUpdater = await SpotifyUpdater.start(request.cookies.spotifyAccessToken, request.cookies.spotifyRefreshToken, redirectUri);
-	response.send('ok');
+app.post('/startJob', async (request: ExpressRequest, response: ExpressResponse) => {
+	if (!request.body) {
+		return response.status(HttpStatus.BAD_REQUEST).end();
+	}
+
+	const type = request.body.jobType;
+	let job: Bull.Job;
+	if (type === JobType.SpotifyUpdate) {
+		if (!request.cookies.spotifyAccessToken || !request.cookies.spotifyRefreshToken) {
+			return response.status(HttpStatus.UNAUTHORIZED).end();
+		}
+
+		job = await spotifyUpdateQueue.add({
+			spotifyAccessToken: request.cookies.spotifyAccessToken,
+			spotifyRefreshToken: request.cookies.spotifyRefreshToken
+		});
+	} else if (type === JobType.IgnitionUpdate) {
+		job = await ignitionQueue.add({});
+	} else {
+		return response.status(HttpStatus.NOT_ACCEPTABLE).end();
+	}
+	return response.json({id: job.id}).end();
 });
 
-app.get('/ignitionUpdate', async (request: ExpressRequest, response: ExpressResponse) => {
-	const updater: IgnitionUpdater = await IgnitionUpdater.start();
-	response.send('ok');
+app.get('/job/:jobType/:id', async (request: ExpressRequest, response: ExpressResponse) => {
+	const type = request.params.jobType;
+	const id: Bull.JobId = request.params.id;
+	let job: Bull.Job|null;
+
+	if (type === JobType.SpotifyUpdate) {
+		job = await spotifyUpdateQueue.getJob(id);
+	} else if (type === JobType.IgnitionUpdate) {
+		job = await ignitionQueue.getJob(id);
+	} else {
+		return response.status(HttpStatus.NOT_ACCEPTABLE);
+	}
+
+	if (job === null) {
+		return response.status(HttpStatus.NOT_FOUND).end();
+	}
+	const status: Bull.JobStatus = await job.getState();
+	return response.json({status});
 });
 
 // Client wants to start Spotify Auth flow
