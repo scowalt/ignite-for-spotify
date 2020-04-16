@@ -1,14 +1,21 @@
 import MySQL from 'mysql';
 
-const TABLE_NAME: string = `songs`;
-const CREATE_TABLE_QUERY: string = `CREATE TABLE IF NOT EXISTS ${TABLE_NAME} (
+const SONGS_TABLE_NAME: string = `songs`;
+const CREATE_SONGS_TABLE_QUERY: string = `CREATE TABLE IF NOT EXISTS ${SONGS_TABLE_NAME} (
 	id INT PRIMARY KEY,
 	album VARCHAR(128) NOT NULL,
 	artist VARCHAR(128) NOT NULL,
 	title VARCHAR(128) NOT NULL,
 	spotifyTrackId VARCHAR(25)
 );`;
-const INSERT_SONG_QUERY: string = `INSERT IGNORE INTO ${TABLE_NAME}(id,album,artist,title) VALUES (?,?,?,?)`;
+const INSERT_SONG_QUERY: string = `INSERT IGNORE INTO ${SONGS_TABLE_NAME}(id,album,artist,title) VALUES (?,?,?,?)`;
+
+const PLAYLISTS_TABLE_NAME: string = `playlists`;
+const CREATE_PLAYLISTS_TABLE_QUERY: string = `CREATE TABLE IF NOT EXISTS ${PLAYLISTS_TABLE_NAME} (
+	id INT PRIMARY KEY AUTOINCREMENT,
+	spoityfPlaylistId VARCHAR(25) NOT NULL
+)`;
+
 
 export interface IgnitionTrackInfo {
 	id: number;
@@ -28,11 +35,11 @@ export class Database {
 
 	private pool: MySQL.Pool|undefined;
 
-	private async init() {
-		return this.createConnectionPool().then(this.setupTable.bind(this));
+	private async init(): Promise<void[]> {
+		return this.createConnectionPool().then(this.setupTables.bind(this));
 	}
 
-	private createConnectionPool() {
+	private createConnectionPool(): Promise<void> {
 		return new Promise<void>((resolve) => {
 			this.pool = MySQL.createPool({
 				connectionLimit: Number(process.env.MYSQL_POOL_CONNECTION_LIMIT),
@@ -46,9 +53,16 @@ export class Database {
 		});
 	}
 
-	private setupTable() {
+	private setupTables(): Promise<void[]> {
+		return Promise.all([
+			this.setupTable(CREATE_SONGS_TABLE_QUERY),
+			this.setupTable(CREATE_PLAYLISTS_TABLE_QUERY),
+		]);
+	}
+
+	private setupTable(query: string) {
 		return new Promise<void>((resolve, reject) => {
-			this.pool!.query(CREATE_TABLE_QUERY, (error) => {
+			this.pool!.query(query, (error) => {
 				if (error) {
 					return reject(error);
 				}
@@ -73,7 +87,7 @@ export class Database {
 	getSongsThatNeedSpotifyTrackId(offset: number) {
 		const LIMIT: number = 25;
 		return new Promise<IgnitionTrackInfo[]>((resolve, reject) => {
-			this.pool!.query(`SELECT id, artist, title FROM ${process.env.MYSQL_DATABASE}.${TABLE_NAME} WHERE spotifyTrackId is NULL ORDER BY id LIMIT ? OFFSET ?`, [LIMIT, offset], (err: MySQL.MysqlError | null, results?) => {
+			this.pool!.query(`SELECT id, artist, title FROM ${process.env.MYSQL_DATABASE}.${SONGS_TABLE_NAME} WHERE spotifyTrackId is NULL ORDER BY id LIMIT ? OFFSET ?`, [LIMIT, offset], (err: MySQL.MysqlError | null, results?) => {
 				if (err) {
 					return reject(err);
 				}
@@ -85,9 +99,9 @@ export class Database {
 		});
 	}
 
-	addSpotifyTrack(trackId: number, spotifyTrackId: string) {
+	addSpotifyTrackIdToSong(trackId: number, spotifyTrackId: string) {
 		return new Promise<void>((resolve, reject) => {
-			this.pool!.query(`UPDATE ${process.env.MYSQL_DATABASE}.${TABLE_NAME} SET spotifyTrackId = ? WHERE id = ?`,
+			this.pool!.query(`UPDATE ${process.env.MYSQL_DATABASE}.${SONGS_TABLE_NAME} SET spotifyTrackId = ? WHERE id = ?`,
 				[spotifyTrackId, trackId],
 				(error) => {
 					if (error) {

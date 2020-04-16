@@ -4,7 +4,7 @@ import { Database, IgnitionTrackInfo } from './Database';
 
 export class SpotifyUpdater {
 	static singleton: SpotifyUpdater;
-	static update = (accessToken: string, refreshToken: string, redirectUri: string) => {
+	static update(accessToken: string, refreshToken: string, redirectUri: string): Promise<void> {
 		return new Promise<void>((resolve, reject) => {
 			// HACK there is a race condition here without a semaphore (maybe)
 			if (SpotifyUpdater.singleton) {
@@ -93,7 +93,7 @@ export class SpotifyUpdater {
 				return Promise.reject(`Spotify has no track for ${searchQuery}`);
 			} else {
 				// Spotify track found, add it to the database
-				return this.db!.addSpotifyTrack(track.id, value.body.tracks.items[0].id);
+				return this.db!.addSpotifyTrackIdToSong(track.id, value.body.tracks.items[0].id);
 			}
 		});
 	}

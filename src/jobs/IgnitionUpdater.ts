@@ -37,7 +37,7 @@ const IGNITION_PAGE_SIZE: number = 25; // Setting this too high results in conne
 
 export class IgnitionUpdater {
 	static singleton: IgnitionUpdater;
-	static update: ()=>Promise<void> = () => {
+	static update(): Promise<void> {
 		return new Promise<void>((resolve, reject) => {
 			// HACK there is a race condition here without a semaphore (maybe)
 			if (IgnitionUpdater.singleton) {
