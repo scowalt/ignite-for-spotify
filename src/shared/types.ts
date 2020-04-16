@@ -8,10 +8,7 @@ const enum JobType {
 interface IgnitionJobData {}
 type IgnitionQueue = Queue<IgnitionJobData>;
 
-interface SpotifyUpdateJobData {
-	spotifyAccessToken: string;
-	spotifyRefreshToken: string;
-}
+interface SpotifyUpdateJobData {}
 type SpotifyUpdateQueue = Queue<SpotifyUpdateJobData>;
 
 export {JobType, IgnitionJobData, IgnitionQueue, SpotifyUpdateJobData, SpotifyUpdateQueue };

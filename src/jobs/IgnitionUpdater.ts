@@ -33,16 +33,20 @@ type dlcEntry = [
 	null];
 
 const ignitionDirectoryUrl: string = "http://ignition.customsforge.com/cfss";
-const IGNITION_PAGE_SIZE: number = 25; // I can mess with this, but setting it too high results in connection timeouts to the server, and isn't very nice
+const IGNITION_PAGE_SIZE: number = 25; // Setting this too high results in connection timeouts to the server, and isn't very nice
 
 export class IgnitionUpdater {
 	static singleton: IgnitionUpdater;
-	static start = async () => {
-		if (!IgnitionUpdater.singleton) {
+	static update: ()=>Promise<void> = () => {
+		return new Promise<void>((resolve, reject) => {
+			// HACK there is a race condition here without a semaphore (maybe)
+			if (IgnitionUpdater.singleton) {
+				return reject("IgnitionUpdater already running");
+			}
+
 			IgnitionUpdater.singleton = new IgnitionUpdater();
-			await IgnitionUpdater.singleton.initAndStart();
-		}
-		return IgnitionUpdater.singleton;
+			return IgnitionUpdater.singleton.initAndStart();
+		});
 	}
 
 	private db: Database|undefined;
@@ -216,10 +220,10 @@ export class IgnitionUpdater {
 		return fetch(ignitionDirectoryUrl, this.generateIgnitionRequestInit(offset)).then((response: FetchResponse) => {
 			return response.json();
 		})
-		.then(this.getSpotifyTrackIdsFromIgnitionResponse.bind(this));
+		.then(this.addIgnitionTracksToDatabase.bind(this));
 	}
 
-	private getSpotifyTrackIdsFromIgnitionResponse(ignitionResult: IgnitionApiResponse) {
+	private addIgnitionTracksToDatabase(ignitionResult: IgnitionApiResponse) {
 		const trackAdditionPromises: Promise<void>[] = [];
 		ignitionResult.data.forEach((entry: dlcEntry, index: number) => {
 			const artist: string = entry[1];
@@ -240,26 +244,32 @@ export class IgnitionUpdater {
 		});
 	}
 
-	private async initAndStart() {
+	private initAndStart() {
 		// TODO for now, this logic assumes that no songs are removed from Ignition at any time. This isn't true,
 		// since dead links are removed from Ignition. This logic will need to be updated to account for that
+		return new Promise<void[]>((resolve, reject) => {
+			Database.getInstance().then((database: Database) => {
+				this.db = database;
 
-		this.db = await Database.getInstance();
+				// TODO Ignore all songs that have already been added
 
-		// TODO Ignore all songs that have already been added
+				// Make a request to Ignition. This is just to see how many requests will need to be generated and put into the queue
+				const promises: Promise<void>[] = [];
+				fetch(ignitionDirectoryUrl, this.generateIgnitionRequestInit(0)).then((ignitionResponse: FetchResponse) => {
+					return ignitionResponse.json();
+				}).then((ignitionResult: IgnitionApiResponse) => {
+					for (let offset: number = 0; offset < ignitionResult.recordsFiltered; offset += IGNITION_PAGE_SIZE) {
+						// Queue a future request to Ignition
+						promises.push(this.ignitionRequestQueue.add(async () => {
+							await this.performIgnitionRequest(offset);
+						}));
+					}
 
-		// Make a request to Ignition. This is just to see how many requests will need to be generated and put into the queue
-		fetch(ignitionDirectoryUrl, this.generateIgnitionRequestInit(0)).then((ignitionResponse: FetchResponse) => {
-			return ignitionResponse.json();
-		}).then((ignitionResult: IgnitionApiResponse) => {
-			for (let offset: number = 0; offset < ignitionResult.recordsFiltered; offset += IGNITION_PAGE_SIZE) {
-				// Queue a future request to Ignition
-				this.ignitionRequestQueue.add(async () => {
-					await this.performIgnitionRequest(offset);
+					return Promise.all(promises).then(resolve);
+				}).catch((error) => {
+					return reject(error);
 				});
-			}
-		}).catch((error: any) => {
-			// TODO handle initial ignition request error
+			});
 		});
 	}
 }

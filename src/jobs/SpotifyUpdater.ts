@@ -3,14 +3,19 @@ import SpotifyWebApi from 'spotify-web-api-node';
 import { Database, IgnitionTrackInfo } from './Database';
 
 export class SpotifyUpdater {
-	static instance: SpotifyUpdater;
-	static start = async (accessToken: string, refreshToken: string, redirectUri: string) => {
-		if (!SpotifyUpdater.instance) {
-			SpotifyUpdater.instance = new SpotifyUpdater(accessToken, refreshToken, redirectUri);
-			await SpotifyUpdater.instance.initAndStart();
-		}
-		return SpotifyUpdater.instance;
+	static singleton: SpotifyUpdater;
+	static update = (accessToken: string, refreshToken: string, redirectUri: string) => {
+		return new Promise<void>((resolve, reject) => {
+			// HACK there is a race condition here without a semaphore (maybe)
+			if (SpotifyUpdater.singleton) {
+				return reject("SpotifyUpdater already running");
+			}
+
+			SpotifyUpdater.singleton = new SpotifyUpdater(accessToken, refreshToken, redirectUri);
+			return SpotifyUpdater.singleton.initAndStart();
+		});
 	}
+
 	private spotify: SpotifyWebApi;
 	private spotifyRequestQueue: PromiseQueue;
 	private db: Database|undefined;
@@ -33,11 +38,13 @@ export class SpotifyUpdater {
 	}
 
 	private async initAndStart() {
-		this.db = await Database.getInstance();
+		return Database.getInstance().then((database: Database) => {
+			this.db = database;
 
-		// TODO need to query the database once to figure out how many songs there will be, then construct promises based off of that and fire them away
-		this.updateAccessToken()
-			.then(this.doEverything.bind(this));
+			// TODO need to query the database once to figure out how many songs there will be, then construct promises based off of that and fire them away
+			return this.updateAccessToken()
+						.then(this.doEverything.bind(this));
+		});
 	}
 
 	private updateAccessToken() {

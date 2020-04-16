@@ -1,6 +1,7 @@
 import dotenv from 'dotenv';
 dotenv.config();
 
+import assert from 'assert';
 import throng from 'throng';
 import { createIgnitionUpdateQueue, createSpotifyUpdateQueue } from './shared/queues';
 import { SpotifyUpdater } from './jobs/SpotifyUpdater';
@@ -11,11 +12,16 @@ const MAX_JOBS_PER_WORKER: number = 1;
 
 function start() {
 	createIgnitionUpdateQueue().process(MAX_JOBS_PER_WORKER, async (job) => {
-		await IgnitionUpdater.start();
+		await IgnitionUpdater.update();
 	});
 	createSpotifyUpdateQueue().process(MAX_JOBS_PER_WORKER, async (job) => {
 		const redirectUri: string = ""; // TODO need to figure out how to handle this in the spotify API
-		await SpotifyUpdater.start(job.data.spotifyAccessToken, job.data.spotifyRefreshToken, redirectUri);
+		if (process.env.SPOTIFY_ACCOUNT_ACCESS_TOKEN === undefined ||
+			process.env.SPOTIFY_ACCOUNT_REFRESH_TOKEN === undefined) {
+			return assert(false, "Spotify access and refresh tokens must be set as environment variables");
+		}
+
+		await SpotifyUpdater.update(process.env.SPOTIFY_ACCOUNT_ACCESS_TOKEN, process.env.SPOTIFY_ACCOUNT_REFRESH_TOKEN, redirectUri);
 	});
 }
 

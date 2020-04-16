@@ -30,14 +30,7 @@ app.post('/startJob', async (request: ExpressRequest, response: ExpressResponse)
 	const type = request.body.jobType;
 	let job: Bull.Job;
 	if (type === JobType.SpotifyUpdate) {
-		if (!request.cookies.spotifyAccessToken || !request.cookies.spotifyRefreshToken) {
-			return response.status(HttpStatus.UNAUTHORIZED).end();
-		}
-
-		job = await spotifyUpdateQueue.add({
-			spotifyAccessToken: request.cookies.spotifyAccessToken,
-			spotifyRefreshToken: request.cookies.spotifyRefreshToken
-		});
+		job = await spotifyUpdateQueue.add({});
 	} else if (type === JobType.IgnitionUpdate) {
 		job = await ignitionQueue.add({});
 	} else {
@@ -56,7 +49,7 @@ app.get('/job/:jobType/:id', async (request: ExpressRequest, response: ExpressRe
 	} else if (type === JobType.IgnitionUpdate) {
 		job = await ignitionQueue.getJob(id);
 	} else {
-		return response.status(HttpStatus.NOT_ACCEPTABLE);
+		return response.status(HttpStatus.NOT_ACCEPTABLE).end();
 	}
 
 	if (job === null) {
