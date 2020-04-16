@@ -55,15 +55,46 @@ export class SpotifyUpdater {
 	}
 
 	private doEverything() {
-		return this.db!.getSongsThatNeedSpotifyTrackId((track: IgnitionTrackInfo) => {
-			return this.spotify.searchTracks(`artist:${track.artist} ${track.title}`).then((value) => {
-				if (!value.body.tracks || value.body.tracks.total === 0) {
-					return Promise.reject("Track not found");
-				} else {
-					// Spotify track found, add it to the database
-					return this.db!.addSpotifyTrack(track.id, value.body.tracks.items[0].id);
-				}
+		return this.giveTracksSpotify(0);
+	}
+
+	private giveTracksSpotify(offset: number): Promise<void> {
+		return this.db!.getSongsThatNeedSpotifyTrackId(offset).then(this.addSpotifyInfoToTracks.bind(this)).then(([failedTracks, done]) => {
+			if (done) {
+				return Promise.resolve();
+			}
+
+			// Skip over all of the tracks that have previously failed
+			return this.giveTracksSpotify(offset + failedTracks);
+		});
+	}
+
+	// Update all of the provided tracks in the database with their spotify IDs
+	// Returns a promise that resolves with the number of tracks that failed, and a boolean that indicates if there are no more songs
+	private addSpotifyInfoToTracks(tracks: IgnitionTrackInfo[]) {
+		return new Promise<[number, boolean]>((resolve) => {
+			let failedTracks = 0;
+			const done: boolean = (tracks.length === 0);
+			const promises: Promise<void>[] = [];
+			tracks.forEach((track) => {
+				promises.push(this.addSpotifyInfoToTrack(track).catch(() => {
+					failedTracks++;
+				}));
 			});
+
+			Promise.all(promises).then(() => { resolve([failedTracks, done]); });
+		});
+	}
+
+	private addSpotifyInfoToTrack(track: IgnitionTrackInfo) {
+		const searchQuery: string = `artist:${track.artist} ${track.title}`;
+		return this.spotify.searchTracks(searchQuery).then((value) => {
+			if (!value.body.tracks || value.body.tracks.total === 0) {
+				return Promise.reject(`Spotify has no track for ${searchQuery}`);
+			} else {
+				// Spotify track found, add it to the database
+				return this.db!.addSpotifyTrack(track.id, value.body.tracks.items[0].id);
+			}
 		});
 	}
 }

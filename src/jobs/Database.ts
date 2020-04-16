@@ -70,35 +70,19 @@ export class Database {
 		});
 	}
 
-	getSongsThatNeedSpotifyTrackId(onDataChunk: ((track: IgnitionTrackInfo) => Promise<void>)) {
-		const promise = new Promise<void>((resolve, reject) => {
-			this.pool!.getConnection((getConnectionError, connection) => {
-				if (getConnectionError) {
-					return reject(getConnectionError);
+	getSongsThatNeedSpotifyTrackId(offset: number) {
+		const LIMIT: number = 25;
+		return new Promise<IgnitionTrackInfo[]>((resolve, reject) => {
+			this.pool!.query(`SELECT id, artist, title FROM ${process.env.MYSQL_DATABASE}.${TABLE_NAME} WHERE spotifyTrackId is NULL ORDER BY id LIMIT ? OFFSET ?`, [LIMIT, offset], (err: MySQL.MysqlError | null, results?) => {
+				if (err) {
+					return reject(err);
 				}
 
-				let rejected: boolean = false;
-				const query = connection.query(`SELECT id, artist, title FROM ${process.env.MYSQL_DATABASE}.${TABLE_NAME} WHERE spotifyTrackId is NULL ORDER BY id`);
-				query.on('error', (error) => {
-					rejected = true;
-					return reject(error);
-				});
-				query.on('result', (row: IgnitionTrackInfo) => {
-					connection.pause();
-					onDataChunk(row).catch((error) => {
-						// TODO The data row (ignition track) couldn't be processed for some reason
-					}).finally(() => {
-						connection.resume();
-					});
-				});
-				query.on('end', () => {
-					if (!rejected) {
-						return resolve();
-					}
-				});
+				// Since there is no error, we'll assume that the response comes in the correct form
+				const tracks: IgnitionTrackInfo[] = results as IgnitionTrackInfo[];
+				return resolve(tracks);
 			});
 		});
-		return promise;
 	}
 
 	addSpotifyTrack(trackId: number, spotifyTrackId: string) {

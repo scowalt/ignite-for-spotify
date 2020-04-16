@@ -233,6 +233,8 @@ export class IgnitionUpdater {
 			trackAdditionPromises.push(promise);
 		});
 
+		// Promise.all will reject before everything else completes if any of the tryAddSong calls reject.
+		// This is accceptable behavior, since the song additions should only fail if there's an issue with the database.
 		return Promise.all(trackAdditionPromises);
 	}
 
