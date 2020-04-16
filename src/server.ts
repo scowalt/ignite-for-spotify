@@ -5,12 +5,11 @@ import express, { Express, Request as ExpressRequest, Response as ExpressRespons
 import BodyParser from 'body-parser';
 import cookieParser from 'cookie-parser';
 import Chance from 'chance';
-import { stringify } from 'qs';
-import fetch, {Response as FetchResponse, RequestInit} from 'node-fetch';
 import Bull from 'bull';
 import { JobType, IgnitionQueue, SpotifyUpdateQueue } from './shared/types';
 import HttpStatus from 'http-status-codes';
 import { createIgnitionUpdateQueue, createSpotifyUpdateQueue } from './shared/queues';
+import SpotifyWebApi from 'spotify-web-api-node';
 
 const ignitionQueue: IgnitionQueue = createIgnitionUpdateQueue();
 const spotifyUpdateQueue: SpotifyUpdateQueue = createSpotifyUpdateQueue();
@@ -69,83 +68,48 @@ app.get('/job/:jobType/:id', async (request: ExpressRequest, response: ExpressRe
 
 // Client wants to start Spotify Auth flow
 app.get('/login', (request: ExpressRequest, response: ExpressResponse) => {
+	const spotifyApi: SpotifyWebApi = new SpotifyWebApi({
+		redirectUri,
+		clientId: process.env.SPOTIFY_CLIENT_ID
+	});
+
+	const scopes: string[] = ['user-read-private', 'user-read-email', 'playlist-read-private', 'playlist-modify-private', 'playlist-modify-public'];
 	const state: string = chance.string({length: 16});
+	const authorizeUrl: string = spotifyApi.createAuthorizeURL(scopes, state);
 	response.cookie(stateKey, state);
 
 	// Redirect to Spotify to auth. Spotify will respond to redirectUri
-	const scope: string = 'user-read-private user-read-email playlist-read-private playlist-modify-private playlist-modify-public';
-	response.redirect(`https://accounts.spotify.com/authorize?${stringify({
-		response_type: 'code',
-		client_id: process.env.SPOTIFY_CLIENT_ID,
-		scope,
-		redirect_uri: redirectUri,
-		state
-	})}`);
+	response.redirect(authorizeUrl);
 });
 
 // Client has finished auth on Spotify and credentials have been passed back here.
 app.get('/spotifyAuthCallback', (request: ExpressRequest, response: ExpressResponse) => {
 	// Request refresh and state tokens
-	const code = request.query.code || null;
+	const code: string = request.query.code || null;
 	const state = request.query.state || null;
 	const storedState = request.cookies ? request.cookies[stateKey] : null;
 
 	if (state === null || state !== storedState) {
-		// TODO state mismatch, don't know how to recover
+		return response.status(HttpStatus.INTERNAL_SERVER_ERROR).end();
 	} else {
 		// Since the authentication has been finished, state is no longer necessary
 		response.clearCookie(stateKey);
-		const init: RequestInit = {
-			method: "POST",
-			headers: {
-				"Accept": "application/json",
-				"Content-Type": "application/x-www-form-urlencoded",
-				'Authorization': `Basic ` + (new Buffer(process.env.SPOTIFY_CLIENT_ID + ':' + process.env.SPOTIFY_CLIENT_SECRET).toString('base64'))
-			},
-			body: new URLSearchParams({
-				"code": code,
-				"redirect_uri": redirectUri,
-				"grant_type": "authorization_code"
-			}).toString()
-		};
-		fetch('https://accounts.spotify.com/api/token', init).then((response2: FetchResponse) => {
-			// TODO handle errors here
-			return response2.json();
-		}).then((body) => {
-			const accessToken = body.access_token;
-			const refreshToken = body.refresh_token;
 
-			// the access token will be used by the client to query the Spotify API.
-			response.cookie("spotifyAccessToken", accessToken);
-			response.cookie("spotifyRefreshToken", refreshToken);
-			response.redirect("/");
+		const spotifyApi: SpotifyWebApi = new SpotifyWebApi({
+			redirectUri,
+			clientId: process.env.SPOTIFY_CLIENT_ID,
+			clientSecret: process.env.SPOTIFY_CLIENT_SECRET
+		});
+
+		spotifyApi.authorizationCodeGrant(code).then((value) => {
+			response.cookie("spotifyAccessToken", value.body.access_token);
+			response.cookie("spotifyRefreshToken", value.body.refresh_token);
+			return response.json({
+				spotifyAccessToken: value.body.access_token,
+				spotifyRefreshToken: value.body.refresh_token
+			});
 		});
 	}
 });
 
-app.get('/spotifyRefreshToken', (req,res) => {
-	const refreshToken = req.query.refresh_token;
-	const init: RequestInit = {
-		method: "POST",
-		headers: {
-			"Accept": "application/json",
-			"Content-Type": "application/x-www-form-urlencoded",
-			'Authorization': `Basic ` + (new Buffer(process.env.SPOTIFY_CLIENT_ID + ':' + process.env.SPOTIFY_CLIENT_SECRET).toString('base64'))
-		},
-		body: new URLSearchParams({
-			grant_type: 'refresh_token',
-			refresh_token: refreshToken
-		}).toString()
-	};
-	fetch("https://accounts.spotify.com/api/token", init).then((response: FetchResponse) => {
-		if (response.status === 200) {
-			return response.json();
-		} else {
-			return Promise.reject();
-		}
-	}).then((body) => {
-		const accessToken = body.access_token;
-		res.send({'access_token': accessToken});
-	});
-});
 app.listen(port);
