@@ -1,7 +1,8 @@
 import PromiseQueue from 'p-queue';
 import SpotifyWebApi from 'spotify-web-api-node';
-import { Database, IgnitionTrackInfo } from './Database';
+import { Database } from '../db/Database';
 import winston from 'winston';
+import { Song } from '../db/models/Song';
 
 export class SpotifyUpdater {
 	static singleton: SpotifyUpdater;
@@ -85,7 +86,7 @@ export class SpotifyUpdater {
 
 	// Update all of the provided tracks in the database with their spotify IDs
 	// Returns a promise that resolves with the number of tracks that failed, and a boolean that indicates if there are no more songs
-	private addSpotifyInfoToTracks(tracks: IgnitionTrackInfo[]) {
+	private addSpotifyInfoToTracks(tracks: Song[]) {
 		this.logger.info(`addSpotifyInfoToTracks(${tracks})`);
 		return new Promise<[number, boolean]>((resolve) => {
 			let failedTracks = 0;
@@ -101,8 +102,8 @@ export class SpotifyUpdater {
 		});
 	}
 
-	private addSpotifyInfoToTrack(track: IgnitionTrackInfo) {
-		this.logger.info(`addSpotifyInfoToTrack(${track})`);
+	private addSpotifyInfoToTrack(track: Song) {
+		this.logger.debug(`addSpotifyInfoToTrack(${track})`);
 		const searchQuery: string = `artist:${track.artist} ${track.title}`;
 		return this.spotify.searchTracks(searchQuery).then((value) => {
 			if (!value.body.tracks || value.body.tracks.total === 0) {

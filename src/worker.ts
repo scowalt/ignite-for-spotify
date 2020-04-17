@@ -34,4 +34,4 @@ function start() {
 	});
 }
 
-throng({ workers, start });
+throng({ workers, start, lifetime: Infinity });

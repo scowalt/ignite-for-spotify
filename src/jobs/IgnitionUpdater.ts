@@ -1,4 +1,4 @@
-import { Database } from "./Database";
+import { Database } from "../db/Database";
 import PromiseQueue from 'p-queue';
 import fetch, {Response as FetchResponse} from 'node-fetch';
 import winston from 'winston';
@@ -228,12 +228,12 @@ export class IgnitionUpdater {
 
 	private addIgnitionTracksToDatabase(ignitionResult: IgnitionApiResponse) {
 		this.logger.info(`addIgnitionTracksToDatabase(${ignitionResult})`);
-		const trackAdditionPromises: Promise<void>[] = [];
+		const trackAdditionPromises: Promise<boolean>[] = [];
 		ignitionResult.data.forEach((entry: dlcEntry, index: number) => {
 			const artist: string = entry[1];
 			const title: string = entry[2];
 			const album: string = entry[3];
-			const promise: Promise<void> = this.db!.tryAddSong(entry[0], album, artist, title);
+			const promise: Promise<boolean> = this.db!.tryAddSong(entry[0], album, artist, title);
 			trackAdditionPromises.push(promise);
 		});
 

@@ -6,6 +6,12 @@
         "outDir": "./dist/",
         "sourceMap": true,
         "esModuleInterop": true, // required for express
-        "noImplicitAny": true
+        "noImplicitAny": true,
+        "target": "es6", // required for sequelize-typescript syntax
+        "module": "commonjs",
+        "experimentalDecorators": true, // required for sequelize-typescript syntax
+        "emitDecoratorMetadata": true, // required for sequelize-typescript syntax
+        "moduleResolution": "node", // https://github.com/request/request-promise-native/issues/5#issuecomment-260282496
+        "strictPropertyInitialization": false // required to write clean sequelize-typescript code without writing pointlesss constructors
     }
 }
