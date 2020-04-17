@@ -1,2 +1,2 @@
 web: node dist/server.js
-worker: node --debug=9090 dist/worker.js
+worker: node --inspect=9090 dist/worker.js
