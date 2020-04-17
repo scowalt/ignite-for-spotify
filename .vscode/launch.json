@@ -3,17 +3,10 @@
     "configurations": [
         {
             "type": "node",
-            "request": "launch",
-            "name": "Launch server",
-            "cwd": "${workspaceFolder}",
-            "skipFiles": [
-                "<node_internals>/**"
-            ],
-            "program": "${workspaceFolder}/src/server/index.ts",
-            "outFiles": [
-                "${workspaceFolder}/dist/**/*.js"
-            ],
-            "preLaunchTask": "npm: build" // NIT Can this be moved to yarn?
-        }
+            "request": "attach",
+            "name": "Attach to remote",
+            "address": "TCP/IP address of process to be debugged",
+            "port": 9090
+          }
     ]
 }

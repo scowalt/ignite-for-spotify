@@ -1,6 +1,7 @@
 import { Database } from "./Database";
 import PromiseQueue from 'p-queue';
 import fetch, {Response as FetchResponse} from 'node-fetch';
+import winston from 'winston';
 
 interface IgnitionApiResponse {
 	draw: number;
@@ -51,6 +52,7 @@ export class IgnitionUpdater {
 
 	private db: Database|undefined;
 	private ignitionRequestQueue: PromiseQueue;
+	private logger: winston.Logger;
 
 	private generateIgnitionRequestInit(offset: number) {
 		return {
@@ -217,6 +219,7 @@ export class IgnitionUpdater {
 	}
 
 	private performIgnitionRequest(offset: number) {
+		this.logger.info(`performIgnitionRequest(${offset})`);
 		return fetch(ignitionDirectoryUrl, this.generateIgnitionRequestInit(offset)).then((response: FetchResponse) => {
 			return response.json();
 		})
@@ -224,6 +227,7 @@ export class IgnitionUpdater {
 	}
 
 	private addIgnitionTracksToDatabase(ignitionResult: IgnitionApiResponse) {
+		this.logger.info(`addIgnitionTracksToDatabase(${ignitionResult})`);
 		const trackAdditionPromises: Promise<void>[] = [];
 		ignitionResult.data.forEach((entry: dlcEntry, index: number) => {
 			const artist: string = entry[1];
@@ -244,33 +248,40 @@ export class IgnitionUpdater {
 			interval: 5000, // interval duration
 			intervalCap: 1 // maximum number of tasks to run in a given interval
 		});
+
+		this.logger = winston.createLogger({
+			transports: [
+				new winston.transports.Console({
+					format: winston.format.simple()
+				})]
+		});
+		this.logger.info(`new IgnitionUpdater()`);
 	}
 
-	private initAndStart() {
+	private initAndStart(): Promise<void> {
+		this.logger.info(`IgnitionUpdater.initAndStart()`);
 		// TODO for now, this logic assumes that no songs are removed from Ignition at any time. This isn't true,
 		// since dead links are removed from Ignition. This logic will need to be updated to account for that
-		return new Promise<void[]>((resolve, reject) => {
-			Database.getInstance().then((database: Database) => {
-				this.db = database;
+		return Database.getInstance().then((database: Database) => {
+			this.db = database;
 
-				// TODO Ignore all songs that have already been added
+			// TODO Ignore all songs that have already been added
 
-				// Make a request to Ignition. This is just to see how many requests will need to be generated and put into the queue
-				const promises: Promise<void>[] = [];
-				fetch(ignitionDirectoryUrl, this.generateIgnitionRequestInit(0)).then((ignitionResponse: FetchResponse) => {
-					return ignitionResponse.json();
-				}).then((ignitionResult: IgnitionApiResponse) => {
-					for (let offset: number = 0; offset < ignitionResult.recordsFiltered; offset += IGNITION_PAGE_SIZE) {
-						// Queue a future request to Ignition
-						promises.push(this.ignitionRequestQueue.add(async () => {
-							await this.performIgnitionRequest(offset);
-						}));
-					}
+			// Make a request to Ignition. This is just to see how many requests will need to be generated and put into the queue
+			const promises: Promise<void>[] = [];
+			fetch(ignitionDirectoryUrl, this.generateIgnitionRequestInit(0)).then((ignitionResponse: FetchResponse) => {
+				return ignitionResponse.json();
+			}).then((ignitionResult: IgnitionApiResponse) => {
+				for (let offset: number = 0; offset < ignitionResult.recordsFiltered; offset += IGNITION_PAGE_SIZE) {
+					// Queue a future request to Ignition
+					promises.push(this.ignitionRequestQueue.add(async () => {
+						await this.performIgnitionRequest(offset);
+					}));
+				}
 
-					return Promise.all(promises).then(resolve);
-				}).catch((error) => {
-					return reject(error);
-				});
+				return Promise.all(promises);
+			}).catch((error) => {
+				return Promise.reject(error);
 			});
 		});
 	}

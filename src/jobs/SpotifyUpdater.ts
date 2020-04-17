@@ -1,6 +1,7 @@
 import PromiseQueue from 'p-queue';
 import SpotifyWebApi from 'spotify-web-api-node';
 import { Database, IgnitionTrackInfo } from './Database';
+import winston from 'winston';
 
 export class SpotifyUpdater {
 	static singleton: SpotifyUpdater;
@@ -19,6 +20,7 @@ export class SpotifyUpdater {
 	private spotify: SpotifyWebApi;
 	private spotifyRequestQueue: PromiseQueue;
 	private db: Database|undefined;
+	private logger: winston.Logger;
 
 	private constructor(accessToken: string, refreshToken: string, redirectUri: string) {
 		this.spotify = new SpotifyWebApi({
@@ -35,9 +37,18 @@ export class SpotifyUpdater {
 			interval: 1000,
 			intervalCap: 10
 		});
+
+		this.logger = winston.createLogger({
+			transports: [
+				new winston.transports.Console({
+					format: winston.format.simple()
+				})]
+		});
+		this.logger.info(`new SpotifyUpdater`);
 	}
 
 	private async initAndStart() {
+		this.logger.info(`SpotifyUpdater.initAndStart()`);
 		return Database.getInstance().then((database: Database) => {
 			this.db = database;
 
@@ -48,6 +59,7 @@ export class SpotifyUpdater {
 	}
 
 	private updateAccessToken() {
+		this.logger.info(`updateAccessToken()`);
 		return this.spotify.refreshAccessToken().then((value) => {
 			this.spotify.setAccessToken(value.body.access_token);
 			return Promise.resolve();
@@ -55,10 +67,12 @@ export class SpotifyUpdater {
 	}
 
 	private doEverything() {
+		this.logger.info(`doEverything()`);
 		return this.giveTracksSpotify(0);
 	}
 
 	private giveTracksSpotify(offset: number): Promise<void> {
+		this.logger.info(`giveTracksSpotify(${offset})`);
 		return this.db!.getSongsThatNeedSpotifyTrackId(offset).then(this.addSpotifyInfoToTracks.bind(this)).then(([failedTracks, done]) => {
 			if (done) {
 				return Promise.resolve();
@@ -72,6 +86,7 @@ export class SpotifyUpdater {
 	// Update all of the provided tracks in the database with their spotify IDs
 	// Returns a promise that resolves with the number of tracks that failed, and a boolean that indicates if there are no more songs
 	private addSpotifyInfoToTracks(tracks: IgnitionTrackInfo[]) {
+		this.logger.info(`addSpotifyInfoToTracks(${tracks})`);
 		return new Promise<[number, boolean]>((resolve) => {
 			let failedTracks = 0;
 			const done: boolean = (tracks.length === 0);
@@ -87,6 +102,7 @@ export class SpotifyUpdater {
 	}
 
 	private addSpotifyInfoToTrack(track: IgnitionTrackInfo) {
+		this.logger.info(`addSpotifyInfoToTrack(${track})`);
 		const searchQuery: string = `artist:${track.artist} ${track.title}`;
 		return this.spotify.searchTracks(searchQuery).then((value) => {
 			if (!value.body.tracks || value.body.tracks.total === 0) {

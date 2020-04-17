@@ -32,7 +32,8 @@
         "qs": "^6.9.3",
         "spotify-web-api-js": "^1.2.0",
         "spotify-web-api-node": "^4.0.0",
-        "throng": "^4.0.0"
+        "throng": "^4.0.0",
+        "winston": "^3.2.1"
     },
     "devDependencies": {
         "@types/bull": "^3.12.2",
