@@ -1,5 +1,7 @@
 import dotenv from 'dotenv';
-dotenv.config();
+import dotenvexpand from 'dotenv-expand';
+const environment: dotenv.DotenvConfigOutput = dotenv.config();
+dotenvexpand(environment);
 
 import winston from 'winston';
 import assert from 'assert';

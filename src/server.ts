@@ -1,7 +1,9 @@
 import dotenv from 'dotenv';
-dotenv.config();
+import dotenvexpand from 'dotenv-expand';
+const environment: dotenv.DotenvConfigOutput = dotenv.config();
+dotenvexpand(environment);
 
-import express, { Express, Request as ExpressRequest, Response as ExpressResponse } from 'express';
+import express, { Express, Request, Response } from 'express';
 import BodyParser from 'body-parser';
 import cookieParser from 'cookie-parser';
 import Chance from 'chance';
@@ -22,7 +24,7 @@ const stateKey: string = "spotify_auth_state";
 app.use(cookieParser());
 app.use(BodyParser.json());
 
-app.post('/startJob', async (request: ExpressRequest, response: ExpressResponse) => {
+app.post('/startJob', async (request: Request, response: Response) => {
 	if (!request.body) {
 		return response.status(HttpStatus.BAD_REQUEST).end();
 	}
@@ -39,7 +41,7 @@ app.post('/startJob', async (request: ExpressRequest, response: ExpressResponse)
 	return response.json({id: job.id}).end();
 });
 
-app.get('/job/:jobType/:id', async (request: ExpressRequest, response: ExpressResponse) => {
+app.get('/job/:jobType/:id', async (request: Request, response: Response) => {
 	const type = request.params.jobType;
 	const id: Bull.JobId = request.params.id;
 	let job: Bull.Job|null;
@@ -60,7 +62,7 @@ app.get('/job/:jobType/:id', async (request: ExpressRequest, response: ExpressRe
 });
 
 // Client wants to start Spotify Auth flow
-app.get('/login', (request: ExpressRequest, response: ExpressResponse) => {
+app.get('/login', (request: Request, response: Response) => {
 	const spotifyApi: SpotifyWebApi = new SpotifyWebApi({
 		redirectUri,
 		clientId: process.env.SPOTIFY_CLIENT_ID
@@ -76,7 +78,7 @@ app.get('/login', (request: ExpressRequest, response: ExpressResponse) => {
 });
 
 // Client has finished auth on Spotify and credentials have been passed back here.
-app.get('/spotifyAuthCallback', (request: ExpressRequest, response: ExpressResponse) => {
+app.get('/spotifyAuthCallback', (request: Request, response: Response) => {
 	// Request refresh and state tokens
 	const code: string = request.query.code || null;
 	const state = request.query.state || null;
@@ -105,7 +107,7 @@ app.get('/spotifyAuthCallback', (request: ExpressRequest, response: ExpressRespo
 	}
 });
 
-app.get('/', (request, response) => {
+app.get('/', (request: Request, response: Response) => {
 	response.send("Hello world!");
 });
 

@@ -16,12 +16,7 @@ export class Database {
 	private sequelize: Sequelize;
 
 	private async init(): Promise<void> {
-		this.sequelize = new Sequelize({
-			database: process.env.MYSQL_DATABASE,
-			username: process.env.MYSQL_USER,
-			password: process.env.MYSQL_PASSWORD,
-			host: process.env.MYSQL_SERVER_ADDRESS,
-			port: Number(process.env.MYSQL_SERVER_PORT),
+		this.sequelize = new Sequelize(process.env.DATABASE_URL!, {
 			pool: {
 				max: Number(process.env.MYSQL_POOL_CONNECTION_LIMIT)
 			},
