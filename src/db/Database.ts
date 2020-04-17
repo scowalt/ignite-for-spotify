@@ -33,6 +33,7 @@ export class Database {
 	}
 
 	tryAddSong(id: number, album: string, artist: string, title: string): Promise<boolean> {
+		// TODO Song.sync() should happen somewhere else, but I need to find a more appropriate spot
 		return Song.sync().then(() => {
 			return Song.upsert({id,album,artist,title});
 		});
