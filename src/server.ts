@@ -105,4 +105,8 @@ app.get('/spotifyAuthCallback', (request: ExpressRequest, response: ExpressRespo
 	}
 });
 
+app.get('/', (request, response) => {
+	response.send("Hello world!");
+});
+
 app.listen(port);
