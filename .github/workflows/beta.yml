@@ -32,6 +32,8 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
 
     - name: Deploy to self-hosted dokku instance
       uses: thadeu/easily-dokku-action@v1.0.8
