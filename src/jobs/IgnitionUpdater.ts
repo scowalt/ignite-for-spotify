@@ -1,8 +1,7 @@
 import { Database } from "../db/Database";
 import PromiseQueue from 'p-queue';
 import fetch, {Response as FetchResponse} from 'node-fetch';
-import winston from 'winston';
-
+import { Logger } from "../shared/Logger";
 interface IgnitionApiResponse {
 	draw: number;
 	recordsTotal: number;
@@ -39,20 +38,16 @@ const IGNITION_PAGE_SIZE: number = 25; // Setting this too high results in conne
 export class IgnitionUpdater {
 	static singleton: IgnitionUpdater;
 	static update(): Promise<void> {
-		return new Promise<void>((resolve, reject) => {
-			// HACK there is a race condition here without a semaphore (maybe)
-			if (IgnitionUpdater.singleton) {
-				return reject("IgnitionUpdater already running");
-			}
+		if (IgnitionUpdater.singleton) {
+			return Promise.reject("IgnitionUpdater already running");
+		}
 
-			IgnitionUpdater.singleton = new IgnitionUpdater();
-			return IgnitionUpdater.singleton.initAndStart();
-		});
+		IgnitionUpdater.singleton = new IgnitionUpdater();
+		return IgnitionUpdater.singleton.initAndStart();
 	}
 
 	private db: Database|undefined;
 	private ignitionRequestQueue: PromiseQueue;
-	private logger: winston.Logger;
 
 	private generateIgnitionRequestInit(offset: number) {
 		return {
@@ -219,7 +214,7 @@ export class IgnitionUpdater {
 	}
 
 	private performIgnitionRequest(offset: number) {
-		this.logger.info(`performIgnitionRequest(${offset})`);
+		Logger.getInstance().info(`performIgnitionRequest(${offset})`);
 		return fetch(ignitionDirectoryUrl, this.generateIgnitionRequestInit(offset)).then((response: FetchResponse) => {
 			return response.json();
 		})
@@ -227,7 +222,7 @@ export class IgnitionUpdater {
 	}
 
 	private addIgnitionTracksToDatabase(ignitionResult: IgnitionApiResponse) {
-		this.logger.info(`addIgnitionTracksToDatabase(${ignitionResult})`);
+		Logger.getInstance().info(`addIgnitionTracksToDatabase(${ignitionResult})`);
 		const trackAdditionPromises: Promise<boolean>[] = [];
 		ignitionResult.data.forEach((entry: dlcEntry, index: number) => {
 			const artist: string = entry[1];
@@ -248,18 +243,11 @@ export class IgnitionUpdater {
 			interval: 5000, // interval duration
 			intervalCap: 1 // maximum number of tasks to run in a given interval
 		});
-
-		this.logger = winston.createLogger({
-			transports: [
-				new winston.transports.Console({
-					format: winston.format.simple()
-				})]
-		});
-		this.logger.info(`new IgnitionUpdater()`);
+		Logger.getInstance().info(`new IgnitionUpdater()`);
 	}
 
 	private initAndStart(): Promise<void> {
-		this.logger.info(`IgnitionUpdater.initAndStart()`);
+		Logger.getInstance().info(`IgnitionUpdater.initAndStart()`);
 		// TODO for now, this logic assumes that no songs are removed from Ignition at any time. This isn't true,
 		// since dead links are removed from Ignition. This logic will need to be updated to account for that
 		return Database.getInstance().then((database: Database) => {

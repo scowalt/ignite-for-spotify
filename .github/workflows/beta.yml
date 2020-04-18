@@ -38,9 +38,9 @@ jobs:
     - name: Deploy to self-hosted dokku instance
       uses: thadeu/easily-dokku-action@v1.0.8
       env:
-        BRANCH: beta # optional
+        BRANCH: beta
         PROJECT: spotify-ignition-beta
-        PORT: 22 # optional
+        PORT: 22
         SSH_PRIVATE_KEY: ${{ secrets.DOKKU_PRIVATE_KEY }}
         SSH_PUBLIC_KEY: ${{ secrets.DOKKU_PUBLIC_KEY }}
         SSH_HOST: ${{ secrets.DOKKU_HOST }}
