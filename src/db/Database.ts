@@ -1,6 +1,7 @@
 import { Sequelize } from 'sequelize-typescript';
 import { Song } from './models/Song';
 import { Playlist } from './models/Playlist';
+import { Logger } from '../shared/Logger';
 
 export class Database {
 	private static instance: Database;
@@ -17,6 +18,7 @@ export class Database {
 
 	private async init(): Promise<void> {
 		this.sequelize = new Sequelize(process.env.DATABASE_URL!, {
+			logging: msg => Logger.getInstance().debug(msg),
 			pool: {
 				max: Number(process.env.MYSQL_POOL_CONNECTION_LIMIT)
 			},
