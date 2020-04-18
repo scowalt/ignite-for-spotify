@@ -32,17 +32,12 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-      with:
-        fetch-depth: 0
 
     - name: Deploy to self-hosted dokku instance
-      uses: thadeu/easily-dokku-action@v1.0.8
+      uses: vitalyliber/dokku-github-action@v4.0
       env:
-        BRANCH: beta # optional
-        PROJECT: spotify-ignition-beta
-        FLAGS: --force # optional
-        PORT: 22 # optional
-        SSH_PRIVATE_KEY: ${{ secrets.DOKKU_PRIVATE_KEY }}
-        SSH_PUBLIC_KEY: ${{ secrets.DOKKU_PUBLIC_KEY }}
-        SSH_HOST: ${{ secrets.DOKKU_HOST }}
-
+        PRIVATE_KEY: ${{ secrets.DOKKU_PRIVATE_KEY }}
+        PUBLIC_KEY: ${{ secrets.DOKKU_PUBLIC_KEY }}
+        HOST: ${{ secrets.DOKKU_HOST }}
+        APP: spotify-ignition-beta
+        BRANCH: beta
