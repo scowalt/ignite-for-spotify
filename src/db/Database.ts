@@ -5,7 +5,7 @@ import { Logger } from '../shared/Logger';
 
 export class Database {
 	private static instance: Database;
-	public static async getInstance() {
+	public static async getInstance(): Promise<Database> {
 		if (!Database.instance) {
 			Database.instance = new Database();
 			await Database.instance.init();
@@ -14,9 +14,10 @@ export class Database {
 		return Database.instance;
 	}
 
-	private sequelize: Sequelize;
+	private sequelize!: Sequelize;
 
-	private async init(): Promise<void> {
+	private constructor() {}
+	private async init(): Promise<any> {
 		this.sequelize = new Sequelize(process.env.DATABASE_URL!, {
 			logging: msg => Logger.getInstance().debug(msg),
 			pool: {
@@ -24,16 +25,21 @@ export class Database {
 			},
 			dialect: "mysql"
 		});
-
 		this.sequelize.addModels([Song, Playlist]);
-		return this.sequelize.authenticate();
+
+		return this.sequelize.authenticate()
+			.then(this.syncTables);
+	}
+
+	syncTables(): Promise<any> {
+		return Promise.all([
+			Song.sync(),
+			Playlist.sync()
+		]);
 	}
 
 	tryAddSong(id: number, album: string, artist: string, title: string): Promise<boolean> {
-		// TODO Song.sync() should happen somewhere else, but I need to find a more appropriate spot
-		return Song.sync().then(() => {
-			return Song.upsert({id,album,artist,title});
-		});
+		return Song.upsert({id,album,artist,title});
 	}
 
 	getSongsThatNeedSpotifyTrackId(offset: number): Promise<Song[]> {

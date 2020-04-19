@@ -2,6 +2,7 @@ import { Database } from "../db/Database";
 import PromiseQueue from 'p-queue';
 import fetch, {Response as FetchResponse} from 'node-fetch';
 import { Logger } from "../shared/Logger";
+import { decode } from 'he';
 interface IgnitionApiResponse {
 	draw: number;
 	recordsTotal: number;
@@ -46,8 +47,44 @@ export class IgnitionUpdater {
 		return IgnitionUpdater.singleton.initAndStart();
 	}
 
-	private db: Database|undefined;
+	private db!: Database;
 	private ignitionRequestQueue: PromiseQueue;
+
+	private constructor() {
+		this.ignitionRequestQueue = new PromiseQueue({
+			concurrency: 1, // maximum number of tasks to run in parallel
+			interval: 5000, // interval duration
+			intervalCap: 1 // maximum number of tasks to run in a given interval
+		});
+		Logger.getInstance().info(`new IgnitionUpdater()`);
+	}
+	private initAndStart(): Promise<void|void[]> {
+		Logger.getInstance().info(`IgnitionUpdater.initAndStart()`);
+		// TODO for now, this logic assumes that no songs are removed from Ignition at any time. This isn't true,
+		// since dead links are removed from Ignition. This logic will need to be updated to account for that
+		return Database.getInstance().then((database: Database) => {
+			this.db = database;
+
+			// TODO Ignore all songs that have already been added
+
+			// Make a request to Ignition. This is just to see how many requests will need to be generated and put into the queue
+			const promises: Promise<void>[] = [];
+			return fetch(ignitionDirectoryUrl, this.generateIgnitionRequestInit(0)).then((ignitionResponse: FetchResponse) => {
+				return ignitionResponse.json();
+			}).then((ignitionResult: IgnitionApiResponse) => {
+				for (let offset: number = 0; offset < ignitionResult.recordsFiltered; offset += IGNITION_PAGE_SIZE) {
+					// Queue a future request to Ignition
+					promises.push(this.ignitionRequestQueue.add(async () => {
+						await this.performIgnitionRequest(offset);
+					}));
+				}
+
+				return Promise.all(promises);
+			}).catch((error) => {
+				return Promise.reject(error);
+			});
+		});
+	}
 
 	private generateIgnitionRequestInit(offset: number) {
 		return {
@@ -224,10 +261,10 @@ export class IgnitionUpdater {
 	private addIgnitionTracksToDatabase(ignitionResult: IgnitionApiResponse) {
 		Logger.getInstance().info(`addIgnitionTracksToDatabase(${ignitionResult})`);
 		const trackAdditionPromises: Promise<boolean>[] = [];
-		ignitionResult.data.forEach((entry: dlcEntry, index: number) => {
-			const artist: string = entry[1];
-			const title: string = entry[2];
-			const album: string = entry[3];
+		ignitionResult.data.forEach((entry: dlcEntry) => {
+			const artist: string = decode(entry[1]);
+			const title: string = decode(entry[2]);
+			const album: string = decode(entry[3]);
 			const promise: Promise<boolean> = this.db!.tryAddSong(entry[0], album, artist, title);
 			trackAdditionPromises.push(promise);
 		});
@@ -235,42 +272,5 @@ export class IgnitionUpdater {
 		// Promise.all will reject before everything else completes if any of the tryAddSong calls reject.
 		// This is accceptable behavior, since the song additions should only fail if there's an issue with the database.
 		return Promise.all(trackAdditionPromises);
-	}
-
-	private constructor() {
-		this.ignitionRequestQueue = new PromiseQueue({
-			concurrency: 1, // maximum number of tasks to run in parallel
-			interval: 5000, // interval duration
-			intervalCap: 1 // maximum number of tasks to run in a given interval
-		});
-		Logger.getInstance().info(`new IgnitionUpdater()`);
-	}
-
-	private initAndStart(): Promise<void|void[]> {
-		Logger.getInstance().info(`IgnitionUpdater.initAndStart()`);
-		// TODO for now, this logic assumes that no songs are removed from Ignition at any time. This isn't true,
-		// since dead links are removed from Ignition. This logic will need to be updated to account for that
-		return Database.getInstance().then((database: Database) => {
-			this.db = database;
-
-			// TODO Ignore all songs that have already been added
-
-			// Make a request to Ignition. This is just to see how many requests will need to be generated and put into the queue
-			const promises: Promise<void>[] = [];
-			return fetch(ignitionDirectoryUrl, this.generateIgnitionRequestInit(0)).then((ignitionResponse: FetchResponse) => {
-				return ignitionResponse.json();
-			}).then((ignitionResult: IgnitionApiResponse) => {
-				for (let offset: number = 0; offset < ignitionResult.recordsFiltered; offset += IGNITION_PAGE_SIZE) {
-					// Queue a future request to Ignition
-					promises.push(this.ignitionRequestQueue.add(async () => {
-						await this.performIgnitionRequest(offset);
-					}));
-				}
-
-				return Promise.all(promises);
-			}).catch((error) => {
-				return Promise.reject(error);
-			});
-		});
 	}
 }

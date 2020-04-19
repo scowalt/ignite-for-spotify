@@ -4,23 +4,23 @@ import {Table, Column, Model, PrimaryKey, Sequelize, UpdatedAt, CreatedAt } from
 export class Song extends Model<Song> {
 	@PrimaryKey
 	@Column
-	id: number;
+	id!: number;
 
 	@Column({ allowNull: false })
-	album: string;
+	album!: string;
 
 	@Column({ allowNull: false })
-	artist: string;
+	artist!: string;
 
 	@Column({ allowNull: false })
-	title: string;
+	title!: string;
 
 	@Column({ allowNull: true })
-	spotifyTrackId: string;
+	spotifyTrackId!: string;
 
 	@CreatedAt
-	creationDate: Date;
+	creationDate!: Date;
 
 	@UpdatedAt
-	updatedOn: Date;
+	updatedOn!: Date;
 }

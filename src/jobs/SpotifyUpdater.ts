@@ -7,7 +7,6 @@ import { Logger } from '../shared/Logger';
 export class SpotifyUpdater {
 	static singleton: SpotifyUpdater;
 	static update(accessToken: string, refreshToken: string, redirectUri: string): Promise<void> {
-		// HACK there is a race condition here without a semaphore (maybe)
 		if (SpotifyUpdater.singleton) {
 			return Promise.reject("SpotifyUpdater already running");
 		}
@@ -20,7 +19,7 @@ export class SpotifyUpdater {
 
 	private spotify: SpotifyWebApi;
 	private spotifyRequestQueue: PromiseQueue;
-	private db: Database|undefined;
+	private db!: Database;
 
 	private constructor(accessToken: string, refreshToken: string, redirectUri: string) {
 		this.spotify = new SpotifyWebApi({

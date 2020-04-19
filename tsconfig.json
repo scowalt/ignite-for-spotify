@@ -12,6 +12,5 @@
         "experimentalDecorators": true, // required for sequelize-typescript syntax
         "emitDecoratorMetadata": true, // required for sequelize-typescript syntax
         "moduleResolution": "node", // https://github.com/request/request-promise-native/issues/5#issuecomment-260282496
-        "strictPropertyInitialization": false // TODO remove this: required to write clean sequelize-typescript code without writing pointless constructors
     }
 }

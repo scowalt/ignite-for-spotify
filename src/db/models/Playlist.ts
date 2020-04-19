@@ -5,8 +5,8 @@ export class Playlist extends Model<Playlist> {
 	@AutoIncrement
 	@PrimaryKey
 	@Column
-	id: number;
+	id!: number;
 
 	@Column({ allowNull: false })
-	spotifyPlaylistId: string;
+	spotifyPlaylistId!: string;
 }
