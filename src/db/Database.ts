@@ -19,7 +19,7 @@ export class Database {
 	private constructor() {}
 	private async init(): Promise<any> {
 		this.sequelize = new Sequelize(process.env.DATABASE_URL!, {
-			logging: msg => Logger.getInstance().debug(msg),
+			logging: (msg) => Logger.getInstance().debug(msg),
 			pool: {
 				max: Number(process.env.MYSQL_POOL_CONNECTION_LIMIT)
 			},

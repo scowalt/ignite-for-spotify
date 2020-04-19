@@ -16,7 +16,7 @@
         "triple-equals": true,
         "radix": false,
         "no-empty-interface": false,
-        "typedef": [true, "call-signature"]
+        "typedef": [true, "call-signature", "parameter"]
     },
     "rulesDirectory": []
 }
