@@ -56,7 +56,7 @@ export class SpotifyUpdater {
 		});
 	}
 
-	private updateAccessToken() {
+	private updateAccessToken(): Promise<void> {
 		Logger.getInstance().info(`updateAccessToken()`);
 		return this.spotify.refreshAccessToken().then((value) => {
 			this.spotify.setAccessToken(value.body.access_token);
@@ -64,7 +64,7 @@ export class SpotifyUpdater {
 		});
 	}
 
-	private doEverything() {
+	private doEverything(): Promise<void> {
 		Logger.getInstance().info(`doEverything()`);
 		return this.giveTracksSpotify(0).finally(() => {
 			Logger.getInstance().info(`finished this.giveTracksSpotify(0)`);
@@ -86,12 +86,12 @@ export class SpotifyUpdater {
 
 	// Update all of the provided tracks in the database with their spotify IDs
 	// Returns a promise that resolves with the number of tracks that failed, and a boolean that indicates if there are no more songs
-	private addSpotifyInfoToTracks(tracks: Song[]) {
+	private addSpotifyInfoToTracks(tracks: Song[]): Promise<[number, boolean]> {
 		Logger.getInstance().info(`addSpotifyInfoToTracks(${tracks})`);
 		return new Promise<[number, boolean]>((resolve) => {
 			let failedTracks = 0;
 			const done: boolean = (tracks.length === 0);
-			const promises: Promise<void>[] = [];
+			const promises: Promise<any>[] = [];
 			tracks.forEach((track) => {
 				promises.push(this.addSpotifyInfoToTrack(track).catch(() => {
 					failedTracks++;
@@ -102,7 +102,7 @@ export class SpotifyUpdater {
 		});
 	}
 
-	private addSpotifyInfoToTrack(track: Song) {
+	private addSpotifyInfoToTrack(track: Song): Promise<any> {
 		Logger.getInstance().debug(`addSpotifyInfoToTrack(${track})`);
 		const searchQuery: string = `artist:${track.artist} ${track.title}`;
 		return this.spotify.searchTracks(searchQuery).then((value) => {

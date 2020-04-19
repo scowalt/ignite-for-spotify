@@ -53,7 +53,7 @@ export class Database {
 		});
 	}
 
-	addSpotifyTrackIdToSong(trackId: number, spotifyTrackId: string) {
+	addSpotifyTrackIdToSong(trackId: number, spotifyTrackId: string): Promise<any> {
 		return Song.update({ spotifyTrackId }, {
 			where: {
 				id: trackId

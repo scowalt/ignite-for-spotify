@@ -9,13 +9,14 @@
         "indent": [true, "tabs"],
         "no-console": true,
         "no-require-imports": true,
-        "no-any": true,
+        "no-any": false, // This will make it much less messy for me to type functions that return Promises whose output isn't needed
         "semicolon": [true, "always"],
         "whitespace": [true, "check-type"],
         "no-shadowed-variable": true,
         "triple-equals": true,
         "radix": false,
-        "no-empty-interface": false
+        "no-empty-interface": false,
+        "typedef": [true, "call-signature"]
     },
     "rulesDirectory": []
 }

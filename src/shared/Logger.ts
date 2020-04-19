@@ -2,7 +2,7 @@ import winston from "winston";
 
 export class Logger {
 	private static singleton: winston.Logger;
-	public static getInstance() {
+	public static getInstance(): winston.Logger {
 		if (!Logger.singleton) {
 			Logger.singleton = Logger.createLogger();
 		}

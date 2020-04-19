@@ -1,6 +1,6 @@
 import { Database } from "../db/Database";
 import PromiseQueue from 'p-queue';
-import fetch, {Response as FetchResponse} from 'node-fetch';
+import fetch, {Response as FetchResponse, RequestInit} from 'node-fetch';
 import { Logger } from "../shared/Logger";
 import { decode } from 'he';
 interface IgnitionApiResponse {
@@ -86,7 +86,7 @@ export class IgnitionUpdater {
 		});
 	}
 
-	private generateIgnitionRequestInit(offset: number) {
+	private generateIgnitionRequestInit(offset: number): RequestInit {
 		return {
 			method: "POST",
 			headers: {
@@ -250,7 +250,7 @@ export class IgnitionUpdater {
 		};
 	}
 
-	private performIgnitionRequest(offset: number) {
+	private performIgnitionRequest(offset: number): Promise<boolean[]> {
 		Logger.getInstance().info(`performIgnitionRequest(${offset})`);
 		return fetch(ignitionDirectoryUrl, this.generateIgnitionRequestInit(offset)).then((response: FetchResponse) => {
 			return response.json();
@@ -258,7 +258,7 @@ export class IgnitionUpdater {
 		.then(this.addIgnitionTracksToDatabase.bind(this));
 	}
 
-	private addIgnitionTracksToDatabase(ignitionResult: IgnitionApiResponse) {
+	private addIgnitionTracksToDatabase(ignitionResult: IgnitionApiResponse): Promise<boolean[]> {
 		Logger.getInstance().info(`addIgnitionTracksToDatabase(${ignitionResult})`);
 		const trackAdditionPromises: Promise<boolean>[] = [];
 		ignitionResult.data.forEach((entry: dlcEntry) => {

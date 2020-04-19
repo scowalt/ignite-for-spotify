@@ -14,7 +14,7 @@ import { SpotifyUpdateJobData } from './shared/types';
 
 const workers: number = Number(process.env.WEB_CONCURRENCY);
 
-function start() {
+function start(): void {
 	createIgnitionUpdateQueue().process((job) => {
 		Logger.getInstance().info(`Started Ignition job ${job.id}`);
 		return IgnitionUpdater.update();
