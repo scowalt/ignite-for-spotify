@@ -37,7 +37,7 @@ const IGNITION_PAGE_SIZE: number = 25; // Setting this too high results in conne
 
 export class IgnitionUpdater {
 	static singleton: IgnitionUpdater;
-	static update(): Promise<void> {
+	static update(): Promise<void|void[]> {
 		if (IgnitionUpdater.singleton) {
 			return Promise.reject("IgnitionUpdater already running");
 		}
@@ -246,7 +246,7 @@ export class IgnitionUpdater {
 		Logger.getInstance().info(`new IgnitionUpdater()`);
 	}
 
-	private initAndStart(): Promise<void> {
+	private initAndStart(): Promise<void|void[]> {
 		Logger.getInstance().info(`IgnitionUpdater.initAndStart()`);
 		// TODO for now, this logic assumes that no songs are removed from Ignition at any time. This isn't true,
 		// since dead links are removed from Ignition. This logic will need to be updated to account for that
@@ -257,7 +257,7 @@ export class IgnitionUpdater {
 
 			// Make a request to Ignition. This is just to see how many requests will need to be generated and put into the queue
 			const promises: Promise<void>[] = [];
-			fetch(ignitionDirectoryUrl, this.generateIgnitionRequestInit(0)).then((ignitionResponse: FetchResponse) => {
+			return fetch(ignitionDirectoryUrl, this.generateIgnitionRequestInit(0)).then((ignitionResponse: FetchResponse) => {
 				return ignitionResponse.json();
 			}).then((ignitionResult: IgnitionApiResponse) => {
 				for (let offset: number = 0; offset < ignitionResult.recordsFiltered; offset += IGNITION_PAGE_SIZE) {
