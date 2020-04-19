@@ -80,7 +80,7 @@ export class IgnitionUpdater {
 				}
 
 				return Promise.all(promises);
-			}).catch((error) => {
+			}).catch((error: any) => {
 				return Promise.reject(error);
 			});
 		});

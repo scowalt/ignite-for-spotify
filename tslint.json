@@ -16,7 +16,14 @@
         "triple-equals": true,
         "radix": false,
         "no-empty-interface": false,
-        "typedef": [true, "call-signature", "parameter"]
+        "typedef": [true,
+            "call-signature",
+            // "arrow-call-signature", // this one isn't very helpful to enable
+            "parameter",
+            // "arrow-parameter", // can't be enabled due to spotify-web-api-node
+            "property-declaration",
+            "variable-declaration"
+        ]
     },
     "rulesDirectory": []
 }

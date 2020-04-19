@@ -29,7 +29,7 @@ app.post('/startJob', async (request: Request, response: Response) => {
 		return response.status(HttpStatus.BAD_REQUEST).end();
 	}
 
-	const type = request.body.jobType;
+	const type: string = request.body.jobType;
 	let job: Bull.Job;
 	if (type === JobType.SpotifyUpdate) {
 		job = await spotifyUpdateQueue.add({});
@@ -42,7 +42,7 @@ app.post('/startJob', async (request: Request, response: Response) => {
 });
 
 app.get('/job/:jobType/:id', async (request: Request, response: Response) => {
-	const type = request.params.jobType;
+	const type: string = request.params.jobType;
 	const id: Bull.JobId = request.params.id;
 	let job: Bull.Job|null;
 
@@ -81,8 +81,8 @@ app.get('/login', (request: Request, response: Response) => {
 app.get('/spotifyAuthCallback', (request: Request, response: Response) => {
 	// Request refresh and state tokens
 	const code: string = request.query.code || null;
-	const state = request.query.state || null;
-	const storedState = request.cookies ? request.cookies[stateKey] : null;
+	const state: string|null = request.query.state || null;
+	const storedState: string|null = request.cookies ? request.cookies[stateKey] : null;
 
 	if (state === null || state !== storedState) {
 		return response.status(HttpStatus.INTERNAL_SERVER_ERROR).end();

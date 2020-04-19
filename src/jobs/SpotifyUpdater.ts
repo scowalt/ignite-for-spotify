@@ -89,7 +89,7 @@ export class SpotifyUpdater {
 	private addSpotifyInfoToTracks(tracks: Song[]): Promise<[number, boolean]> {
 		Logger.getInstance().info(`addSpotifyInfoToTracks(${tracks})`);
 		return new Promise<[number, boolean]>((resolve) => {
-			let failedTracks = 0;
+			let failedTracks: number = 0;
 			const done: boolean = (tracks.length === 0);
 			const promises: Promise<any>[] = [];
 			tracks.forEach((track) => {
