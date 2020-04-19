@@ -38,7 +38,7 @@ const IGNITION_PAGE_SIZE: number = 25; // Setting this too high results in conne
 
 export class IgnitionUpdater {
 	static singleton: IgnitionUpdater;
-	static update(): Promise<void | void[]> {
+	static update(): Promise<void|void[]> {
 		if (IgnitionUpdater.singleton) {
 			return Promise.reject("IgnitionUpdater already running");
 		}

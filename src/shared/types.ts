@@ -5,10 +5,10 @@ const enum JobType {
 	SpotifyUpdate = "Spotify"
 }
 
-interface IgnitionJobData {}
+interface IgnitionJobData { }
 type IgnitionQueue = Queue<IgnitionJobData>;
 
-interface SpotifyUpdateJobData {}
+interface SpotifyUpdateJobData { }
 type SpotifyUpdateQueue = Queue<SpotifyUpdateJobData>;
 
-export {JobType, IgnitionJobData, IgnitionQueue, SpotifyUpdateJobData, SpotifyUpdateQueue };
+export { JobType, IgnitionJobData, IgnitionQueue, SpotifyUpdateJobData, SpotifyUpdateQueue };
