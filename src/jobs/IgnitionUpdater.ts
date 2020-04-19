@@ -1,6 +1,6 @@
 import { Database } from "../db/Database";
 import PromiseQueue from 'p-queue';
-import fetch, {Response as FetchResponse, RequestInit} from 'node-fetch';
+import fetch, { Response as FetchResponse, RequestInit } from 'node-fetch';
 import { Logger } from "../shared/Logger";
 import { decode } from 'he';
 interface IgnitionApiResponse {
@@ -38,7 +38,7 @@ const IGNITION_PAGE_SIZE: number = 25; // Setting this too high results in conne
 
 export class IgnitionUpdater {
 	static singleton: IgnitionUpdater;
-	static update(): Promise<void|void[]> {
+	static update(): Promise<void | void[]> {
 		if (IgnitionUpdater.singleton) {
 			return Promise.reject("IgnitionUpdater already running");
 		}

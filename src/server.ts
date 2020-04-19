@@ -32,13 +32,13 @@ app.post('/startJob', async (request: Request, response: Response) => {
 	const type: string = request.body.jobType;
 	let job: Bull.Job;
 	if (type === JobType.SpotifyUpdate) {
-		job = await spotifyUpdateQueue.add({});
+		job = await spotifyUpdateQueue.add({ });
 	} else if (type === JobType.IgnitionUpdate) {
-		job = await ignitionQueue.add({});
+		job = await ignitionQueue.add({ });
 	} else {
 		return response.status(HttpStatus.NOT_ACCEPTABLE).end();
 	}
-	return response.json({id: job.id}).end();
+	return response.json({ id: job.id }).end();
 });
 
 app.get('/job/:jobType/:id', async (request: Request, response: Response) => {
@@ -58,7 +58,7 @@ app.get('/job/:jobType/:id', async (request: Request, response: Response) => {
 		return response.status(HttpStatus.NOT_FOUND).end();
 	}
 	const status: Bull.JobStatus = await job.getState();
-	return response.json({status});
+	return response.json({ status });
 });
 
 // Client wants to start Spotify Auth flow
@@ -69,7 +69,7 @@ app.get('/login', (request: Request, response: Response) => {
 	});
 
 	const scopes: string[] = ['user-read-private', 'user-read-email', 'playlist-read-private', 'playlist-modify-private', 'playlist-modify-public'];
-	const state: string = chance.string({length: 16});
+	const state: string = chance.string({ length: 16 });
 	const authorizeUrl: string = spotifyApi.createAuthorizeURL(scopes, state);
 	response.cookie(stateKey, state);
 

@@ -4,7 +4,6 @@ import { Playlist } from './models/Playlist';
 import { Logger } from '../shared/Logger';
 
 export class Database {
-	private static instance: Database;
 	public static async getInstance(): Promise<Database> {
 		if (!Database.instance) {
 			Database.instance = new Database();
@@ -13,33 +12,18 @@ export class Database {
 
 		return Database.instance;
 	}
+	private static instance: Database;
 
 	private sequelize!: Sequelize;
 
-	private constructor() {}
-	private async init(): Promise<any> {
-		this.sequelize = new Sequelize(process.env.DATABASE_URL!, {
-			logging: (msg: string) => Logger.getInstance().debug(msg),
-			pool: {
-				max: Number(process.env.MYSQL_POOL_CONNECTION_LIMIT)
-			},
-			dialect: "mysql"
+	private constructor() { }
+
+	addSpotifyTrackIdToSong(trackId: number, spotifyTrackId: string): Promise<any> {
+		return Song.update({ spotifyTrackId }, {
+			where: {
+				id: trackId
+			}
 		});
-		this.sequelize.addModels([Song, Playlist]);
-
-		return this.sequelize.authenticate()
-			.then(this.syncTables);
-	}
-
-	syncTables(): Promise<any> {
-		return Promise.all([
-			Song.sync(),
-			Playlist.sync()
-		]);
-	}
-
-	tryAddSong(id: number, album: string, artist: string, title: string): Promise<boolean> {
-		return Song.upsert({id,album,artist,title});
 	}
 
 	getSongsThatNeedSpotifyTrackId(offset: number): Promise<Song[]> {
@@ -53,11 +37,28 @@ export class Database {
 		});
 	}
 
-	addSpotifyTrackIdToSong(trackId: number, spotifyTrackId: string): Promise<any> {
-		return Song.update({ spotifyTrackId }, {
-			where: {
-				id: trackId
-			}
+	syncTables(): Promise<any> {
+		return Promise.all([
+			Song.sync(),
+			Playlist.sync()
+		]);
+	}
+
+	tryAddSong(id: number, album: string, artist: string, title: string): Promise<boolean> {
+		return Song.upsert({ id, album, artist, title});
+	}
+
+	private async init(): Promise<any> {
+		this.sequelize = new Sequelize(process.env.DATABASE_URL!, {
+			logging: (msg: string) => Logger.getInstance().debug(msg),
+			pool: {
+				max: Number(process.env.MYSQL_POOL_CONNECTION_LIMIT)
+			},
+			dialect: "mysql"
 		});
+		this.sequelize.addModels([Song, Playlist]);
+
+		return this.sequelize.authenticate()
+			.then(this.syncTables);
 	}
 }

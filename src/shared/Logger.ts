@@ -1,7 +1,6 @@
 import winston from "winston";
 
 export class Logger {
-	private static singleton: winston.Logger;
 	public static getInstance(): winston.Logger {
 		if (!Logger.singleton) {
 			Logger.singleton = Logger.createLogger();
@@ -9,6 +8,7 @@ export class Logger {
 
 		return Logger.singleton;
 	}
+	private static singleton: winston.Logger;
 
 	private static createLogger(): winston.Logger {
 		return winston.createLogger({
