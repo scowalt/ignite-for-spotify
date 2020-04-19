@@ -36,7 +36,7 @@
 		"no-empty-interface": false, // Empty interfaces are helpful placeholders in case the interface needs to be expanded later
 		"typedef": [
 			true, // enable typedef for the following scenarios:
-			"call-signature",
+			// "call-signature", // can't be enabled due to spotify-web-api-node not exporting the necessary types
 			// "arrow-call-signature", // this one isn't very helpful to enable
 			"parameter",
 			// "arrow-parameter", // can't be enabled due to spotify-web-api-node not exporting the necessary types

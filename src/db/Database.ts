@@ -37,13 +37,6 @@ export class Database {
 		});
 	}
 
-	syncTables(): Promise<any> {
-		return Promise.all([
-			Song.sync(),
-			Playlist.sync()
-		]);
-	}
-
 	tryAddSong(id: number, album: string, artist: string, title: string): Promise<boolean> {
 		return Song.upsert({ id, album, artist, title});
 	}
@@ -60,5 +53,12 @@ export class Database {
 
 		return this.sequelize.authenticate()
 			.then(this.syncTables);
+	}
+
+	private syncTables(): Promise<any> {
+		return Promise.all([
+			Song.sync(),
+			Playlist.sync()
+		]);
 	}
 }

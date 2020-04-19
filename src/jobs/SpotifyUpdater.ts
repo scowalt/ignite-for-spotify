@@ -1,8 +1,7 @@
-import PromiseQueue from 'p-queue';
-import SpotifyWebApi from 'spotify-web-api-node';
 import { Database } from '../db/Database';
 import { Song } from '../db/models/Song';
 import { Logger } from '../shared/Logger';
+import { RateLimitedSpotifyWebApi } from '../shared/RateLimitedSpotifyWebApi';
 
 export class SpotifyUpdater {
 	static singleton: SpotifyUpdater;
@@ -11,61 +10,22 @@ export class SpotifyUpdater {
 			return Promise.reject("SpotifyUpdater already running");
 		}
 
-		SpotifyUpdater.singleton = new SpotifyUpdater(accessToken, refreshToken, redirectUri);
-		return SpotifyUpdater.singleton.initAndStart().finally(() => {
+		SpotifyUpdater.singleton = new SpotifyUpdater();
+		return SpotifyUpdater.singleton.initAndStart(accessToken, refreshToken, redirectUri).finally(() => {
 			Logger.getInstance().info(`SpotifyUpdater.initAndStart() DONE`);
 		});
 	}
 
-	private spotify: SpotifyWebApi;
-	private spotifyRequestQueue: PromiseQueue;
+	private spotify!: RateLimitedSpotifyWebApi;
 	private db!: Database;
 
-	private constructor(accessToken: string, refreshToken: string, redirectUri: string) {
-		this.spotify = new SpotifyWebApi({
-			clientId: process.env.SPOTIFY_CLIENT_ID,
-			clientSecret: process.env.SPOTIFY_CLIENT_SECRET,
-			redirectUri
-		});
-		this.spotify.setAccessToken(accessToken);
-		this.spotify.setRefreshToken(refreshToken);
+	private constructor() { }
 
-
-		this.spotifyRequestQueue = new PromiseQueue({
-			concurrency: 1,
-			interval: 1000,
-			intervalCap: 10
-		});
-
-		Logger.getInstance().info(`new SpotifyUpdater`);
-	}
-
-	private async initAndStart(): Promise<void> {
+	private async initAndStart(accessToken: string, refreshToken: string, redirectUri: string): Promise<void> {
 		Logger.getInstance().info(`SpotifyUpdater.initAndStart()`);
-		return Database.getInstance().then((database: Database) => {
-			this.db = database;
+		this.spotify = await RateLimitedSpotifyWebApi.getInstance(accessToken, refreshToken, redirectUri);
+		this.db = await Database.getInstance();
 
-			// TODO need to query the database once to figure out how many songs there will be, then construct promises based off of that and fire them away
-			return this.updateAccessToken()
-						.then(this.doEverything.bind(this))
-						.finally(() => {
-							Logger.getInstance().info(`this.doEverything done`);
-						});
-		}).finally(() => {
-			Logger.getInstance().info(`Database.getInstance() promise finished`);
-		});
-	}
-
-	private updateAccessToken(): Promise<void> {
-		Logger.getInstance().info(`updateAccessToken()`);
-		return this.spotify.refreshAccessToken().then((value) => {
-			this.spotify.setAccessToken(value.body.access_token);
-			return Promise.resolve();
-		});
-	}
-
-	private doEverything(): Promise<void> {
-		Logger.getInstance().info(`doEverything()`);
 		return this.giveTracksSpotify(0).finally(() => {
 			Logger.getInstance().info(`finished this.giveTracksSpotify(0)`);
 		});
@@ -105,12 +65,12 @@ export class SpotifyUpdater {
 	private addSpotifyInfoToTrack(track: Song): Promise<any> {
 		Logger.getInstance().debug(`addSpotifyInfoToTrack(${track})`);
 		const searchQuery: string = `artist:${track.artist} ${track.title}`;
-		return this.spotify.searchTracks(searchQuery).then((value) => {
-			if (!value.body.tracks || value.body.tracks.total === 0) {
+		return this.spotify.searchTracks(searchQuery).then((tracks) => {
+			if (!tracks || tracks.total === 0) {
 				return Promise.reject(`Spotify has no track for ${searchQuery}`);
 			} else {
 				// Spotify track found, add it to the database
-				return this.db!.addSpotifyTrackIdToSong(track.id, value.body.tracks.items[0].id);
+				return this.db!.addSpotifyTrackIdToSong(track.id, tracks.items[0].id);
 			}
 		});
 	}

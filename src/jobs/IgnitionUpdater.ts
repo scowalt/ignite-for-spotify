@@ -68,14 +68,14 @@ export class IgnitionUpdater {
 			// TODO Ignore all songs that have already been added
 
 			// Make a request to Ignition. This is just to see how many requests will need to be generated and put into the queue
-			const promises: Promise<void>[] = [];
+			const promises: Promise<any>[] = [];
 			return fetch(ignitionDirectoryUrl, this.generateIgnitionRequestInit(0)).then((ignitionResponse: FetchResponse) => {
 				return ignitionResponse.json();
 			}).then((ignitionResult: IgnitionApiResponse) => {
 				for (let offset: number = 0; offset < ignitionResult.recordsFiltered; offset += IGNITION_PAGE_SIZE) {
 					// Queue a future request to Ignition
-					promises.push(this.ignitionRequestQueue.add(async () => {
-						await this.performIgnitionRequest(offset);
+					promises.push(this.ignitionRequestQueue.add(() => {
+						return this.performIgnitionRequest(offset);
 					}));
 				}
 
