@@ -26,7 +26,9 @@ function start(): void {
 		Logger.getInstance().info(`Spotify job finished`);
 	});
 
-	createPlaylistUpdateQueue().process(playlistProcessFunction);
+	createPlaylistUpdateQueue().process(playlistProcessFunction).finally(() => {
+		Logger.getInstance().info(`Playlist job finished`);
+	});
 }
 
 function spotifyProcessFunction(job: Bull.Job<SpotifyUpdateJobData>): Promise<void> {

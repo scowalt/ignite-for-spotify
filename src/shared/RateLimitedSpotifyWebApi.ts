@@ -1,6 +1,7 @@
 import SpotifyWebApi from "spotify-web-api-node";
 import PromiseQueue from "p-queue";
 import { Logger } from "./Logger";
+import { Song } from "../db/models/Song";
 
 export class RateLimitedSpotifyWebApi {
 	public static async getInstance(accessToken: string, refreshToken: string, redirectUri: string): Promise<RateLimitedSpotifyWebApi> {
@@ -20,7 +21,7 @@ export class RateLimitedSpotifyWebApi {
 		this.queue = new PromiseQueue({
 			concurrency: 5,
 			interval: 1000,
-			intervalCap: 10
+			intervalCap: 3
 		});
 
 		this.spotify = new SpotifyWebApi({
@@ -46,6 +47,21 @@ export class RateLimitedSpotifyWebApi {
 			return this.spotify.createPlaylist(userProfile.body.id, `Test ${id}`);
 		});
 		return createPlaylistResponse.body.id;
+	}
+
+	public async getPlaylistTracks(playlistId: string, offset: number, limit: number) {
+		return this.queue.add(() => {
+			return this.spotify.getPlaylistTracks(playlistId, {
+				offset,
+				limit
+			});
+		});
+	}
+
+	public async addSongsToPlaylist(playlistId: string, songs: Song[], position: number) {
+		return this.queue.add(() => {
+			return this.spotify.addTracksToPlaylist(playlistId, songs.map((song: Song) => { return `spotify:track:${song.spotifyTrackId}`; }), { position });
+		});
 	}
 
 	private init(): Promise<any> {

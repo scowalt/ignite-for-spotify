@@ -50,10 +50,9 @@ export class Database {
 		});
 	}
 
-	getSongswithSpotifyTrack(offset: number): Promise<Song[]> {
-		const LIMIT: number = 25;
+	getSongsWithSpotifyTrack(offset: number, limit: number): Promise<Song[]> {
 		return Song.findAll({
-			limit: LIMIT,
+			limit,
 			offset,
 			where: {
 				spotifyTrackId: {
