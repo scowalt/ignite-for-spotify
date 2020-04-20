@@ -8,13 +8,14 @@ import BodyParser from 'body-parser';
 import cookieParser from 'cookie-parser';
 import Chance from 'chance';
 import Bull from 'bull';
-import { JobType, IgnitionQueue, SpotifyUpdateQueue } from './shared/types';
+import { JobType, IgnitionQueue, SpotifyUpdateQueue, PlaylistUpdateQueue } from './shared/types';
 import HttpStatus from 'http-status-codes';
-import { createIgnitionUpdateQueue, createSpotifyUpdateQueue } from './shared/queues';
+import { createIgnitionUpdateQueue, createSpotifyUpdateQueue, createPlaylistUpdateQueue } from './shared/queues';
 import SpotifyWebApi from 'spotify-web-api-node';
 
 const ignitionQueue: IgnitionQueue = createIgnitionUpdateQueue();
 const spotifyUpdateQueue: SpotifyUpdateQueue = createSpotifyUpdateQueue();
+const playlistUpdateQueue: PlaylistUpdateQueue = createPlaylistUpdateQueue();
 const redirectUri: string = process.env.BASE_URL! + "/spotifyAuthCallback";
 const chance: Chance.Chance = new Chance();
 const app: Express = express();
@@ -35,6 +36,8 @@ app.post('/startJob', async (request: Request, response: Response) => {
 		job = await spotifyUpdateQueue.add({ });
 	} else if (type === JobType.IgnitionUpdate) {
 		job = await ignitionQueue.add({ });
+	} else if (type === JobType.PlaylistUpdate) {
+		job = await playlistUpdateQueue.add({ });
 	} else {
 		return response.status(HttpStatus.NOT_ACCEPTABLE).end();
 	}
@@ -50,7 +53,9 @@ app.get('/job/:jobType/:id', async (request: Request, response: Response) => {
 		job = await spotifyUpdateQueue.getJob(id);
 	} else if (type === JobType.IgnitionUpdate) {
 		job = await ignitionQueue.getJob(id);
-	} else {
+	} else if (type === JobType.PlaylistUpdate) {
+		job = await playlistUpdateQueue.getJob(id);
+	}else {
 		return response.status(HttpStatus.NOT_ACCEPTABLE).end();
 	}
 

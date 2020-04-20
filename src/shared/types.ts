@@ -1,14 +1,16 @@
 import { Queue } from "bull";
 
-const enum JobType {
+export const enum JobType {
 	IgnitionUpdate = "Ignition",
-	SpotifyUpdate = "Spotify"
+	SpotifyUpdate = "Spotify",
+	PlaylistUpdate = "Playlist"
 }
 
-interface IgnitionJobData { }
-type IgnitionQueue = Queue<IgnitionJobData>;
+export interface IgnitionJobData { }
+export type IgnitionQueue = Queue<IgnitionJobData>;
 
-interface SpotifyUpdateJobData { }
-type SpotifyUpdateQueue = Queue<SpotifyUpdateJobData>;
+export interface SpotifyUpdateJobData { }
+export type SpotifyUpdateQueue = Queue<SpotifyUpdateJobData>;
 
-export { JobType, IgnitionJobData, IgnitionQueue, SpotifyUpdateJobData, SpotifyUpdateQueue };
+export interface PlaylistJobData{ }
+export type PlaylistUpdateQueue = Queue<PlaylistJobData>;

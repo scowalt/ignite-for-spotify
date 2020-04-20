@@ -41,7 +41,7 @@
 			"parameter",
 			// "arrow-parameter", // can't be enabled due to spotify-web-api-node not exporting the necessary types
 			"property-declaration",
-			"variable-declaration",
+			// "variable-declaration", // can't be enabled due to spotify-web-api-node not exporting the necessary types
 			"member-variable-declaration",
 			"object-destructuring",
 			"array-destructuring"

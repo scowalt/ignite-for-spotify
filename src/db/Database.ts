@@ -2,7 +2,7 @@ import { Sequelize } from 'sequelize-typescript';
 import { Song } from './models/Song';
 import { Playlist } from './models/Playlist';
 import { Logger } from '../shared/Logger';
-import { Model } from 'sequelize/types';
+import { Op } from 'sequelize';
 
 export class Database {
 	public static async getInstance(): Promise<Database> {
@@ -27,6 +27,18 @@ export class Database {
 		});
 	}
 
+	addPlaylist(playlistId: number, spotifyPlaylistId: string): Promise<Playlist> {
+		return Playlist.create({ id: playlistId, spotifyPlaylistId });
+	}
+
+	getPlaylistById(id: number): Promise<Playlist|null> {
+		return Playlist.findOne({
+			having: {
+				id
+			}
+		});
+	}
+
 	getSongsThatNeedSpotifyTrackId(offset: number): Promise<Song[]> {
 		const LIMIT: number = 25;
 		return Song.findAll({
@@ -34,6 +46,19 @@ export class Database {
 			offset,
 			where: {
 				spotifyTrackId: null
+			}
+		});
+	}
+
+	getSongswithSpotifyTrack(offset: number): Promise<Song[]> {
+		const LIMIT: number = 25;
+		return Song.findAll({
+			limit: LIMIT,
+			offset,
+			where: {
+				spotifyTrackId: {
+					[Op.not]: null
+				}
 			}
 		});
 	}

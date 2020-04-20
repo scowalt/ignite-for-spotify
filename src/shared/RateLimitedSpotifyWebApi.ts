@@ -40,6 +40,14 @@ export class RateLimitedSpotifyWebApi {
 		});
 	}
 
+	public async createPlaylist(id: number): Promise<string> {
+		const userProfile = await this.queue.add(() => { return this.spotify.getMe(); });
+		const createPlaylistResponse = await this.queue.add(() => {
+			return this.spotify.createPlaylist(userProfile.body.id, `Test ${id}`);
+		});
+		return createPlaylistResponse.body.id;
+	}
+
 	private init(): Promise<any> {
 		return this.updateAccessToken();
 	}
