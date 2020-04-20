@@ -48,18 +48,16 @@ export class SpotifyUpdater {
 	// Returns a promise that resolves with the number of tracks that failed, and a boolean that indicates if there are no more songs
 	private addSpotifyInfoToTracks(tracks: Song[]): Promise<[number, boolean]> {
 		Logger.getInstance().info(`addSpotifyInfoToTracks(${tracks})`);
-		return new Promise<[number, boolean]>((resolve) => {
-			let failedTracks: number = 0;
-			const done: boolean = (tracks.length === 0);
-			const promises: Promise<any>[] = [];
-			tracks.forEach((track) => {
-				promises.push(this.addSpotifyInfoToTrack(track).catch(() => {
-					failedTracks++;
-				}));
-			});
-
-			Promise.all(promises).then(() => { resolve([failedTracks, done]); });
+		let failedTracks: number = 0;
+		const done: boolean = (tracks.length === 0);
+		const promises: Promise<any>[] = [];
+		tracks.forEach((track) => {
+			promises.push(this.addSpotifyInfoToTrack(track).catch(() => {
+				failedTracks++;
+			}));
 		});
+
+		return Promise.all(promises).then(() => { return Promise.resolve([failedTracks, done]); });
 	}
 
 	private addSpotifyInfoToTrack(track: Song): Promise<any> {

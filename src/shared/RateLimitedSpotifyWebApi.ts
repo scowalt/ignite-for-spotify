@@ -14,8 +14,8 @@ export class RateLimitedSpotifyWebApi {
 	}
 	private static instance: RateLimitedSpotifyWebApi;
 
-	private spotify!: SpotifyWebApi;
-	private queue: PromiseQueue;
+	private readonly spotify!: SpotifyWebApi;
+	private readonly queue: PromiseQueue;
 
 	private constructor(accessToken: string, refreshToken: string, redirectUri: string) {
 		this.queue = new PromiseQueue({

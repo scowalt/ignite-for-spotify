@@ -48,7 +48,7 @@ export class IgnitionUpdater {
 	}
 
 	private db!: Database;
-	private ignitionRequestQueue: PromiseQueue;
+	private readonly ignitionRequestQueue: PromiseQueue;
 
 	private constructor() {
 		this.ignitionRequestQueue = new PromiseQueue({
