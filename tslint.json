@@ -34,6 +34,8 @@
         "radix": false,
 		"jsdoc-format": [true, "check-multiline-start"],
 		"prefer-readonly": true,
+		"no-parameter-reassignment": true,
+		"no-parameter-properties": true,
 		"no-empty-interface": false, // Empty interfaces are helpful placeholders in case the interface needs to be expanded later
 		"typedef": [
 			true, // enable typedef for the following scenarios:

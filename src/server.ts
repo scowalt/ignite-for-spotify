@@ -67,7 +67,7 @@ app.get('/job/:jobType/:id', async (request: Request, response: Response) => {
 });
 
 // Client wants to start Spotify Auth flow
-app.get('/login', (request: Request, response: Response) => {
+app.get('/login', (_request: Request, response: Response) => {
 	const spotifyApi: SpotifyWebApi = new SpotifyWebApi({
 		redirectUri,
 		clientId: process.env.SPOTIFY_CLIENT_ID
@@ -112,7 +112,7 @@ app.get('/spotifyAuthCallback', (request: Request, response: Response) => {
 	}
 });
 
-app.get('/', (request: Request, response: Response) => {
+app.get('/', (_request: Request, response: Response) => {
 	response.send("Hello world!");
 });
 

@@ -1,4 +1,4 @@
-import { Table, Column, Model, PrimaryKey, Sequelize, UpdatedAt, CreatedAt } from 'sequelize-typescript';
+import { Table, Column, Model, PrimaryKey, UpdatedAt, CreatedAt } from 'sequelize-typescript';
 
 @Table
 export class Song extends Model<Song> {

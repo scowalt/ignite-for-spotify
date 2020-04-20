@@ -45,7 +45,7 @@ function spotifyProcessFunction(job: Bull.Job<SpotifyUpdateJobData>): Promise<vo
 	});
 }
 
-function playlistProcessFunction(job: Bull.Job<PlaylistJobData>): Promise<void> {
+function playlistProcessFunction(_job: Bull.Job<PlaylistJobData>): Promise<void> {
 	const redirectUri: string = ""; // TODO need to figure out how to handle this in the spotify API
 	if (process.env.SPOTIFY_ACCOUNT_ACCESS_TOKEN === undefined ||
 		process.env.SPOTIFY_ACCOUNT_REFRESH_TOKEN === undefined) {

@@ -2,7 +2,6 @@ import { RateLimitedSpotifyWebApi } from "../shared/RateLimitedSpotifyWebApi";
 import { Database } from "../db/Database";
 import { Playlist } from "../db/models/Playlist";
 import { Song } from "../db/models/Song";
-import { Logger } from "../shared/Logger";
 
 const SPOTIFY_MAX_PLAYLIST_SIZE: number = 10 * 1000;
 export class SpotifyPlaylistUpdater {

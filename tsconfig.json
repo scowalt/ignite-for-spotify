@@ -12,5 +12,7 @@
         "experimentalDecorators": true, // required for sequelize-typescript syntax
         "emitDecoratorMetadata": true, // required for sequelize-typescript syntax
         "moduleResolution": "node", // https://github.com/request/request-promise-native/issues/5#issuecomment-260282496
+        "noUnusedLocals": true,
+        "noUnusedParameters": true
     }
 }
