@@ -64,6 +64,25 @@ export class RateLimitedSpotifyWebApi {
 		});
 	}
 
+	public async removePlaylistTracksAtPosition(playlistId: string, playlistOffset: number, count: number) {
+		return this.queue.add(async () => {
+			const playlistResponse = await this.spotify.getPlaylist(playlistId);
+			const positions: number[] = [];
+			const limit: number = Math.min(playlistOffset + count, playlistResponse.body.tracks.total);
+			for (let position: number = playlistOffset; position < limit; position++) {
+				positions.push(position);
+			}
+			if (positions.length !== 0) {
+				return this.spotify.removeTracksFromPlaylistByPosition(playlistId, positions, playlistResponse.body.snapshot_id);
+			} else {
+				return Promise.resolve(playlistResponse);
+			}
+		}).catch((reason) => {
+			Logger.getInstance().error(`Spotify API error ${reason.toString}`);
+			return Promise.reject(reason);
+		});
+	}
+
 	private init(): Promise<any> {
 		return this.updateAccessToken();
 	}
