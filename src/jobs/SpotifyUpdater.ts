@@ -15,6 +15,21 @@ export class SpotifyUpdater {
 			Logger.getInstance().info(`SpotifyUpdater.initAndStart() DONE`);
 		});
 	}
+	private static generateQuery(artist: string, title: string): string {
+		return `artist:${artist} ${title}`;
+	}
+	private static generatePipeQueries(artist: string, title: string): string[] {
+		const artists: string[] = artist.split('|').map((str: string) => { return str.trim(); });
+		const titles: string[] = title.split('|').map((str: string) => { return str.trim(); });
+		const queries: string[] = [];
+		artists.forEach((a: string) => {
+			titles.forEach((t: string) => {
+				queries.push(SpotifyUpdater.generateQuery(a, t));
+			});
+		});
+
+		return queries;
+	}
 
 	private spotify!: RateLimitedSpotifyWebApi;
 	private db!: Database;
@@ -62,13 +77,39 @@ export class SpotifyUpdater {
 
 	private addSpotifyInfoToTrack(track: Song): Promise<any> {
 		Logger.getInstance().debug(`addSpotifyInfoToTrack(${track})`);
-		const searchQuery: string = `artist:${track.artist} ${track.title}`;
+
+		// First, try searching for just the track by the artist. This works for around half of the ignition DB
+		const firstSearchQuery: string = SpotifyUpdater.generateQuery(track.artist, track.title);
+		return this.getTrackIdForSearchQuery(firstSearchQuery)
+			.catch(() => {
+				// It's possible that the artist and/or title of the track has is listed as:
+				// "{Non-english name} | {English name}" (example: "Sektor Gaza | Сектор газа")
+				// The order may also be reversed. Some may even be in the form "name1 | name2 | name3".
+				// There is no way to know which name or name combination might be valid.
+				// So, generate an array of all of the possible queries, and search them one-by-one
+				const pipeQueries: string[] = SpotifyUpdater.generatePipeQueries(track.artist, track.title);
+				return this.getTrackIdFromSearchQueries(pipeQueries);
+			}).then((spotifyTrackId: string) => {
+				return this.db!.addSpotifyTrackIdToSong(track.id, spotifyTrackId);
+			});
+	}
+
+	private async getTrackIdFromSearchQueries(searchQueries: string[]): Promise<string> {
+		if (searchQueries.length === 0) {
+			return Promise.reject(`No spotify track found for any provided search queries`);
+		}
+
+		return this.getTrackIdForSearchQuery(searchQueries[0]).catch(() => {
+			return this.getTrackIdFromSearchQueries(searchQueries.splice(1));
+		});
+	}
+
+	private getTrackIdForSearchQuery(searchQuery: string): Promise<string> {
 		return this.spotify.searchTracks(searchQuery).then((tracks) => {
 			if (!tracks || tracks.total === 0) {
 				return Promise.reject(`Spotify has no track for ${searchQuery}`);
 			} else {
-				// Spotify track found, add it to the database
-				return this.db!.addSpotifyTrackIdToSong(track.id, tracks.items[0].id);
+				return Promise.resolve(tracks.items[0].id);
 			}
 		});
 	}
