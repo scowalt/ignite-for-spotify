@@ -81,17 +81,37 @@ export class SpotifyUpdater {
 		// First, try searching for just the track by the artist. This works for around half of the ignition DB
 		const firstSearchQuery: string = SpotifyUpdater.generateQuery(track.artist, track.title);
 		return this.getTrackIdForSearchQuery(firstSearchQuery)
-			.catch(() => {
-				// It's possible that the artist and/or title of the track has is listed as:
-				// "{Non-english name} | {English name}" (example: "Sektor Gaza | Сектор газа")
-				// The order may also be reversed. Some may even be in the form "name1 | name2 | name3".
-				// There is no way to know which name or name combination might be valid.
-				// So, generate an array of all of the possible queries, and search them one-by-one
-				const pipeQueries: string[] = SpotifyUpdater.generatePipeQueries(track.artist, track.title);
-				return this.getTrackIdFromSearchQueries(pipeQueries);
-			}).then((spotifyTrackId: string) => {
+			.catch(this.trySeparatingPipedStrings(track))
+			.catch(this.tryRemovingParentheticalSubtitle(track))
+			.then((spotifyTrackId: string) => {
 				return this.db!.addSpotifyTrackIdToSong(track.id, spotifyTrackId);
 			});
+	}
+
+	private trySeparatingPipedStrings(track: Song): () => Promise<string> {
+		return () => {
+			// It's possible that the artist and/or title of the track has is listed as:
+			// "{Non-english name} | {English name}" (example: "Sektor Gaza | Сектор газа")
+			// The order may also be reversed. Some may even be in the form "name1 | name2 | name3".
+			// There is no way to know which name or name combination might be valid.
+			// So, generate an array of all of the possible queries, and search them one-by-one
+			const pipeQueries: string[] = SpotifyUpdater.generatePipeQueries(track.artist, track.title);
+			return this.getTrackIdFromSearchQueries(pipeQueries);
+		};
+	}
+
+	private tryRemovingParentheticalSubtitle(track: Song): () => Promise<string> {
+		return () => {
+			// Sometimes a track title will have a parenthetical subtitle that doesn't appear on Spotify.
+			// For example, "Welcome to the Machine (Cover)" by Shadows Fall appears on Spotify as "Welcome to the Machine".
+			// Removing the parenthetical subtitle might help find the track
+			const expression: RegExp = /(.*\S)\s*\(.*\)/;
+			const match: RegExpExecArray | null = expression.exec(track.title);
+			if (match === null) {
+				return Promise.reject(`No parenthetical subtitle found`);
+			}
+			return this.getTrackIdForSearchQuery(SpotifyUpdater.generateQuery(track.artist, match[1]));
+		};
 	}
 
 	private async getTrackIdFromSearchQueries(searchQueries: string[]): Promise<string> {
