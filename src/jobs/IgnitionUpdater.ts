@@ -11,24 +11,24 @@ interface IgnitionApiResponse {
 }
 
 type dlcEntry = [
-	number, // ID (CustomsForge internal)
-	string, // Artist
-	string, // Title
-	string, // Album
-	string, // Tuning
-	string, // Version
-	string, // Author
-	number, // Date added (new Date(number*1000) gives you the date)
-	number, // Last updated (new Date(number*1000) gives you the date)
-	number, // Number of downloads
-	string, // Parts (i.e. "lead,rhythm,bass,vocals")
-	boolean, // Dynamic difficulty?
-	string, // Platforms (i.e. ",pc,mac,xbox360,ps3,")
-	string, // ???
-	number, // ID (CustomsForge internal)(identical to 0)
-	boolean, // (might be true for official / false for unofficial)
-	string, // Link to download
-	string, // Link for YouTube
+	number, //  0 ID (CustomsForge internal)
+	string, //  1 Artist
+	string, //  2 Title
+	string, //  3 Album
+	string, //  4 Tuning
+	string, //  5 Version
+	string, //  6 Author
+	number, //  7 Date added (new Date(number*1000) gives you the date)
+	number, //  8 Last updated (new Date(number*1000) gives you the date)
+	number, //  9 Number of downloads
+	string, // 10 Parts (i.e. "lead,rhythm,bass,vocals")
+	boolean, // 11 Dynamic difficulty?
+	string, // 12 Platforms (i.e. ",pc,mac,xbox360,ps3,")
+	string, // 13 ???
+	number, // 14 ID (CustomsForge internal)(identical to index 0)
+	boolean, // 15 (might be true for official DLC / false for unofficial)
+	string, // 16 Link to download
+	string, // 17 Link for YouTube
 	null, // These last three appear to always be null
 	null,
 	null];
@@ -262,15 +262,32 @@ export class IgnitionUpdater {
 		Logger.getInstance().info(`addIgnitionTracksToDatabase(${ignitionResult})`);
 		const trackAdditionPromises: Promise<boolean>[] = [];
 		ignitionResult.data.forEach((entry: dlcEntry) => {
-			const artist: string = decode(entry[1]);
-			const title: string = decode(entry[2]);
-			const album: string = decode(entry[3]);
-			const promise: Promise<boolean> = this.db!.tryAddSong(entry[0], album, artist, title);
-			trackAdditionPromises.push(promise);
+			trackAdditionPromises.push(this.tryAddEntry(entry));
 		});
 
 		// Promise.all will reject before everything else completes if any of the tryAddSong calls reject.
 		// This is accceptable behavior, since the song additions should only fail if there's an issue with the database.
 		return Promise.all(trackAdditionPromises);
+	}
+
+	private tryAddEntry(entry: dlcEntry): Promise<boolean> {
+		const parts: string = entry[10];
+		return this.db!.tryAddSong({
+			id: entry[0],
+			artist: decode(entry[1]),
+			title: decode(entry[2]),
+			album: decode(entry[3]),
+			tuning: entry[4],
+			version: entry[5],
+			author: entry[6],
+			dateAddedToIgnition: new Date(entry[7] * 1000),
+			dateUpdatedInIgnition: new Date(entry[8] * 1000),
+			lead: parts.indexOf('lead') !== -1,
+			rhythm: parts.indexOf('rhythm') !== -1,
+			bass: parts.indexOf('bass') !== -1,
+			vocals: parts.indexOf('vocals') !== -1,
+			dynamicDifficulty: entry[11],
+			downloadLink: entry[16]
+		});
 	}
 }

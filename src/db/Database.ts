@@ -2,6 +2,7 @@ import { Sequelize } from 'sequelize-typescript';
 import { Song } from './models/Song';
 import { Playlist } from './models/Playlist';
 import { Logger } from '../shared/Logger';
+import { Model } from 'sequelize/types';
 
 export class Database {
 	public static async getInstance(): Promise<Database> {
@@ -37,8 +38,8 @@ export class Database {
 		});
 	}
 
-	tryAddSong(id: number, album: string, artist: string, title: string): Promise<boolean> {
-		return Song.upsert({ id, album, artist, title});
+	tryAddSong(song: object): Promise<boolean> {
+		return Song.upsert(song);
 	}
 
 	private async init(): Promise<any> {

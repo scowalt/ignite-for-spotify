@@ -7,13 +7,46 @@ export class Song extends Model<Song> {
 	id!: number;
 
 	@Column({ allowNull: false })
-	album!: string;
-
-	@Column({ allowNull: false })
 	artist!: string;
 
 	@Column({ allowNull: false })
 	title!: string;
+
+	@Column({ allowNull: false })
+	album!: string;
+
+	@Column({ allowNull: true })
+	tuning!: string;
+
+	@Column({ allowNull: true })
+	version!: string;
+
+	@Column({ allowNull: true })
+	author!: string;
+
+	@Column({ allowNull: true })
+	dateAddedToIgnition!: Date;
+
+	@Column({ allowNull: true })
+	dateUpdatedInIgnition!: Date;
+
+	@Column({ allowNull: false })
+	lead!: boolean;
+
+	@Column({ allowNull: false })
+	rhythm!: boolean;
+
+	@Column({ allowNull: false })
+	bass!: boolean;
+
+	@Column({ allowNull: false })
+	vocals!: boolean;
+
+	@Column({ allowNull: false })
+	dynamicDifficulty!: boolean;
+
+	@Column({ allowNull: false })
+	downloadLink!: string;
 
 	@Column({ allowNull: true })
 	spotifyTrackId!: string;
