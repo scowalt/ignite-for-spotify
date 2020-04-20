@@ -44,7 +44,11 @@ export class RateLimitedSpotifyWebApi {
 	public async createPlaylist(id: number): Promise<string> {
 		const userProfile = await this.queue.add(() => { return this.spotify.getMe(); });
 		const createPlaylistResponse = await this.queue.add(() => {
-			return this.spotify.createPlaylist(userProfile.body.id, `Test ${id}`);
+			return this.spotify.createPlaylist(userProfile.body.id, `Rocksmith (C)DLC (part ${id}/?)`, {
+				public: false, // Start the playlist private, manually make public later
+				collaborative: false,
+				description: `Rocksmith and Rocksmith 2014 DLC and CDLC. Mirrors the database found at CustomsForge Ignition.`
+			});
 		});
 		return createPlaylistResponse.body.id;
 	}
