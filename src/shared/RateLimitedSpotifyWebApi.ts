@@ -34,9 +34,15 @@ export class RateLimitedSpotifyWebApi {
 	}
 
 	public searchTracks(searchQuery: string) {
+		Logger.getInstance().debug(`RateLimitedSpotifyWebApi.serachTracks(${searchQuery}) [Queue pending promises: ${this.queue.pending}]`);
 		return this.queue.add(() => {
+			Logger.getInstance().debug(`Calling this.spotify.searchTracks(${searchQuery})`);
 			return this.spotify.searchTracks(searchQuery).then((value) => {
+				Logger.getInstance().debug(`this.spotify.searchTracks(${searchQuery}) SUCCEEDED`);
 				return Promise.resolve(value.body.tracks);
+			}).catch((reason: any) => {
+				Logger.getInstance().debug(`this.spotify.searchTracks(${searchQuery}) FAILED with reason ${JSON.stringify(reason)}`);
+				return Promise.reject(reason);
 			});
 		});
 	}

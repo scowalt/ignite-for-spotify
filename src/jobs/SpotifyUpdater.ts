@@ -56,7 +56,7 @@ export class SpotifyUpdater {
 	}
 
 	private giveTracksSpotify(offset: number): Promise<any> {
-		Logger.getInstance().info(`giveTracksSpotify(${offset})`);
+		Logger.getInstance().debug(`giveTracksSpotify(${offset})`);
 		return this.db!.getSongsThatNeedSpotifyTrackId(CHUNK_SIZE, offset).then(this.addSpotifyInfoToTracks.bind(this));
 	}
 
