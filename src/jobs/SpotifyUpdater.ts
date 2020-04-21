@@ -45,7 +45,7 @@ export class SpotifyUpdater {
 		this.db = await Database.getInstance();
 
 		// TODO take advantage of parallelization here, since each track from the database is an independent slice of work
-		const promises: Promise<any>[] = []
+		const promises: Promise<any>[] = [];
 		const totalTracks: number = await this.db.getCountSongsThatNeedSpotifyTrackId();
 		for (let offset: number = 0; offset < totalTracks; offset += CHUNK_SIZE) {
 			promises.push(this.giveTracksSpotify(offset));
@@ -109,7 +109,7 @@ export class SpotifyUpdater {
 				SpotifyUpdater.generateQuery(track.artist, nlp(track.title).contractions().contract().all().text())
 			];
 			return this.getTrackIdFromSearchQueries(queries);
-		}
+		};
 	}
 
 	private trySeparatingPipedStrings(track: Song): () => Promise<string> {
