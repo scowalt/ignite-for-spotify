@@ -12,6 +12,8 @@ import { JobType, IgnitionQueue, SpotifyUpdateQueue, PlaylistUpdateQueue } from 
 import HttpStatus from 'http-status-codes';
 import { createIgnitionUpdateQueue, createSpotifyUpdateQueue, createPlaylistUpdateQueue } from './shared/queues';
 import SpotifyWebApi from 'spotify-web-api-node';
+import favicon from 'serve-favicon';
+import path from 'path';
 
 const ignitionQueue: IgnitionQueue = createIgnitionUpdateQueue();
 const spotifyUpdateQueue: SpotifyUpdateQueue = createSpotifyUpdateQueue();
@@ -22,6 +24,7 @@ const app: Express = express();
 const port: number = parseInt(process.env.PORT!);
 const stateKey: string = "spotify_auth_state";
 
+app.use(favicon(path.join(__dirname, '..', 'res', 'icon', 'favicon.ico')));
 app.use(cookieParser());
 app.use(BodyParser.json());
 
