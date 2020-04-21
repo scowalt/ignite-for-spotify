@@ -55,7 +55,10 @@ function playlistProcessFunction(_job: Bull.Job<PlaylistJobData>): Promise<void>
 		return Promise.reject("Spotify access and refresh tokens must be set as environment variables");
 	}
 
-	return SpotifyPlaylistUpdater.update(process.env.SPOTIFY_ACCOUNT_ACCESS_TOKEN, process.env.SPOTIFY_ACCOUNT_REFRESH_TOKEN, redirectUri);
+	return SpotifyPlaylistUpdater.update(process.env.SPOTIFY_ACCOUNT_ACCESS_TOKEN, process.env.SPOTIFY_ACCOUNT_REFRESH_TOKEN, redirectUri).catch((reason: any) => {
+		Logger.getInstance().error(`SpotifyPlaylistUpdater failed with reason ${reason.toString()}`);
+		return Promise.reject(reason);
+	});
 }
 
 throng({ workers, start });

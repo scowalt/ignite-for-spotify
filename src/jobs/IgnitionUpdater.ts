@@ -37,15 +37,17 @@ const ignitionDirectoryUrl: string = "http://ignition.customsforge.com/cfss";
 const IGNITION_PAGE_SIZE: number = 25; // Setting this too high results in connection timeouts to the server, and isn't very nice
 
 export class IgnitionUpdater {
-	static singleton: IgnitionUpdater;
-	static update(): Promise<void|void[]> {
-		if (IgnitionUpdater.singleton) {
+	static update(): Promise<any> {
+		if (IgnitionUpdater.singleton !== null) {
 			return Promise.reject("IgnitionUpdater already running");
 		}
 
 		IgnitionUpdater.singleton = new IgnitionUpdater();
-		return IgnitionUpdater.singleton.initAndStart();
+		return IgnitionUpdater.singleton.initAndStart().finally(() => {
+			IgnitionUpdater.singleton = null;
+		});
 	}
+	private static singleton: IgnitionUpdater|null = null;
 
 	private db!: Database;
 	private readonly ignitionRequestQueue: PromiseQueue;

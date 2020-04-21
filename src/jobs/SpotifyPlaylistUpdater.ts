@@ -2,20 +2,21 @@ import { RateLimitedSpotifyWebApi } from "../shared/RateLimitedSpotifyWebApi";
 import { Database } from "../db/Database";
 import { Playlist } from "../db/models/Playlist";
 import { Song } from "../db/models/Song";
+import { Logger } from "../shared/Logger";
 
 const SPOTIFY_MAX_PLAYLIST_SIZE: number = 10 * 1000;
 export class SpotifyPlaylistUpdater {
 	static update(accessToken: string, refreshToken: string, redirectUri: string): Promise<void> {
-		if (SpotifyPlaylistUpdater.singleton) {
+		if (SpotifyPlaylistUpdater.singleton !== null) {
 			return Promise.reject("Updater is already running");
 		}
 
 		SpotifyPlaylistUpdater.singleton = new SpotifyPlaylistUpdater();
-		return SpotifyPlaylistUpdater.singleton.run(accessToken, refreshToken, redirectUri).then(() => {
-			delete SpotifyPlaylistUpdater.singleton;
+		return SpotifyPlaylistUpdater.singleton.run(accessToken, refreshToken, redirectUri).finally(() => {
+			SpotifyPlaylistUpdater.singleton = null;
 		});
 	}
-	private static singleton: SpotifyPlaylistUpdater;
+	private static singleton: SpotifyPlaylistUpdater|null = null;
 
 	private static getPlaylistNumber(songOffset: number): number {
 		return Math.floor(songOffset / SPOTIFY_MAX_PLAYLIST_SIZE) + 1;
@@ -26,6 +27,7 @@ export class SpotifyPlaylistUpdater {
 
 	private constructor() { }
 	private async run(accessToken: string, refreshToken: string, redirectUri: string): Promise<void> {
+		Logger.getInstance().info(`SpotifyPlaylistUpdater.run(...)`);
 		this.spotify = await RateLimitedSpotifyWebApi.getInstance(accessToken, refreshToken, redirectUri);
 		this.db = await Database.getInstance();
 		return this.ensureTracksInPlaylist();

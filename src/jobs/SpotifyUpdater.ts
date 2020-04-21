@@ -6,17 +6,18 @@ import nlp from 'compromise';
 
 const CHUNK_SIZE: number = 25;
 export class SpotifyUpdater {
-	static singleton: SpotifyUpdater;
 	static update(accessToken: string, refreshToken: string, redirectUri: string): Promise<any> {
-		if (SpotifyUpdater.singleton) {
+		if (SpotifyUpdater.singleton !== null) {
 			return Promise.reject("SpotifyUpdater already running");
 		}
 
 		SpotifyUpdater.singleton = new SpotifyUpdater();
 		return SpotifyUpdater.singleton.initAndStart(accessToken, refreshToken, redirectUri).finally(() => {
 			Logger.getInstance().info(`SpotifyUpdater.initAndStart() DONE`);
+			SpotifyUpdater.singleton = null;
 		});
 	}
+	private static singleton: SpotifyUpdater|null = null;
 	private static generateQuery(artist: string, title: string): string {
 		return `artist:${artist} ${title}`;
 	}
@@ -81,6 +82,10 @@ export class SpotifyUpdater {
 	private addSpotifyInfoToTrack(track: Song): Promise<any> {
 		// First, try searching for just the track by the artist. This works for around half of the ignition DB
 		const firstSearchQuery: string = SpotifyUpdater.generateQuery(track.artist, track.title);
+
+		// TODO add a check for song artists with "ft." and "&".
+		// Example: "Robin Thicke ft. T.I. & Pharrell Williams" becomes "Robin Thicke T.I. Pharrell Williams"
+		// At time of writing, there are around 300 tracks in the database that could gain a spotify track ID with this fix.
 		return this.getTrackIdForSearchQuery(firstSearchQuery)
 			.catch(this.trySeparatingPipedStrings(track))
 			.catch(this.tryRemovingParentheticalSubtitle(track))
