@@ -22,7 +22,8 @@ export class Logger {
 					level: 'warn'
 				}),
 				new winston.transports.File({ filename: 'werror.log', level: 'warn' }),
-				new winston.transports.File({ filename: 'combined.log', level: 'debug' })
+				new winston.transports.File({ filename: 'info.log', level: 'info' }),
+				new winston.transports.File({ filename: 'debug.log', level: 'debug' })
 			]
 		});
 	}

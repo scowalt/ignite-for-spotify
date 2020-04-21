@@ -21,7 +21,7 @@ export class RateLimitedSpotifyWebApi {
 		this.queue = new PromiseQueue({
 			concurrency: 5,
 			interval: 1000,
-			intervalCap: 3
+			intervalCap: 10
 		});
 
 		this.spotify = new SpotifyWebApi({
@@ -92,7 +92,6 @@ export class RateLimitedSpotifyWebApi {
 	}
 
 	private updateAccessToken(): Promise<void> {
-		Logger.getInstance().info(`updateAccessToken()`);
 		return this.spotify.refreshAccessToken().then((value) => {
 			this.spotify.setAccessToken(value.body.access_token);
 			return Promise.resolve();

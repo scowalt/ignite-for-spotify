@@ -39,11 +39,18 @@ export class Database {
 		});
 	}
 
-	getSongsThatNeedSpotifyTrackId(offset: number): Promise<Song[]> {
-		const LIMIT: number = 25;
+	getSongsThatNeedSpotifyTrackId(limit: number, offset: number): Promise<Song[]> {
 		return Song.findAll({
-			limit: LIMIT,
+			limit,
 			offset,
+			where: {
+				spotifyTrackId: null
+			}
+		});
+	}
+
+	getCountSongsThatNeedSpotifyTrackId(): Promise<number> {
+		return Song.count({
 			where: {
 				spotifyTrackId: null
 			}

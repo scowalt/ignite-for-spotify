@@ -2,10 +2,12 @@ import { Database } from '../db/Database';
 import { Song } from '../db/models/Song';
 import { Logger } from '../shared/Logger';
 import { RateLimitedSpotifyWebApi } from '../shared/RateLimitedSpotifyWebApi';
+import nlp from 'compromise';
 
+const CHUNK_SIZE: number = 25;
 export class SpotifyUpdater {
 	static singleton: SpotifyUpdater;
-	static update(accessToken: string, refreshToken: string, redirectUri: string): Promise<void> {
+	static update(accessToken: string, refreshToken: string, redirectUri: string): Promise<any> {
 		if (SpotifyUpdater.singleton) {
 			return Promise.reject("SpotifyUpdater already running");
 		}
@@ -36,57 +38,73 @@ export class SpotifyUpdater {
 
 	private constructor() { }
 
-	private async initAndStart(accessToken: string, refreshToken: string, redirectUri: string): Promise<void> {
+	private async initAndStart(accessToken: string, refreshToken: string, redirectUri: string): Promise<any> {
 		Logger.getInstance().info(`SpotifyUpdater.initAndStart()`);
 		this.spotify = await RateLimitedSpotifyWebApi.getInstance(accessToken, refreshToken, redirectUri);
 		this.db = await Database.getInstance();
 
-		return this.giveTracksSpotify(0).finally(() => {
-			Logger.getInstance().info(`finished this.giveTracksSpotify(0)`);
+		// TODO take advantage of parallelization here, since each track from the database is an independent slice of work
+		const promises: Promise<any>[] = []
+		const totalTracks: number = await this.db.getCountSongsThatNeedSpotifyTrackId();
+		for (let offset: number = 0; offset < totalTracks; offset += CHUNK_SIZE) {
+			promises.push(this.giveTracksSpotify(offset));
+		}
+		return Promise.all(promises).finally(() => {
+			Logger.getInstance().info(`finished this.initAndStart`);
 		});
 	}
 
-	private giveTracksSpotify(offset: number): Promise<void> {
+	private giveTracksSpotify(offset: number): Promise<any> {
 		Logger.getInstance().info(`giveTracksSpotify(${offset})`);
-		return this.db!.getSongsThatNeedSpotifyTrackId(offset).then(this.addSpotifyInfoToTracks.bind(this)).then(([failedTracks, done]) => {
-			if (done) {
-				Logger.getInstance().info(`resolving giveTracksSpotify(${offset})`);
-				return Promise.resolve();
-			}
-
-			// Skip over all of the tracks that have previously failed
-			return this.giveTracksSpotify(offset + failedTracks);
-		});
+		return this.db!.getSongsThatNeedSpotifyTrackId(CHUNK_SIZE, offset).then(this.addSpotifyInfoToTracks.bind(this));
 	}
 
 	// Update all of the provided tracks in the database with their spotify IDs
 	// Returns a promise that resolves with the number of tracks that failed, and a boolean that indicates if there are no more songs
-	private addSpotifyInfoToTracks(tracks: Song[]): Promise<[number, boolean]> {
-		Logger.getInstance().info(`addSpotifyInfoToTracks(${tracks})`);
-		let failedTracks: number = 0;
-		const done: boolean = (tracks.length === 0);
+	private addSpotifyInfoToTracks(tracks: Song[]): Promise<any> {
 		const promises: Promise<any>[] = [];
 		tracks.forEach((track) => {
-			promises.push(this.addSpotifyInfoToTrack(track).catch(() => {
-				Logger.getInstance().debug(`failed to get spotify track info for ({Song with id ${track.id} artist ${track.artist} title ${track.title}})`);
-				failedTracks++;
-			}));
+			const promise: Promise<any> = this.addSpotifyInfoToTrack(track)
+				.then(() => {
+					Logger.getInstance().info(`addSpotifyInfoToTrack SUCCEEDED for ({Song with id ${track.id} artist "${track.artist}" title "${track.title}"})`);
+					return Promise.resolve();
+				})
+				.catch(() => {
+					Logger.getInstance().info(`addSpotifyInfoToTrack FAILED for ({Song with id ${track.id} artist "${track.artist}" title "${track.title}"})`);
+				});
+			promises.push(promise);
 		});
 
-		return Promise.all(promises).then(() => { return Promise.resolve([failedTracks, done]); });
+		return Promise.all(promises);
 	}
 
 	private addSpotifyInfoToTrack(track: Song): Promise<any> {
-		Logger.getInstance().debug(`addSpotifyInfoToTrack({Song with id ${track.id} artist ${track.artist} title ${track.title}})`);
-
 		// First, try searching for just the track by the artist. This works for around half of the ignition DB
 		const firstSearchQuery: string = SpotifyUpdater.generateQuery(track.artist, track.title);
 		return this.getTrackIdForSearchQuery(firstSearchQuery)
 			.catch(this.trySeparatingPipedStrings(track))
 			.catch(this.tryRemovingParentheticalSubtitle(track))
+			.catch(this.tryChangingContractions(track))
 			.then((spotifyTrackId: string) => {
-				return this.db!.addSpotifyTrackIdToSong(track.id, spotifyTrackId);
+				return this.db!.addSpotifyTrackIdToSong(track.id, spotifyTrackId).catch((reason: any) => {
+					// The caller may squash any failure here. However, this failure shouldn't come from the database
+					Logger.getInstance().error(`db.addSpotifyTracIdToSong ERROR ${JSON.stringify(reason)}`);
+					return Promise.reject(reason);
+				});
 			});
+	}
+
+	private tryChangingContractions(track: Song): () => Promise<string> {
+		return () => {
+			// Try expanding and contracting contractions:
+			// example: "Call Me When You Are Sober" is in spotify as "Call Me When You're Sober"
+			// example: "All That I'm Living For" is in spotify as "All That I Am Living For"
+			const queries: string[] = [
+				SpotifyUpdater.generateQuery(track.artist, nlp(track.title).contractions().expand().all().text()),
+				SpotifyUpdater.generateQuery(track.artist, nlp(track.title).contractions().contract().all().text())
+			];
+			return this.getTrackIdFromSearchQueries(queries);
+		}
 	}
 
 	private trySeparatingPipedStrings(track: Song): () => Promise<string> {
