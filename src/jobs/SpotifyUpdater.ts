@@ -68,6 +68,7 @@ export class SpotifyUpdater {
 		const promises: Promise<any>[] = [];
 		tracks.forEach((track) => {
 			promises.push(this.addSpotifyInfoToTrack(track).catch(() => {
+				Logger.getInstance().debug(`failed to get spotify track info for ({Song with id ${track.id} artist ${track.artist} title ${track.title}})`);
 				failedTracks++;
 			}));
 		});
@@ -76,7 +77,7 @@ export class SpotifyUpdater {
 	}
 
 	private addSpotifyInfoToTrack(track: Song): Promise<any> {
-		Logger.getInstance().debug(`addSpotifyInfoToTrack(${track})`);
+		Logger.getInstance().debug(`addSpotifyInfoToTrack({Song with id ${track.id} artist ${track.artist} title ${track.title}})`);
 
 		// First, try searching for just the track by the artist. This works for around half of the ignition DB
 		const firstSearchQuery: string = SpotifyUpdater.generateQuery(track.artist, track.title);

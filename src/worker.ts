@@ -18,6 +18,8 @@ const workers: number = Number(process.env.WEB_CONCURRENCY);
 function start(): void {
 	createIgnitionUpdateQueue().process((job) => {
 		Logger.getInstance().info(`Started Ignition job ${job.id}`);
+
+		// BUG There's potentially an issue where all ignition jobs mark as "failed", even if they succeed
 		return IgnitionUpdater.update();
 	}).finally(() => {
 		Logger.getInstance().info(`Ignition job finished`);
