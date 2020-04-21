@@ -34,22 +34,19 @@ export class RateLimitedSpotifyWebApi {
 	}
 
 	public searchTracks(searchQuery: string) {
-		Logger.getInstance().debug(`RateLimitedSpotifyWebApi.serachTracks(${searchQuery}) [Queue pending promises: ${this.queue.pending}]`);
-		return this.queue.add(() => {
-			Logger.getInstance().debug(`Calling this.spotify.searchTracks(${searchQuery})`);
+		Logger.getInstance().debug(`RateLimitedSpotifyWebApi.serachTracks("${searchQuery}") [Queue pending promises: ${this.queue.pending}]`);
+		return this.enqueue(() => {
+			Logger.getInstance().debug(`Calling this.spotify.searchTracks("${searchQuery}")`);
 			return this.spotify.searchTracks(searchQuery).then((value) => {
-				Logger.getInstance().debug(`this.spotify.searchTracks(${searchQuery}) SUCCEEDED`);
+				Logger.getInstance().debug(`this.spotify.searchTracks("${searchQuery}") SUCCEEDED`);
 				return Promise.resolve(value.body.tracks);
-			}).catch((reason: any) => {
-				Logger.getInstance().debug(`this.spotify.searchTracks(${searchQuery}) FAILED with reason ${JSON.stringify(reason)}`);
-				return Promise.reject(reason);
 			});
 		});
 	}
 
 	public async createPlaylist(id: number): Promise<string> {
-		const userProfile = await this.queue.add(() => { return this.spotify.getMe(); });
-		const createPlaylistResponse = await this.queue.add(() => {
+		const userProfile = await this.enqueue(() => { return this.spotify.getMe(); });
+		const createPlaylistResponse = await this.enqueue(() => {
 			return this.spotify.createPlaylist(userProfile.body.id, `Rocksmith (C)DLC (part ${id}/?)`, {
 				public: false, // Start the playlist private, manually make public later
 				collaborative: false,
@@ -60,7 +57,7 @@ export class RateLimitedSpotifyWebApi {
 	}
 
 	public async getPlaylistTracks(playlistId: string, offset: number, limit: number) {
-		return this.queue.add(() => {
+		return this.enqueue(() => {
 			return this.spotify.getPlaylistTracks(playlistId, {
 				offset,
 				limit
@@ -69,13 +66,13 @@ export class RateLimitedSpotifyWebApi {
 	}
 
 	public async addSongsToPlaylist(playlistId: string, songs: Song[], position: number) {
-		return this.queue.add(() => {
+		return this.enqueue(() => {
 			return this.spotify.addTracksToPlaylist(playlistId, songs.map((song: Song) => { return `spotify:track:${song.spotifyTrackId}`; }), { position });
 		});
 	}
 
 	public async removePlaylistTracksAtPosition(playlistId: string, playlistOffset: number, count: number) {
-		return this.queue.add(async () => {
+		return this.enqueue(async () => {
 			const playlistResponse = await this.spotify.getPlaylist(playlistId);
 			const positions: number[] = [];
 			const limit: number = Math.min(playlistOffset + count, playlistResponse.body.tracks.total);
@@ -101,6 +98,25 @@ export class RateLimitedSpotifyWebApi {
 		return this.spotify.refreshAccessToken().then((value) => {
 			this.spotify.setAccessToken(value.body.access_token);
 			return Promise.resolve();
+		});
+	}
+
+	private enqueue<T>(task: () => Promise<T>): Promise<T> {
+		return this.queue.add(task).catch((reason: any) => {
+			Logger.getInstance().error(`Spotify API error ${JSON.stringify(reason)}`);
+			if (reason && reason.name === "WebapiError" && reason.statusCode === 401 && reason.message === "Unauthorized") {
+				// This action likely failed because the access token expired. Pause execution of tasks in the queue while
+				// the auth token updates to avoid other failures. Retry this task, since it likely only failed due to the
+				// expired token, and return the new result;
+				this.queue.pause();
+				return this.updateAccessToken().then(() => {
+					this.queue.start();
+					return task();
+				});
+			}
+
+			// If the failure was anything else, no need to catch it here.
+			return Promise.reject(reason);
 		});
 	}
 }
