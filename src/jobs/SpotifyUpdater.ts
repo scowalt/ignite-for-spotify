@@ -44,7 +44,6 @@ export class SpotifyUpdater {
 		this.spotify = await RateLimitedSpotifyWebApi.getInstance(accessToken, refreshToken, redirectUri);
 		this.db = await Database.getInstance();
 
-		// TODO take advantage of parallelization here, since each track from the database is an independent slice of work
 		const promises: Promise<any>[] = [];
 		const totalTracks: number = await this.db.getCountSongsThatNeedSpotifyTrackId();
 		for (let offset: number = 0; offset < totalTracks; offset += CHUNK_SIZE) {
@@ -81,6 +80,9 @@ export class SpotifyUpdater {
 
 	private addSpotifyInfoToTrack(track: Song): Promise<any> {
 		// First, try searching for just the track by the artist. This works for around half of the ignition DB
+		// TODO The first search query should try to use the album too.
+		// (example: "artist:bowling for soup Punk Rock 101" returns an aniversary re-recording, but the database
+		// uses the original recording from the album "Drunk Enough to Dance")
 		const firstSearchQuery: string = SpotifyUpdater.generateQuery(track.artist, track.title);
 
 		// TODO add a check for song artists with "ft." and "&".

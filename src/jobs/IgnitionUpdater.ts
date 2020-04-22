@@ -63,11 +63,9 @@ export class IgnitionUpdater {
 	private initAndStart(): Promise<void|void[]> {
 		Logger.getInstance().info(`IgnitionUpdater.initAndStart()`);
 		// TODO for now, this logic assumes that no songs are removed from Ignition at any time. This isn't true,
-		// since dead links are removed from Ignition. This logic will need to be updated to account for that
+		// since dead links are occasionally removed from Ignition. This logic will need to be updated to account for that
 		return Database.getInstance().then((database: Database) => {
 			this.db = database;
-
-			// TODO Ignore all songs that have already been added
 
 			// Make a request to Ignition. This is just to see how many requests will need to be generated and put into the queue
 			const promises: Promise<any>[] = [];

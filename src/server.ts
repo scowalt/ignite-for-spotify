@@ -14,6 +14,8 @@ import { createIgnitionUpdateQueue, createSpotifyUpdateQueue, createPlaylistUpda
 import SpotifyWebApi from 'spotify-web-api-node';
 import favicon from 'serve-favicon';
 import path from 'path';
+import { Database } from './db/Database';
+import { Playlist } from './db/models/Playlist';
 
 const ignitionQueue: IgnitionQueue = createIgnitionUpdateQueue();
 const spotifyUpdateQueue: SpotifyUpdateQueue = createSpotifyUpdateQueue();
@@ -23,6 +25,7 @@ const chance: Chance.Chance = new Chance();
 const app: Express = express();
 const port: number = parseInt(process.env.PORT!);
 const stateKey: string = "spotify_auth_state";
+let database: Database|null = null;
 
 app.use(favicon(path.join(__dirname, '..', 'res', 'icon', 'favicon.ico')));
 app.use(cookieParser());
@@ -83,6 +86,15 @@ app.get('/login', (_request: Request, response: Response) => {
 
 	// Redirect to Spotify to auth. Spotify will respond to redirectUri
 	response.redirect(authorizeUrl);
+});
+
+app.get('/getPlaylists', async (_request: Request, response: Response) => {
+	if (database === null) {
+		database = await Database.getInstance();
+	}
+
+	const playlists: Playlist[] = await database.getAllPlaylists();
+	return response.json(playlists.map((playlist: Playlist) => { return { id: playlist.id, spotifyPlaylistId: playlist.spotifyPlaylistId }; }));
 });
 
 // Client has finished auth on Spotify and credentials have been passed back here.

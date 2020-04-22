@@ -39,6 +39,10 @@ export class Database {
 		});
 	}
 
+	getAllPlaylists(): Promise<Playlist[]> {
+		return Playlist.findAll();
+	}
+
 	getSongsThatNeedSpotifyTrackId(limit: number, offset: number): Promise<Song[]> {
 		return Song.findAll({
 			limit,
