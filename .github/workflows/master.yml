@@ -1,0 +1,47 @@
+name: Master CI and deploy
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [^12.12.0]
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v1
+      with:
+        node-version: ${{ matrix.node-version }}
+
+    - name: Install dependencies
+      run: yarn install
+
+    - name: Run build
+      run: yarn build
+
+  deploy:
+    needs: ["build"] # Ensure successful build before deployment
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+
+    - name: Deploy to self-hosted dokku instance
+      uses: thadeu/easily-dokku-action@v1.0.8
+      env:
+        BRANCH: master
+        PROJECT: spotify-ignition
+        PORT: 22
+        SSH_PRIVATE_KEY: ${{ secrets.DOKKU_PRIVATE_KEY }}
+        SSH_PUBLIC_KEY: ${{ secrets.DOKKU_PUBLIC_KEY }}
+        SSH_HOST: ${{ secrets.DOKKU_HOST }}
+
