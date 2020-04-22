@@ -30,6 +30,7 @@ let database: Database|null = null;
 app.use(favicon(path.join(__dirname, '..', 'res', 'icon', 'favicon.ico')));
 app.use(cookieParser());
 app.use(BodyParser.json());
+app.use(express.static(path.join(__dirname, 'views')));
 
 app.post('/startJob', async (request: Request, response: Response) => {
 	if (!request.body) {
@@ -127,8 +128,8 @@ app.get('/spotifyAuthCallback', (request: Request, response: Response) => {
 	}
 });
 
-app.get('/', (_request: Request, response: Response) => {
-	response.send("Hello world!");
-});
+// app.get('/', (_request: Request, response: Response) => {
+// 	response.send("Hello world!");
+// });
 
 app.listen(port);

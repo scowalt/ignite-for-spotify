@@ -30,10 +30,22 @@ async function restartWorker(): Promise<void> {
 	workerNode = await spawn('node', ['--inspect=9231', `${OUTPUT_DIRECTORY}/worker.js`], { stdio: 'inherit' });
 }
 
-function getSourceFiles(): NodeJS.ReadWriteStream {
-	return gulp.src("src/**");
+function build(): Promise<any> {
+	return Promise.all([
+		buildSourceTypeScript(),
+		copyStaticFiles()
+	]);
 }
-function build(): NodeJS.ReadWriteStream {
+
+function copyStaticFiles(): NodeJS.ReadWriteStream {
+	return gulp.src(['src/**/*.html', 'src/**/*.css'])
+		.pipe(gulp.dest(`${OUTPUT_DIRECTORY}`));
+}
+
+function getSourceFiles(): NodeJS.ReadWriteStream {
+	return gulp.src("src/**/*.{ts,tsx}");
+}
+function buildSourceTypeScript(): NodeJS.ReadWriteStream {
 	return getSourceFiles()
 		.pipe(sourcemaps.init()) // Necessary for sourcemap generation
 		.pipe(tsProject())
