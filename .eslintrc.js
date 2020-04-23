@@ -155,9 +155,9 @@ module.exports = {
             "error",
             "never"
         ],
-        "radix": "off",
+        "radix": "error",
         "spaced-comment": "error",
         "use-isnan": "error",
-        "valid-typeof": "off"
+        "valid-typeof": "error"
     }
 };

@@ -26,7 +26,7 @@ const playlistUpdateQueue: PlaylistUpdateQueue = createPlaylistUpdateQueue();
 const redirectUri: string = process.env.BASE_URL! + "/spotifyAuthCallback";
 const chance: Chance.Chance = new Chance();
 const app: Express = express();
-const port: number = parseInt(process.env.PORT!);
+const port: number = parseInt(process.env.PORT!, 10);
 const stateKey: string = "spotify_auth_state";
 let database: Database|null = null;
 
