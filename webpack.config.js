@@ -1,6 +1,7 @@
 // webpack.config.js
 const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const TerserPlugin = require('terser-webpack-plugin');
 const path = require('path');
 
 module.exports = (env) => {
@@ -34,8 +35,19 @@ module.exports = (env) => {
 			stats: 'errors-only', // lots of warning noise from sequelize
             externals: ['pg', 'sqlite3', 'tedious', 'pg-hstore'], // Work-around for sequelize: https://github.com/sequelize/sequelize/issues/7509#issuecomment-616235834
             plugins: [
-                new webpack.DefinePlugin({ "global.GENTLY": false }) // https://github.com/node-formidable/formidable/issues/337#issuecomment-153408479
-            ],
+				new webpack.DefinePlugin({ "global.GENTLY": false }), // https://github.com/node-formidable/formidable/issues/337#issuecomment-153408479
+
+			],
+			optimization: {
+				// Necessary to pack mysql2, which is required for sequelize. See https://github.com/sidorares/node-mysql2/issues/1016#issuecomment-549105591
+				minimizer: [
+				  new TerserPlugin({
+					terserOptions: {
+						keep_fnames: true
+					}
+				  })
+				]
+			},
         };
     }
 
