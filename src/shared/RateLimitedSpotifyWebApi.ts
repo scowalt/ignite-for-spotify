@@ -3,6 +3,10 @@ import PromiseQueue from "p-queue";
 import { Logger } from "./Logger";
 import { Song } from "../db/models/Song";
 import { RefreshAccessTokenResponse } from "../../lib/@types/spotify-web-api-node";
+import { Query } from "./Query";
+import { promisify } from 'util';
+
+const wait: (ms: number) => Promise<void> = promisify(setTimeout);
 
 export class RateLimitedSpotifyWebApi {
 	public static async getInstance(accessToken: string, refreshToken: string, redirectUri: string): Promise<RateLimitedSpotifyWebApi> {
@@ -21,8 +25,9 @@ export class RateLimitedSpotifyWebApi {
 	private constructor(accessToken: string, refreshToken: string, redirectUri: string) {
 		this.queue = new PromiseQueue({
 			concurrency: 5,
-			interval: 1000,
-			intervalCap: 10
+			interval: 1 * 1000, // one second
+			// Spotify doesn't prescribe how many requests are allowed per second. In my testing, I've found that 10/s is too many.
+			intervalCap: 8
 		});
 
 		this.spotify = new SpotifyWebApi({
@@ -34,11 +39,11 @@ export class RateLimitedSpotifyWebApi {
 		this.spotify.setRefreshToken(refreshToken);
 	}
 
-	public searchTracks(searchQuery: string): Promise<SpotifyApi.PagingObject<SpotifyApi.TrackObjectFull> | undefined> {
-		Logger.getInstance().debug(`RateLimitedSpotifyWebApi.serachTracks("${searchQuery}") [Queue pending promises: ${this.queue.pending}]`);
+	public searchTracks(searchQuery: Query): Promise<SpotifyApi.PagingObject<SpotifyApi.TrackObjectFull> | undefined> {
+		Logger.getInstance().debug(`RateLimitedSpotifyWebApi.serachTracks("${searchQuery.toString()}") [Queue pending promises: ${this.queue.pending}]`);
 		return this.enqueue(() => {
-			Logger.getInstance().debug(`Calling this.spotify.searchTracks("${searchQuery}")`);
-			return this.spotify.searchTracks(searchQuery).then((value: SpotifyWebApi.Response<SpotifyApi.SearchResponse>) => {
+			Logger.getInstance().debug(`Calling this.spotify.searchTracks("${searchQuery.toString()}")`);
+			return this.spotify.searchTracks(searchQuery.toString()).then((value: SpotifyWebApi.Response<SpotifyApi.SearchResponse>) => {
 				Logger.getInstance().debug(`this.spotify.searchTracks("${searchQuery}") SUCCEEDED`);
 				return Promise.resolve(value.body.tracks);
 			});
@@ -105,12 +110,22 @@ export class RateLimitedSpotifyWebApi {
 	private enqueue<T>(task: () => Promise<T>): Promise<T> {
 		return this.queue.add(task).catch((reason: any) => {
 			Logger.getInstance().error(`Spotify API error ${JSON.stringify(reason)}`);
+			let restartCondition: Promise<void>|undefined;
 			if (reason && reason.name === "WebapiError" && reason.statusCode === 401 && reason.message === "Unauthorized") {
 				// This action likely failed because the access token expired. Pause execution of tasks in the queue while
 				// the auth token updates to avoid other failures. Retry this task, since it likely only failed due to the
 				// expired token, and return the new result;
+				restartCondition = this.updateAccessToken();
+			}else if (reason && reason.name === `WebapiError` && reason.statusCode === 429 && reason.message === "Too Many Requests") {
+				// The Spotify API returns a "Retry-After" header that prescribes the exact amount of time that should pass before more requests are sent.
+				// Unfortunately, this information isn't exposed by the spotify api wrapper. So, for now, just wait a constant amount of seconds.
+				// See https://stackoverflow.com/a/30557896/1222411
+				restartCondition = wait(4*1000);
+			}
+
+			if (restartCondition) {
 				this.queue.pause();
-				return this.updateAccessToken().then(() => {
+				return restartCondition.then(() => {
 					this.queue.start();
 					return task();
 				});

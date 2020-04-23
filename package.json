@@ -4,10 +4,10 @@
     "description": "",
     "main": "index.js",
     "scripts": {
-        "build": "webpack --env.production",
+        "build": "webpack --env.development",
         "heroku-postbuild": "webpack --env.production",
         "clean": "node ./node_modules/trash-cli/cli.js dist/**",
-        "watch": "concurrently \"webpack --env.development --watch\" \"nodemon --inspect=9229 ./dist/server.js\" \"nodemon --inspect=9300 ./dist/worker.js\" --prefix \"{time}-{pid}\"",
+        "watch": "concurrently \"webpack --env.development --watch\" \"nodemon --watch dist --inspect=9229 ./dist/server.js\" \"nodemon --watch dist --inspect=9300 ./dist/worker.js\" --prefix \"{time}-{pid}\"",
         "lint": "eslint src/**"
     },
     "engines": {

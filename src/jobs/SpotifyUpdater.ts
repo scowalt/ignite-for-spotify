@@ -3,6 +3,7 @@ import { Song } from '../db/models/Song';
 import { Logger } from '../shared/Logger';
 import { RateLimitedSpotifyWebApi } from '../shared/RateLimitedSpotifyWebApi';
 import nlp from 'compromise';
+import { Query } from '../shared/Query';
 
 const CHUNK_SIZE: number = 25;
 export class SpotifyUpdater {
@@ -18,16 +19,13 @@ export class SpotifyUpdater {
 		});
 	}
 	private static singleton: SpotifyUpdater|null = null;
-	private static generateQuery(artist: string, title: string): string {
-		return `artist:${artist} ${title}`;
-	}
-	private static generatePipeQueries(artist: string, title: string): string[] {
+	private static generatePipeQueries(artist: string, title: string): Query[] {
 		const artists: string[] = artist.split('|').map((str: string) => { return str.trim(); });
 		const titles: string[] = title.split('|').map((str: string) => { return str.trim(); });
-		const queries: string[] = [];
+		const queries: Query[] = [];
 		artists.forEach((a: string) => {
 			titles.forEach((t: string) => {
-				queries.push(SpotifyUpdater.generateQuery(a, t));
+				queries.push(new Query(a, t));
 			});
 		});
 
@@ -79,23 +77,23 @@ export class SpotifyUpdater {
 	}
 
 	private addSpotifyInfoToTrack(track: Song): Promise<any> {
-		// First, try searching for just the track by the artist. This works for around half of the ignition DB
-		// TODO The first search query should try to use the album too.
+		// First, try searching for just the track by the artist on the album. The album is an important inclusion in first search
 		// (example: "artist:bowling for soup Punk Rock 101" returns an aniversary re-recording, but the database
 		// uses the original recording from the album "Drunk Enough to Dance")
-		const firstSearchQuery: string = SpotifyUpdater.generateQuery(track.artist, track.title);
+		const firstSearchQuery: Query = new Query(track.artist, track.title, track.album);
 
 		// TODO add a check for song artists with "ft." and "&".
 		// Example: "Robin Thicke ft. T.I. & Pharrell Williams" becomes "Robin Thicke T.I. Pharrell Williams"
 		// At time of writing, there are around 300 tracks in the database that could gain a spotify track ID with this fix.
 		return this.getTrackIdForSearchQuery(firstSearchQuery)
+			.catch(() => { return this.getTrackIdForSearchQuery(new Query(track.artist, track.title));})
 			.catch(this.trySeparatingPipedStrings(track))
 			.catch(this.tryRemovingParentheticalSubtitle(track))
 			.catch(this.tryChangingContractions(track))
 			.then((spotifyTrackId: string) => {
 				return this.db.addSpotifyTrackIdToSong(track.id, spotifyTrackId).catch((reason: any) => {
 					// The caller may squash any failure here. However, this failure shouldn't come from the database
-					Logger.getInstance().error(`db.addSpotifyTracIdToSong ERROR ${JSON.stringify(reason)}`);
+					Logger.getInstance().error(`db.addSpotifyTrackIdToSong ERROR ${JSON.stringify(reason)}`);
 					return Promise.reject(reason);
 				});
 			});
@@ -106,9 +104,9 @@ export class SpotifyUpdater {
 			// Try expanding and contracting contractions:
 			// example: "Call Me When You Are Sober" is in spotify as "Call Me When You're Sober"
 			// example: "All That I'm Living For" is in spotify as "All That I Am Living For"
-			const queries: string[] = [
-				SpotifyUpdater.generateQuery(track.artist, nlp(track.title).contractions().expand().all().text()),
-				SpotifyUpdater.generateQuery(track.artist, nlp(track.title).contractions().contract().all().text())
+			const queries: Query[] = [
+				new Query(track.artist, nlp(track.title).contractions().expand().all().text()),
+				new Query(track.artist, nlp(track.title).contractions().contract().all().text())
 			];
 			return this.getTrackIdFromSearchQueries(queries);
 		};
@@ -121,7 +119,7 @@ export class SpotifyUpdater {
 			// The order may also be reversed. Some may even be in the form "name1 | name2 | name3".
 			// There is no way to know which name or name combination might be valid.
 			// So, generate an array of all of the possible queries, and search them one-by-one
-			const pipeQueries: string[] = SpotifyUpdater.generatePipeQueries(track.artist, track.title);
+			const pipeQueries: Query[] = SpotifyUpdater.generatePipeQueries(track.artist, track.title);
 			return this.getTrackIdFromSearchQueries(pipeQueries);
 		};
 	}
@@ -136,11 +134,11 @@ export class SpotifyUpdater {
 			if (match === null) {
 				return Promise.reject(`No parenthetical subtitle found`);
 			}
-			return this.getTrackIdForSearchQuery(SpotifyUpdater.generateQuery(track.artist, match[1]));
+			return this.getTrackIdForSearchQuery(new Query(track.artist, match[1]));
 		};
 	}
 
-	private async getTrackIdFromSearchQueries(searchQueries: string[]): Promise<string> {
+	private async getTrackIdFromSearchQueries(searchQueries: Query[]): Promise<string> {
 		if (searchQueries.length === 0) {
 			return Promise.reject(`No spotify track found for any provided search queries`);
 		}
@@ -150,8 +148,8 @@ export class SpotifyUpdater {
 		});
 	}
 
-	private getTrackIdForSearchQuery(searchQuery: string): Promise<string> {
-		return this.spotify.searchTracks(searchQuery).then((tracks: SpotifyApi.PagingObject<SpotifyApi.TrackObjectFull> | undefined) => {
+	private getTrackIdForSearchQuery(searchQuery: Query): Promise<string> {
+		return this.spotify.searchTracks(searchQuery).then((tracks?: SpotifyApi.PagingObject<SpotifyApi.TrackObjectFull>) => {
 			if (!tracks || tracks.total === 0) {
 				return Promise.reject(`Spotify has no track for ${searchQuery}`);
 			} else {
