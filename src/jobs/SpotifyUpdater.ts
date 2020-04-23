@@ -102,7 +102,7 @@ export class SpotifyUpdater {
 	}
 
 	private tryChangingContractions(track: Song): () => Promise<string> {
-		return () => {
+		return (): Promise<string> => {
 			// Try expanding and contracting contractions:
 			// example: "Call Me When You Are Sober" is in spotify as "Call Me When You're Sober"
 			// example: "All That I'm Living For" is in spotify as "All That I Am Living For"
@@ -115,7 +115,7 @@ export class SpotifyUpdater {
 	}
 
 	private trySeparatingPipedStrings(track: Song): () => Promise<string> {
-		return () => {
+		return (): Promise<string> => {
 			// It's possible that the artist and/or title of the track has is listed as:
 			// "{Non-english name} | {English name}" (example: "Sektor Gaza | Сектор газа")
 			// The order may also be reversed. Some may even be in the form "name1 | name2 | name3".
@@ -127,7 +127,7 @@ export class SpotifyUpdater {
 	}
 
 	private tryRemovingParentheticalSubtitle(track: Song): () => Promise<string> {
-		return () => {
+		return (): Promise<string> => {
 			// Sometimes a track title will have a parenthetical subtitle that doesn't appear on Spotify.
 			// For example, "Welcome to the Machine (Cover)" by Shadows Fall appears on Spotify as "Welcome to the Machine".
 			// Removing the parenthetical subtitle might help find the track

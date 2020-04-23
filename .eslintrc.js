@@ -81,7 +81,7 @@ module.exports = {
             ]
         }],
         "@typescript-eslint/no-inferrable-types": "off", // HACK: Consider turning this on in the future
-        "@typescript-eslint/explicit-function-return-type": "off", // HACK: can't be enabled due to spotify-web-api-node not exporting the necessary types
+        "@typescript-eslint/explicit-function-return-type": "error",
         "@typescript-eslint/no-non-null-assertion": "off", // HACK: eventually turn this back on
         "@typescript-eslint/no-empty-interface": "off", // Empty interfaces are good placeholders in case the interface needs expansion later
         "@typescript-eslint/no-explicit-any": "off", // This will make it less messy to type functions that return Promises whose output isn't needed

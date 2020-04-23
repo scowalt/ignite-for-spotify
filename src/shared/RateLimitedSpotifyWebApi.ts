@@ -34,7 +34,7 @@ export class RateLimitedSpotifyWebApi {
 		this.spotify.setRefreshToken(refreshToken);
 	}
 
-	public searchTracks(searchQuery: string) {
+	public searchTracks(searchQuery: string): Promise<SpotifyApi.PagingObject<SpotifyApi.TrackObjectFull> | undefined> {
 		Logger.getInstance().debug(`RateLimitedSpotifyWebApi.serachTracks("${searchQuery}") [Queue pending promises: ${this.queue.pending}]`);
 		return this.enqueue(() => {
 			Logger.getInstance().debug(`Calling this.spotify.searchTracks("${searchQuery}")`);
@@ -57,7 +57,7 @@ export class RateLimitedSpotifyWebApi {
 		return createPlaylistResponse.body.id;
 	}
 
-	public async getPlaylistTracks(playlistId: string, offset: number, limit: number) {
+	public async getPlaylistTracks(playlistId: string, offset: number, limit: number): Promise<SpotifyWebApi.Response<SpotifyApi.PlaylistTrackResponse>> {
 		return this.enqueue(() => {
 			return this.spotify.getPlaylistTracks(playlistId, {
 				offset,
@@ -66,13 +66,13 @@ export class RateLimitedSpotifyWebApi {
 		});
 	}
 
-	public async addSongsToPlaylist(playlistId: string, songs: Song[], position: number) {
+	public async addSongsToPlaylist(playlistId: string, songs: Song[], position: number): Promise<SpotifyWebApi.Response<SpotifyApi.AddTracksToPlaylistResponse>> {
 		return this.enqueue(() => {
 			return this.spotify.addTracksToPlaylist(playlistId, songs.map((song: Song) => { return `spotify:track:${song.spotifyTrackId}`; }), { position });
 		});
 	}
 
-	public async removePlaylistTracksAtPosition(playlistId: string, playlistOffset: number, count: number) {
+	public async removePlaylistTracksAtPosition(playlistId: string, playlistOffset: number, count: number): Promise<SpotifyWebApi.Response<SpotifyApi.RemoveTracksFromPlaylistResponse>> {
 		return this.enqueue(async () => {
 			const playlistResponse: SpotifyWebApi.Response<SpotifyApi.SinglePlaylistResponse> = await this.spotify.getPlaylist(playlistId);
 			const positions: number[] = [];
