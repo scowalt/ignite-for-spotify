@@ -10,8 +10,8 @@ export class Query {
 	}
 
 	public toString(): string {
-		const albumSearch: string = (this.album) ? `album:${this.album}` : '';
-		const str: string = `artist:${this.artist} ${albumSearch} ${this.title}`;
+		const albumSearch: string = (this.album) ? `album:${this.album} ` : '';
+		const str: string = `artist:${this.artist} ${albumSearch}${this.title}`;
 		return str;
 	}
 }

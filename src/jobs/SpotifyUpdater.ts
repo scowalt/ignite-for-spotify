@@ -132,6 +132,7 @@ export class SpotifyUpdater {
 			const expression: RegExp = /(.*\S)\s*\(.*\)/;
 			const match: RegExpExecArray | null = expression.exec(track.title);
 			if (match === null) {
+				Logger.getInstance().debug(`No parenthetical subtitle found for "${track.title}"`);
 				return Promise.reject(`No parenthetical subtitle found`);
 			}
 			return this.getTrackIdForSearchQuery(new Query(track.artist, match[1]));
