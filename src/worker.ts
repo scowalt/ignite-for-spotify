@@ -15,25 +15,6 @@ import { SpotifyPlaylistUpdater } from './jobs/SpotifyPlaylistUpdater';
 
 const workers: number = Number(process.env.WEB_CONCURRENCY);
 
-function start(): void {
-	createIgnitionUpdateQueue().process((job: Bull.Job<IgnitionJobData>) => {
-		Logger.getInstance().info(`Started Ignition job ${job.id}`);
-
-		// BUG There's potentially an issue where all ignition jobs mark as "failed", even if they succeed.
-		// This could be because job success relies on all ~1700 requests to the CustomsForge server completing successfully
-		return IgnitionUpdater.update();
-	}).finally(() => {
-		Logger.getInstance().info(`Ignition job finished`);
-	});
-	createSpotifyUpdateQueue().process(spotifyProcessFunction).finally(() => {
-		Logger.getInstance().info(`Spotify job finished`);
-	});
-
-	createPlaylistUpdateQueue().process(playlistProcessFunction).finally(() => {
-		Logger.getInstance().info(`Playlist job finished`);
-	});
-}
-
 function spotifyProcessFunction(job: Bull.Job<SpotifyUpdateJobData>): Promise<void> {
 	Logger.getInstance().info(`Started Spotify job ${job.id}`);
 	const redirectUri: string = ""; // TODO need to figure out how to handle this in the spotify API
@@ -59,6 +40,25 @@ function playlistProcessFunction(_job: Bull.Job<PlaylistJobData>): Promise<void>
 	return SpotifyPlaylistUpdater.update(process.env.SPOTIFY_ACCOUNT_ACCESS_TOKEN, process.env.SPOTIFY_ACCOUNT_REFRESH_TOKEN, redirectUri).catch((reason: any) => {
 		Logger.getInstance().error(`SpotifyPlaylistUpdater failed with reason ${reason.toString()}`);
 		return Promise.reject(reason);
+	});
+}
+
+function start(): void {
+	createIgnitionUpdateQueue().process((job: Bull.Job<IgnitionJobData>) => {
+		Logger.getInstance().info(`Started Ignition job ${job.id}`);
+
+		// BUG There's potentially an issue where all ignition jobs mark as "failed", even if they succeed.
+		// This could be because job success relies on all ~1700 requests to the CustomsForge server completing successfully
+		return IgnitionUpdater.update();
+	}).finally(() => {
+		Logger.getInstance().info(`Ignition job finished`);
+	});
+	createSpotifyUpdateQueue().process(spotifyProcessFunction).finally(() => {
+		Logger.getInstance().info(`Spotify job finished`);
+	});
+
+	createPlaylistUpdateQueue().process(playlistProcessFunction).finally(() => {
+		Logger.getInstance().info(`Playlist job finished`);
 	});
 }
 

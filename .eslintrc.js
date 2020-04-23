@@ -88,7 +88,7 @@ module.exports = {
         "no-param-reassign": "error",
         "@typescript-eslint/no-parameter-properties": "error",
         "@typescript-eslint/no-require-imports": "error",
-        "@typescript-eslint/no-use-before-define": "off",
+        "@typescript-eslint/no-use-before-define": "error",
         "@typescript-eslint/prefer-for-of": "error",
         "@typescript-eslint/prefer-function-type": "error",
         "@typescript-eslint/prefer-readonly": "error",
