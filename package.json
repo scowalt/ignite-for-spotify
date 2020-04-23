@@ -4,8 +4,11 @@
     "description": "",
     "main": "index.js",
     "scripts": {
-        "build": "gulp build",
-        "heroku-postbuild": "gulp build"
+        "build": "webpack --env.production",
+        "heroku-postbuild": "webpack --env.production",
+        "clean": "node ./node_modules/trash-cli/cli.js dist/**",
+        "watch": "concurrently \"webpack --env.development --watch\" \"nodemon --inspect=9229 ./dist/server.js\" \"nodemon --inspect=9300 ./dist/worker.js\" --prefix \"{time}-{pid}\"",
+        "lint": "eslint src/**"
     },
     "engines": {
         "node": "^12.12.0"
@@ -29,6 +32,8 @@
         "node-fetch": "^2.6.0",
         "p-queue": "^6.3.0",
         "qs": "^6.9.3",
+        "react": "^16.13.1",
+        "react-dom": "^16.13.1",
         "reflect-metadata": "^0.1.13",
         "sequelize": "^5.21.6",
         "sequelize-typescript": "^1.1.0",
@@ -44,27 +49,30 @@
         "@types/chance": "^1.0.10",
         "@types/cookie-parser": "^1.4.2",
         "@types/express": "^4.17.4",
-        "@types/gulp": "^4.0.6",
-        "@types/gulp-sourcemaps": "^0.0.32",
         "@types/he": "^1.1.1",
         "@types/js-cookie": "^2.2.5",
         "@types/mysql": "^2.15.9",
         "@types/node": "^13.11.1",
         "@types/node-fetch": "^2.5.5",
         "@types/qs": "^6.9.1",
+        "@types/react": "^16.9.34",
+        "@types/react-dom": "^16.9.6",
         "@types/serve-favicon": "^2.5.0",
         "@types/spotify-web-api-node": "^4.0.1",
         "@types/throng": "^4.0.2",
         "@types/validator": "^13.0.0",
+        "@typescript-eslint/eslint-plugin": "^2.29.0",
+        "@typescript-eslint/parser": "^2.29.0",
+        "concurrently": "^5.1.0",
         "del": "^5.1.0",
-        "gulp": "^4.0.2",
-        "gulp-cli": "^2.2.0",
-        "gulp-sourcemaps": "^2.6.5",
-        "gulp-tslint": "^8.1.4",
-        "gulp-typescript": "^6.0.0-alpha.1",
+        "eslint": "^6.8.0",
+        "eslint-plugin-html": "^6.0.2",
+        "html-webpack-plugin": "^4.2.0",
         "trash-cli": "^3.0.0",
+        "ts-loader": "^7.0.1",
         "ts-node": "^8.9.0",
-        "tslint": "^6.1.1",
-        "typescript": "^3.8.3"
+        "typescript": "^3.8.3",
+        "webpack": "^4.43.0",
+        "webpack-cli": "^3.3.11"
     }
 }

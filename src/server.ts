@@ -30,7 +30,9 @@ let database: Database|null = null;
 app.use(favicon(path.join(__dirname, '..', 'res', 'icon', 'favicon.ico')));
 app.use(cookieParser());
 app.use(BodyParser.json());
-app.use(express.static(path.join(__dirname, 'views')));
+
+// HACK: __dirname must inaccurate here in order for webpack to work, but this is a bad work-around since it depends on "dist" naming
+app.use(express.static(path.join(__dirname, '..', 'dist', 'views')));
 
 app.post('/startJob', async (request: Request, response: Response) => {
 	if (!request.body) {

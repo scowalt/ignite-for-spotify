@@ -252,10 +252,11 @@ export class IgnitionUpdater {
 
 	private performIgnitionRequest(offset: number): Promise<boolean[]> {
 		Logger.getInstance().info(`performIgnitionRequest(${offset})`);
-		return fetch(ignitionDirectoryUrl, this.generateIgnitionRequestInit(offset)).then((response: FetchResponse) => {
-			return response.json();
-		})
-		.then(this.addIgnitionTracksToDatabase.bind(this));
+		return fetch(ignitionDirectoryUrl, this.generateIgnitionRequestInit(offset))
+			.then((response: FetchResponse) => {
+				return response.json();
+			})
+			.then(this.addIgnitionTracksToDatabase.bind(this));
 	}
 
 	private addIgnitionTracksToDatabase(ignitionResult: IgnitionApiResponse): Promise<boolean[]> {
@@ -272,7 +273,7 @@ export class IgnitionUpdater {
 
 	private tryAddEntry(entry: dlcEntry): Promise<boolean> {
 		const parts: string = entry[10];
-		return this.db!.tryAddSong({
+		return this.db.tryAddSong({
 			id: entry[0],
 			artist: decode(entry[1]),
 			title: decode(entry[2]),
@@ -282,10 +283,10 @@ export class IgnitionUpdater {
 			author: entry[6],
 			dateAddedToIgnition: new Date(entry[7] * 1000),
 			dateUpdatedInIgnition: new Date(entry[8] * 1000),
-			lead: parts.indexOf('lead') !== -1,
-			rhythm: parts.indexOf('rhythm') !== -1,
-			bass: parts.indexOf('bass') !== -1,
-			vocals: parts.indexOf('vocals') !== -1,
+			lead: parts.includes('lead'),
+			rhythm: parts.includes('rhythm'),
+			bass: parts.includes('bass'),
+			vocals: parts.includes('vocals'),
 			dynamicDifficulty: entry[11],
 			downloadLink: entry[16]
 		});

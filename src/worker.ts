@@ -37,8 +37,8 @@ function start(): void {
 function spotifyProcessFunction(job: Bull.Job<SpotifyUpdateJobData>): Promise<void> {
 	Logger.getInstance().info(`Started Spotify job ${job.id}`);
 	const redirectUri: string = ""; // TODO need to figure out how to handle this in the spotify API
-	if (process.env.SPOTIFY_ACCOUNT_ACCESS_TOKEN === undefined ||
-		process.env.SPOTIFY_ACCOUNT_REFRESH_TOKEN === undefined) {
+	if (!process.env.SPOTIFY_ACCOUNT_ACCESS_TOKEN ||
+		!process.env.SPOTIFY_ACCOUNT_REFRESH_TOKEN) {
 		assert(false, "Spotify access and refresh tokens must be set as environment variables");
 		return Promise.reject("Spotify access and refresh tokens must be set as environment variables");
 	}
@@ -50,8 +50,8 @@ function spotifyProcessFunction(job: Bull.Job<SpotifyUpdateJobData>): Promise<vo
 
 function playlistProcessFunction(_job: Bull.Job<PlaylistJobData>): Promise<void> {
 	const redirectUri: string = ""; // TODO need to figure out how to handle this in the spotify API
-	if (process.env.SPOTIFY_ACCOUNT_ACCESS_TOKEN === undefined ||
-		process.env.SPOTIFY_ACCOUNT_REFRESH_TOKEN === undefined) {
+	if (!process.env.SPOTIFY_ACCOUNT_ACCESS_TOKEN ||
+		!process.env.SPOTIFY_ACCOUNT_REFRESH_TOKEN) {
 		assert(false, "Spotify access and refresh tokens must be set as environment variables");
 		return Promise.reject("Spotify access and refresh tokens must be set as environment variables");
 	}

@@ -2,6 +2,9 @@
     "compilerOptions": {
         "strict": true,
         "jsx": "react",
+        "rootDir": "src",
+        "outDir": "./dist/",
+        "sourceMap": true,
         "esModuleInterop": true, // required for express
         "noImplicitAny": true,
         "target": "es6", // required for sequelize-typescript syntax

@@ -56,7 +56,7 @@ export class SpotifyUpdater {
 
 	private giveTracksSpotify(offset: number): Promise<any> {
 		Logger.getInstance().debug(`giveTracksSpotify(${offset})`);
-		return this.db!.getSongsThatNeedSpotifyTrackId(CHUNK_SIZE, offset).then(this.addSpotifyInfoToTracks.bind(this));
+		return this.db.getSongsThatNeedSpotifyTrackId(CHUNK_SIZE, offset).then(this.addSpotifyInfoToTracks.bind(this));
 	}
 
 	// Update all of the provided tracks in the database with their spotify IDs
@@ -93,7 +93,7 @@ export class SpotifyUpdater {
 			.catch(this.tryRemovingParentheticalSubtitle(track))
 			.catch(this.tryChangingContractions(track))
 			.then((spotifyTrackId: string) => {
-				return this.db!.addSpotifyTrackIdToSong(track.id, spotifyTrackId).catch((reason: any) => {
+				return this.db.addSpotifyTrackIdToSong(track.id, spotifyTrackId).catch((reason: any) => {
 					// The caller may squash any failure here. However, this failure shouldn't come from the database
 					Logger.getInstance().error(`db.addSpotifyTracIdToSong ERROR ${JSON.stringify(reason)}`);
 					return Promise.reject(reason);

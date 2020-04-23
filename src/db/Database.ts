@@ -88,7 +88,7 @@ export class Database {
 		this.sequelize.addModels([Song, Playlist]);
 
 		return this.sequelize.authenticate()
-			.then(this.syncTables);
+			.then(this.syncTables.bind(this));
 	}
 
 	private syncTables(): Promise<any> {
