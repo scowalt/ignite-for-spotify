@@ -98,7 +98,7 @@ module.exports = {
         ],
         "@typescript-eslint/unified-signatures": "error",
         "camelcase": "error",
-        "complexity": "off",
+        "complexity": "error",
         "constructor-super": "error",
         "curly": "error",
         "dot-notation": "error",
