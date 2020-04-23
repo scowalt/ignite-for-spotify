@@ -10,7 +10,7 @@ import { SpotifyUpdater } from './jobs/SpotifyUpdater';
 import { IgnitionUpdater } from './jobs/IgnitionUpdater';
 import { Logger } from './shared/Logger';
 import Bull from 'bull';
-import { SpotifyUpdateJobData, PlaylistJobData, IgnitionJobData } from './shared/types';
+import { SpotifyUpdateJobData, IgnitionJobData } from './shared/types';
 import { SpotifyPlaylistUpdater } from './jobs/SpotifyPlaylistUpdater';
 
 const workers: number = Number(process.env.WEB_CONCURRENCY);
@@ -29,7 +29,7 @@ function spotifyProcessFunction(job: Bull.Job<SpotifyUpdateJobData>): Promise<vo
 	});
 }
 
-function playlistProcessFunction(_job: Bull.Job<PlaylistJobData>): Promise<void> {
+function playlistProcessFunction(): Promise<void> {
 	const redirectUri: string = ""; // TODO need to figure out how to handle this in the spotify API
 	if (!process.env.SPOTIFY_ACCOUNT_ACCESS_TOKEN ||
 		!process.env.SPOTIFY_ACCOUNT_REFRESH_TOKEN) {
