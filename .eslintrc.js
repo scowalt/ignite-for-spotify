@@ -133,8 +133,8 @@ module.exports = {
         "no-debugger": "error",
         "no-empty": "error",
         "no-eval": "error",
-        "no-fallthrough": "off",
-        "no-invalid-this": "off",
+        "no-fallthrough": "error",
+        "no-invalid-this": "error",
         "no-new-wrappers": "error",
         "no-shadow": [
             "error",
