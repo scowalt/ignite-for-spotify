@@ -2,6 +2,7 @@ import SpotifyWebApi from "spotify-web-api-node";
 import PromiseQueue from "p-queue";
 import { Logger } from "./Logger";
 import { Song } from "../db/models/Song";
+import { RefreshAccessTokenResponse } from "../../lib/@types/spotify-web-api-node";
 
 export class RateLimitedSpotifyWebApi {
 	public static async getInstance(accessToken: string, refreshToken: string, redirectUri: string): Promise<RateLimitedSpotifyWebApi> {
@@ -37,7 +38,7 @@ export class RateLimitedSpotifyWebApi {
 		Logger.getInstance().debug(`RateLimitedSpotifyWebApi.serachTracks("${searchQuery}") [Queue pending promises: ${this.queue.pending}]`);
 		return this.enqueue(() => {
 			Logger.getInstance().debug(`Calling this.spotify.searchTracks("${searchQuery}")`);
-			return this.spotify.searchTracks(searchQuery).then((value) => {
+			return this.spotify.searchTracks(searchQuery).then((value: SpotifyWebApi.Response<SpotifyApi.SearchResponse>) => {
 				Logger.getInstance().debug(`this.spotify.searchTracks("${searchQuery}") SUCCEEDED`);
 				return Promise.resolve(value.body.tracks);
 			});
@@ -45,8 +46,8 @@ export class RateLimitedSpotifyWebApi {
 	}
 
 	public async createPlaylist(id: number): Promise<string> {
-		const userProfile = await this.enqueue(() => { return this.spotify.getMe(); });
-		const createPlaylistResponse = await this.enqueue(() => {
+		const userProfile: SpotifyWebApi.Response<SpotifyApi.CurrentUsersProfileResponse> = await this.enqueue(() => { return this.spotify.getMe(); });
+		const createPlaylistResponse: SpotifyWebApi.Response<SpotifyApi.CreatePlaylistResponse> = await this.enqueue(() => {
 			return this.spotify.createPlaylist(userProfile.body.id, `Rocksmith (C)DLC (part ${id}/?)`, {
 				public: false, // Start the playlist private, manually make public later
 				collaborative: false,
@@ -73,7 +74,7 @@ export class RateLimitedSpotifyWebApi {
 
 	public async removePlaylistTracksAtPosition(playlistId: string, playlistOffset: number, count: number) {
 		return this.enqueue(async () => {
-			const playlistResponse = await this.spotify.getPlaylist(playlistId);
+			const playlistResponse: SpotifyWebApi.Response<SpotifyApi.SinglePlaylistResponse> = await this.spotify.getPlaylist(playlistId);
 			const positions: number[] = [];
 			const limit: number = Math.min(playlistOffset + count, playlistResponse.body.tracks.total);
 			for (let position: number = playlistOffset; position < limit; position++) {
@@ -84,7 +85,7 @@ export class RateLimitedSpotifyWebApi {
 			} else {
 				return Promise.resolve(playlistResponse);
 			}
-		}).catch((reason) => {
+		}).catch((reason: any) => {
 			Logger.getInstance().error(`Spotify API error ${reason.toString}`);
 			return Promise.reject(reason);
 		});
@@ -95,7 +96,7 @@ export class RateLimitedSpotifyWebApi {
 	}
 
 	private updateAccessToken(): Promise<void> {
-		return this.spotify.refreshAccessToken().then((value) => {
+		return this.spotify.refreshAccessToken().then((value: SpotifyWebApi.Response<RefreshAccessTokenResponse>) => {
 			this.spotify.setAccessToken(value.body.access_token);
 			return Promise.resolve();
 		});

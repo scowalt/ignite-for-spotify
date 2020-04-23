@@ -19,6 +19,13 @@ module.exports = {
         "html"
     ],
     "rules": {
+        "@typescript-eslint/typedef": [
+            "error",
+            {
+              "arrowParameter": true,
+              "variableDeclaration": true
+            }
+        ],
         "@typescript-eslint/array-type": [
             "error",
             {

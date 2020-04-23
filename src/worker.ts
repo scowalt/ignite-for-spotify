@@ -10,13 +10,13 @@ import { SpotifyUpdater } from './jobs/SpotifyUpdater';
 import { IgnitionUpdater } from './jobs/IgnitionUpdater';
 import { Logger } from './shared/Logger';
 import Bull from 'bull';
-import { SpotifyUpdateJobData, PlaylistJobData } from './shared/types';
+import { SpotifyUpdateJobData, PlaylistJobData, IgnitionJobData } from './shared/types';
 import { SpotifyPlaylistUpdater } from './jobs/SpotifyPlaylistUpdater';
 
 const workers: number = Number(process.env.WEB_CONCURRENCY);
 
 function start(): void {
-	createIgnitionUpdateQueue().process((job) => {
+	createIgnitionUpdateQueue().process((job: Bull.Job<IgnitionJobData>) => {
 		Logger.getInstance().info(`Started Ignition job ${job.id}`);
 
 		// BUG There's potentially an issue where all ignition jobs mark as "failed", even if they succeed.

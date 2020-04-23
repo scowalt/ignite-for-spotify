@@ -3,7 +3,9 @@ import dotenvexpand from 'dotenv-expand';
 const environment: dotenv.DotenvConfigOutput = dotenv.config();
 dotenvexpand(environment);
 
-import express, { Express, Request, Response } from 'express';
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+import express = require('express');
+import { Express, Request, Response } from 'express';
 import BodyParser from 'body-parser';
 import cookieParser from 'cookie-parser';
 import Chance from 'chance';
@@ -16,6 +18,7 @@ import favicon from 'serve-favicon';
 import path from 'path';
 import { Database } from './db/Database';
 import { Playlist } from './db/models/Playlist';
+import { AuthorizationCodeGrantResponse } from '../lib/@types/spotify-web-api-node';
 
 const ignitionQueue: IgnitionQueue = createIgnitionUpdateQueue();
 const spotifyUpdateQueue: SpotifyUpdateQueue = createSpotifyUpdateQueue();
@@ -119,7 +122,7 @@ app.get('/spotifyAuthCallback', (request: Request, response: Response) => {
 			clientSecret: process.env.SPOTIFY_CLIENT_SECRET
 		});
 
-		spotifyApi.authorizationCodeGrant(code).then((value) => {
+		spotifyApi.authorizationCodeGrant(code).then((value: SpotifyWebApi.Response<AuthorizationCodeGrantResponse>) => {
 			response.cookie("spotifyAccessToken", value.body.access_token);
 			response.cookie("spotifyRefreshToken", value.body.refresh_token);
 			return response.json({
