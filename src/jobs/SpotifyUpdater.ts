@@ -81,12 +81,9 @@ export class SpotifyUpdater {
 		// (example: "artist:bowling for soup Punk Rock 101" returns an aniversary re-recording, but the database
 		// uses the original recording from the album "Drunk Enough to Dance")
 		const firstSearchQuery: Query = new Query(track.artist, track.title, track.album);
-
-		// TODO add a check for song artists with "ft." and "&".
-		// Example: "Robin Thicke ft. T.I. & Pharrell Williams" becomes "Robin Thicke T.I. Pharrell Williams"
-		// At time of writing, there are around 300 tracks in the database that could gain a spotify track ID with this fix.
 		return this.getTrackIdForSearchQuery(firstSearchQuery)
 			.catch(() => { return this.getTrackIdForSearchQuery(new Query(track.artist, track.title));})
+			.catch(this.tryRemovingDecoratorsFromArtist(track))
 			.catch(this.trySeparatingPipedStrings(track))
 			.catch(this.tryRemovingParentheticalSubtitle(track))
 			.catch(this.tryChangingContractions(track))
@@ -97,6 +94,12 @@ export class SpotifyUpdater {
 					return Promise.reject(reason);
 				});
 			});
+	}
+	private tryRemovingDecoratorsFromArtist(track: Song): () => Promise<string> {
+		return (): Promise<string> => {
+			const newArtist: string = track.artist.replace('ft.', '').replace('Ft.', '').replace('&', '');
+			return this.getTrackIdForSearchQuery(new Query(newArtist, track.title));
+		};
 	}
 
 	private tryChangingContractions(track: Song): () => Promise<string> {
