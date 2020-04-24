@@ -16,3 +16,37 @@ These instructions are not complete. They provide general guidence and a referen
 11. Start the instance
 12. Login with the master account
 13. Set the `SPOTIFY_ACCOUNT_ACCESS_TOKEN` and `SPOTIFY_ACCOUNT_REFRESH_TOKEN` variables.
+
+### Optional: configure automated database backups
+
+1. Setup an AWS S3 bucket (no public access)
+2. Setup an IAM user, with permissions to access the bucket. [Amazon documents the minimal permissions required for a single bucket,](https://aws.amazon.com/premiumsupport/knowledge-center/s3-console-access-certain-bucket/) but I'll repeat those here:
+```
+{
+   "Version":"2012-10-17",
+   "Statement":[
+      {
+         "Effect":"Allow",
+         "Action":[
+            "s3:ListBucket"
+         ],
+         "Resource":"arn:aws:s3:::awsexamplebucket"
+      },
+      {
+         "Effect":"Allow",
+         "Action":[
+            "s3:PutObject",
+            "s3:GetObject"
+         ],
+         "Resource":"arn:aws:s3:::awsexamplebucket/*"
+      }
+   ]
+}
+```
+3. Use `dokku mysql:backup-auth $SERVICE AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY` to attach credentials to the database server
+4. Use `dokku mysql:backup $SERVICE $BUCKET_NAME` to test settings.
+5. Schedule regular backups, for example `dokku mysql:backup-schedule $SERVICE "0 3 * * *" $BUCKET_NAME` backs up every day at 3 am
+
+#### Restoring from a created backup
+
+Extract the backup. The `export` file can be imported using `dokku mysql:import` or an external tool like DBeaver.
