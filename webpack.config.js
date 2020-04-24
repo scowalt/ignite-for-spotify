@@ -79,6 +79,12 @@ module.exports = (env) => {
 					'sass-loader',
 					],
 				},
+				{
+					test: /\.(png|svg|jpg|gif)$/,
+					use: [
+						'file-loader',
+					],
+				},
 			] },
 			output: {
 				path: __dirname + '/dist/views',

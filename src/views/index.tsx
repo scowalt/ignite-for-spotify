@@ -5,5 +5,6 @@ import ReactDOM from 'react-dom';
 import './index.scss';
 import { TitleBar } from './components/TitleBar';
 import { Container } from 'react-bootstrap';
+import { Home } from './components/Home';
 
-ReactDOM.render(<><TitleBar></TitleBar><Container><h1>Hello world!</h1></Container></>, document.getElementById('root'));
+ReactDOM.render(<><TitleBar></TitleBar><Container><Home></Home></Container></>, document.getElementById('root'));
