@@ -8,7 +8,7 @@ export class TitleBar extends React.Component<{}, {}> {
 			<Container>
 				<Navbar.Brand href="#">
 					<img src={Icon} className="brandIcon"></img>
-					Spotify Ignition
+					Ignite for Spotify
 				</Navbar.Brand>
 			</Container>
 		</Navbar>;
