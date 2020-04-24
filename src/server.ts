@@ -8,7 +8,7 @@ import BodyParser from 'body-parser';
 import cookieParser from 'cookie-parser';
 import Chance from 'chance';
 import Bull from 'bull';
-import { JobType, IgnitionQueue, SpotifyUpdateQueue, PlaylistUpdateQueue } from './shared/types';
+import { JobType, IgnitionQueue, SpotifyUpdateQueue, PlaylistUpdateQueue } from './types/JobTypes';
 import HttpStatus from 'http-status-codes';
 import { createIgnitionUpdateQueue, createSpotifyUpdateQueue, createPlaylistUpdateQueue } from './shared/queues';
 import SpotifyWebApi from 'spotify-web-api-node';
@@ -17,6 +17,7 @@ import path from 'path';
 import { Database } from './db/Database';
 import { Playlist } from './db/models/Playlist';
 import { AuthorizationCodeGrantResponse } from '../lib/@types/spotify-web-api-node';
+import { PlaylistApiInfo } from './types/PlaylistAPIInfo';
 
 const ignitionQueue: IgnitionQueue = createIgnitionUpdateQueue();
 const spotifyUpdateQueue: SpotifyUpdateQueue = createSpotifyUpdateQueue();
@@ -98,7 +99,7 @@ app.get('/getPlaylists', async (_request: Request, response: Response) => {
 	}
 
 	const playlists: Playlist[] = await database.getAllPlaylists();
-	return response.json(playlists.map((playlist: Playlist) => { return { id: playlist.id, spotifyPlaylistId: playlist.spotifyPlaylistId }; }));
+	return response.json(playlists.map((playlist: Playlist) => { return new PlaylistApiInfo(playlist); }));
 });
 
 // Client has finished auth on Spotify and credentials have been passed back here.

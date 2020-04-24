@@ -1,5 +1,5 @@
 import Bull from 'bull';
-import { IgnitionJobData, IgnitionQueue, SpotifyUpdateJobData, SpotifyUpdateQueue, PlaylistUpdateQueue } from './types';
+import { IgnitionJobData, IgnitionQueue, SpotifyUpdateJobData, SpotifyUpdateQueue, PlaylistUpdateQueue } from '../types/JobTypes';
 
 export function createIgnitionUpdateQueue(): IgnitionQueue {
 	return (new Bull<IgnitionJobData>('ignition', process.env.REDIS_URL!)) as IgnitionQueue;
