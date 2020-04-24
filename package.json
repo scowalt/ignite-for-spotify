@@ -6,9 +6,9 @@
     "scripts": {
         "build": "webpack --env.development",
         "heroku-postbuild": "webpack --env.production",
-        "clean": "node ./node_modules/trash-cli/cli.js dist/**",
+        "clean": "trash dist/**",
         "watch": "concurrently \"webpack --env.development --watch\" \"nodemon --watch dist --inspect=9229 ./dist/server.js\" \"nodemon --watch dist --inspect=9300 ./dist/worker.js\" --prefix \"{time}-{pid}\"",
-        "lint": "eslint src/** && stylelint src/**",
+        "lint": "(eslint \"./src/**/*.{ts,tsx,html}\") && (stylelint \"./src/**/*.scss\")",
         "run": "concurrently \"node ./dist/server.js\" \"node ./dist/worker.js\""
     },
     "engines": {
