@@ -1,6 +1,6 @@
 import React, { ReactNode, ReactElement } from "react";
 import update from 'immutability-helper';
-import { PlaylistApiInfo } from "../../types/PlaylistAPIInfo";
+import { PlaylistApiInfo } from "../../types/PlaylistApiInfo";
 
 interface PlaylistsState {
 	downloadAbort: AbortController;

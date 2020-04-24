@@ -17,7 +17,7 @@ import path from 'path';
 import { Database } from './db/Database';
 import { Playlist } from './db/models/Playlist';
 import { AuthorizationCodeGrantResponse } from '../lib/@types/spotify-web-api-node';
-import { PlaylistApiInfo } from './types/PlaylistAPIInfo';
+import { PlaylistApiInfo } from './types/PlaylistApiInfo';
 
 const ignitionQueue: IgnitionQueue = createIgnitionUpdateQueue();
 const spotifyUpdateQueue: SpotifyUpdateQueue = createSpotifyUpdateQueue();
