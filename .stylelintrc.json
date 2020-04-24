@@ -3,5 +3,7 @@
     "plugins": [
         "stylelint-scss"
     ],
-    "rules": { }
+    "rules": {
+        "indentation": "tab"
+    }
 }

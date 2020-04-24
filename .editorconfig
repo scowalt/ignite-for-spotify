@@ -1,5 +1,5 @@
 # top-most EditorConfig file
 root = true
 
-[*.{ts,tsx,css,html}]
+[*.{ts,tsx,css,html,scss}]
 indent_style = tab
