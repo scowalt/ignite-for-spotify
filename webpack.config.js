@@ -63,11 +63,23 @@ module.exports = (env) => {
 				extensions: [".ts", ".tsx", ".js", ".jsx"]
 			},
 			module: { rules: [
-			{ // Include TypeScript files in the TypeScript loader
-				test: /\.ts(x?)$/,
-				include: /src/,
-				use: [{ loader: 'ts-loader' }]
-			}] },
+				{ // Include TypeScript files in the TypeScript loader
+					test: /\.ts(x?)$/,
+					include: /src/,
+					use: [{ loader: 'ts-loader' }]
+				},
+				{
+					test: /\.s[ac]ss$/i,
+					use: [
+					// Creates `style` nodes from JS strings
+					'style-loader',
+					// Translates CSS into CommonJS
+					'css-loader',
+					// Compiles Sass to CSS
+					'sass-loader',
+					],
+				},
+			] },
 			output: {
 				path: __dirname + '/dist/views',
 				filename: 'index.js'

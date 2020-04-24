@@ -8,7 +8,8 @@
         "heroku-postbuild": "webpack --env.production",
         "clean": "node ./node_modules/trash-cli/cli.js dist/**",
         "watch": "concurrently \"webpack --env.development --watch\" \"nodemon --watch dist --inspect=9229 ./dist/server.js\" \"nodemon --watch dist --inspect=9300 ./dist/worker.js\" --prefix \"{time}-{pid}\"",
-        "lint": "eslint src/**"
+        "lint": "eslint src/** && stylelint src/**",
+        "run": "concurrently \"node ./dist/server.js\" \"node ./dist/worker.js\""
     },
     "engines": {
         "node": "^12.12.0"
@@ -17,6 +18,8 @@
     "license": "",
     "dependencies": {
         "body-parser": "^1.19.0",
+        "bootstrap": "^4.4.1",
+        "bootswatch": "^4.4.1",
         "bull": "^3.13.0",
         "chance": "^1.1.4",
         "compromise": "^13.1.1",
@@ -33,6 +36,7 @@
         "p-queue": "^6.3.0",
         "qs": "^6.9.3",
         "react": "^16.13.1",
+        "react-bootstrap": "^1.0.1",
         "react-dom": "^16.13.1",
         "reflect-metadata": "^0.1.13",
         "sequelize": "^5.21.6",
@@ -65,10 +69,18 @@
         "@typescript-eslint/eslint-plugin": "^2.29.0",
         "@typescript-eslint/parser": "^2.29.0",
         "concurrently": "^5.1.0",
+        "css-loader": "^3.5.2",
         "del": "^5.1.0",
         "eslint": "^6.8.0",
         "eslint-plugin-html": "^6.0.2",
+        "eslint-plugin-react": "^7.19.0",
         "html-webpack-plugin": "^4.2.0",
+        "sass": "^1.26.3",
+        "sass-loader": "^8.0.2",
+        "style-loader": "^1.1.4",
+        "stylelint": "^13.3.3",
+        "stylelint-config-standard": "^20.0.0",
+        "stylelint-scss": "^3.17.1",
         "terser-webpack-plugin": "^2.3.5",
         "trash-cli": "^3.0.0",
         "ts-loader": "^7.0.1",

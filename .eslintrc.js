@@ -4,10 +4,16 @@ module.exports = {
         "es6": true,
         "node": true
     },
+    "settings": {
+        "react": {
+            "version": "detect" // Avoid warning about react version during linting
+        }
+    },
     "extends": [
         'eslint:recommended',
         "plugin:@typescript-eslint/recommended",
-        "plugin:@typescript-eslint/recommended-requiring-type-checking"
+        "plugin:@typescript-eslint/recommended-requiring-type-checking",
+        "plugin:react/recommended",
     ],
     "parser": "@typescript-eslint/parser",
     "parserOptions": {
@@ -16,7 +22,7 @@ module.exports = {
     },
     "plugins": [
         "@typescript-eslint",
-        "html"
+        "html" // required for .html files to work
     ],
     "rules": {
         "@typescript-eslint/typedef": [

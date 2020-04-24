@@ -2,4 +2,8 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 
-ReactDOM.render(<h1>Hello world!</h1>, document.getElementById('root'));
+import './index.scss';
+import { TitleBar } from './components/TitleBar';
+import { Container } from 'react-bootstrap';
+
+ReactDOM.render(<><TitleBar></TitleBar><Container><h1>Hello world!</h1></Container></>, document.getElementById('root'));
