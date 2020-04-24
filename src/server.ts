@@ -3,9 +3,7 @@ import dotenvexpand from 'dotenv-expand';
 const environment: dotenv.DotenvConfigOutput = dotenv.config();
 dotenvexpand(environment);
 
-// eslint-disable-next-line @typescript-eslint/no-require-imports
-import express = require('express');
-import { Express, Request, Response } from 'express';
+import express, { Express, Request, Response } from 'express';
 import BodyParser from 'body-parser';
 import cookieParser from 'cookie-parser';
 import Chance from 'chance';
@@ -34,7 +32,7 @@ app.use(favicon(path.join(__dirname, '..', 'res', 'icon', 'favicon.ico')));
 app.use(cookieParser());
 app.use(BodyParser.json());
 
-// HACK: __dirname must inaccurate here in order for webpack to work, but this is a bad work-around since it depends on "dist" naming
+// HACK: __dirname must be inaccurate here in order for webpack to work, but this is a bad work-around since it depends on "dist" naming
 app.use(express.static(path.join(__dirname, '..', 'dist', 'views')));
 
 app.post('/startJob', async (request: Request, response: Response) => {
