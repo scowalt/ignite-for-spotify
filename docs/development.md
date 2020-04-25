@@ -9,10 +9,7 @@
 
 ### MySQL
 
-This app uses a MySQL server to store its data. It's possible to setup a docker container locally and configure it to work. It's also possible to setup a MySQL server on your local dev box. However, for development purposes, I prefer to use a free service that does all of this for you. Here are a few options:
-
-- [AWS RDS](https://aws.amazon.com/rds/free/) using the MySQL community free tier
-- [RemoteMySQL](https://remotemysql.com/)
+This app uses a MySQL server to store its data. It's possible to setup a docker container locally and configure it to work. It's also possible to setup a MySQL server on your local dev box. However, for development purposes, I prefer to use a free service that does all of this for you. There are good [free DBaaS options listed here](https://github.com/ripienaar/free-for-dev#dbaas).
 
 ### Redis
 
