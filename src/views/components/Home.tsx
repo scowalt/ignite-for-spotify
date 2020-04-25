@@ -1,8 +1,23 @@
 import React, { ReactNode } from "react";
 import { Playlists } from "./Playlists";
+import Cookies from 'js-cookie';
+import { SpotifyAuthInfo, Generator } from "./Generator";
+import { Row } from "react-bootstrap";
 
 export class Home extends React.Component<{}, {}> {
 	render(): ReactNode {
-		return <><h1>Hello world!</h1><Playlists></Playlists></>;
+		let auth: SpotifyAuthInfo|undefined;
+		const access: string|undefined = Cookies.get("spotifyAccessToken");
+		const refresh: string|undefined = Cookies.get("spotifyRefreshToken");
+		if (access && refresh) {
+			auth = {
+				spotifyAccessToken: access,
+				spotifyRefreshToken: refresh
+			};
+		}
+		return <>
+			<Row><Generator spotifyAuth={auth} ></Generator></Row>
+			<Row><Playlists></Playlists></Row>
+		</>;
 	}
 }

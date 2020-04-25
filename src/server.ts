@@ -124,16 +124,30 @@ app.get('/spotifyAuthCallback', (request: Request, response: Response) => {
 		spotifyApi.authorizationCodeGrant(code).then((value: SpotifyWebApi.Response<AuthorizationCodeGrantResponse>) => {
 			response.cookie("spotifyAccessToken", value.body.access_token);
 			response.cookie("spotifyRefreshToken", value.body.refresh_token);
-			return response.json({
-				spotifyAccessToken: value.body.access_token,
-				spotifyRefreshToken: value.body.refresh_token
-			});
+			return response.redirect("/");
 		});
 	}
 });
 
-// app.get('/', (_request: Request, response: Response) => {
-// 	response.send("Hello world!");
-// });
+app.get('/refreshSpotifyAuth', (request: Request, response: Response) => {
+	const accessToken: string|null = request.cookies ? request.cookies.spotifyAccessToken : null;
+	const refreshToken: string|null = request.cookies ? request.cookies.spotifyRefreshToken : null;
+	const spotifyApi: SpotifyWebApi = new SpotifyWebApi({
+		redirectUri,
+		clientId: process.env.SPOTIFY_CLIENT_ID,
+		clientSecret: process.env.SPOTIFY_CLIENT_SECRET
+	});
+
+	if (!accessToken || !refreshToken) {
+		return response.status(HttpStatus.BAD_REQUEST).end();
+	}
+
+	spotifyApi.setAccessToken(accessToken);
+	spotifyApi.setRefreshToken(refreshToken);
+	spotifyApi.refreshAccessToken().then((value: SpotifyWebApi.Response<SpotifyWebApi.RefreshAccessTokenResponse>) => {
+		response.cookie("spotifyAccessToken", value.body.access_token);
+		return response.status(HttpStatus.OK).json(value.body.access_token).send();
+	});
+});
 
 app.listen(port);

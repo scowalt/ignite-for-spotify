@@ -156,7 +156,7 @@ module.exports = {
 		"no-unused-expressions": "error",
 		"no-unused-labels": "error",
 		"object-shorthand": "error",
-		"@typescript-eslint/no-unused-vars": "error",
+		"@typescript-eslint/no-unused-vars": "warn",
 		"one-var": [
 			"error",
 			"never"
