@@ -1,7 +1,10 @@
 import React, { ReactNode } from "react";
 import SpotifyWebApi from 'spotify-web-api-js';
 import { SpotifyAuthInfo } from "./Generator";
+import { Col, Row, Pagination } from "react-bootstrap";
 import update from 'immutability-helper';
+
+const PLAYLISTS_PER_REQUEST: number = 20;
 
 interface SpotifySourceProps extends React.Props<{}> {
 	auth: SpotifyAuthInfo;
@@ -10,7 +13,7 @@ interface SpotifySourceProps extends React.Props<{}> {
 interface SpotifySourceState {
 	downloadAbort: AbortController;
 	readonly spotify: SpotifyWebApi.SpotifyWebApiJs;
-	playlists?: SpotifyApi.PlaylistObjectSimplified[];
+	playlists?: SpotifyApi.ListOfUsersPlaylistsResponse;
 }
 export class SpotifySource extends React.Component<SpotifySourceProps, SpotifySourceState> {
 	constructor(props: SpotifySourceProps) {
@@ -30,31 +33,61 @@ export class SpotifySource extends React.Component<SpotifySourceProps, SpotifySo
 	}
 
 	getUserSpotifyPlaylists(): Promise<any> {
-		return this.state.spotify.getUserPlaylists().then((value: SpotifyApi.ListOfUsersPlaylistsResponse) => {
+		return this.state.spotify.getUserPlaylists(undefined, {
+			limit: PLAYLISTS_PER_REQUEST
+		}).then((value: SpotifyApi.ListOfUsersPlaylistsResponse) => {
 			// TODO handle multiple pages of playlists
-			this.setState(update(this.state, {
-				playlists: {$set: value.items}
-			}));
+			if (!this.state.downloadAbort.signal.aborted) {
+				this.setState(update(this.state, {
+					playlists: {$set: value}
+				}));
+			}
 		}).catch((xhr: XMLHttpRequest) => {
-			if (xhr.status === 401 && xhr.responseText.includes("The access token expired")) {
-				return fetch('/refreshSpotifyAuth').then((response: Response) => {
+			if (!this.state.downloadAbort.signal.aborted && xhr.status === 401 && xhr.responseText.includes("The access token expired")) {
+				return fetch('/refreshSpotifyAuth', {
+					signal: this.state.downloadAbort.signal
+				}).then((response: Response) => {
 					return response.json();
 				}).then((response: string) => {
 					this.state.spotify.setAccessToken(response);
-					return this.getUserSpotifyPlaylists();
+					if (!this.state.downloadAbort.signal.aborted) {
+						return this.getUserSpotifyPlaylists();
+					}
 				});
 			}
 			return Promise.reject(xhr);
 		});
 	}
 
+	// Zero-based page number for playlists
+	static getCurrentPageNumber(playlists: SpotifyApi.ListOfUsersPlaylistsResponse): number {
+		return Math.floor(playlists.offset / PLAYLISTS_PER_REQUEST);
+	}
+
+	static getTotalPages(playlists: SpotifyApi.ListOfUsersPlaylistsResponse): number {
+		return Math.floor(playlists.total / PLAYLISTS_PER_REQUEST)+1;
+	}
+
 	render(): ReactNode {
 		if (this.state.playlists) {
-			return <>
-				{this.state.playlists.map((playlist: SpotifyApi.PlaylistObjectSimplified, index: number) => {
-					return <div key={index}>{playlist.name}</div>;
-				})}
-			</>;
+			const paginators: ReactNode[] = [];
+			for (let index: number = 0; index < SpotifySource.getTotalPages(this.state.playlists); index ++) {
+				paginators.push(
+					<Pagination.Item key={index} active={index === SpotifySource.getCurrentPageNumber(this.state.playlists)}>
+						{index+1}
+					</Pagination.Item>
+				);
+			}
+			return <Col>
+				{
+					this.state.playlists.items.map((playlist: SpotifyApi.PlaylistObjectSimplified, index: number) => {
+						return <Row key={index}>{playlist.name}</Row>;
+					})
+				}
+				<Row>
+					<Pagination>{paginators}</Pagination>
+				</Row>
+			</Col>;
 		}
 		return <>Spotify Source</>;
 	}

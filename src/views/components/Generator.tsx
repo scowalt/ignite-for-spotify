@@ -8,8 +8,8 @@ export interface SpotifyAuthInfo {
 	spotifyRefreshToken: string;
 }
 enum Source {
-	Spotify,
-	CustomsForge
+	Spotify = "Spotify",
+	CustomsForge = "CustomsForge"
 }
 interface GeneratorProps extends React.Props<{}> {
 	spotifyAuth?: SpotifyAuthInfo;
@@ -27,7 +27,7 @@ export class Generator extends React.Component<GeneratorProps, GeneratorState> {
 	}
 
 	onSourceChange(event: React.ChangeEvent<HTMLSelectElement>): void {
-		const source: Source = Source[event.target.value as keyof typeof Source]; // https://stackoverflow.com/a/56076148/1222411
+		const source: Source = event.target.value as Source;
 		this.setState(update(this.state, {
 			source: {$set: source}
 		}));

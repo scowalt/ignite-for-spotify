@@ -84,8 +84,16 @@ app.get('/login', (_request: Request, response: Response) => {
 		clientId: process.env.SPOTIFY_CLIENT_ID
 	});
 
-	const scopes: string[] = ['user-read-private', 'user-read-email', 'playlist-read-private', 'playlist-modify-private', 'playlist-modify-public'];
-	const state: string = chance.string({ length: 16 });
+	const scopes: string[] = [
+		'user-read-private',
+		'user-read-email',
+		'playlist-read-private',
+		'playlist-modify-private',
+		'playlist-modify-public'
+	];
+
+	// Have non-alphanumeric characters in the state string can cause issues, since the string is passed as a URL query parameter
+	const state: string = chance.string({ length: 16, alpha: true, numeric: true });
 	const authorizeUrl: string = spotifyApi.createAuthorizeURL(scopes, state);
 	response.cookie(stateKey, state);
 
@@ -110,7 +118,7 @@ app.get('/spotifyAuthCallback', (request: Request, response: Response) => {
 	const storedState: string|null = request.cookies ? request.cookies[stateKey] : null;
 
 	if (state === null || state !== storedState) {
-		return response.status(HttpStatus.INTERNAL_SERVER_ERROR).end();
+		return response.status(HttpStatus.INTERNAL_SERVER_ERROR).send("Invalid auth state");
 	} else {
 		// Since the authentication has been finished, state is no longer necessary
 		response.clearCookie(stateKey);
@@ -125,6 +133,8 @@ app.get('/spotifyAuthCallback', (request: Request, response: Response) => {
 			response.cookie("spotifyAccessToken", value.body.access_token);
 			response.cookie("spotifyRefreshToken", value.body.refresh_token);
 			return response.redirect("/");
+		}).catch((reason: any) => {
+			return response.status(HttpStatus.INTERNAL_SERVER_ERROR).send(JSON.stringify(reason));
 		});
 	}
 });
