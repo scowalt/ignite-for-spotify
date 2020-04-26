@@ -22,6 +22,12 @@ import { PlaylistApiInfo } from './types/PlaylistApiInfo';
 const ignitionQueue: IgnitionQueue = createIgnitionUpdateQueue();
 const spotifyUpdateQueue: SpotifyUpdateQueue = createSpotifyUpdateQueue();
 const playlistUpdateQueue: PlaylistUpdateQueue = createPlaylistUpdateQueue();
+
+// BUG: This breaks when there are multiple domains that can be used to access a page for a single environment.
+// For example: app.example.com and app2.example.com both point here, but there is only one BASE_URL set.
+// Since cookies are set per-subdomain, the auth flow can be broken since it can't maintain state.
+// Hopefully, this can be fixed by getting the base url from the express request object, then creating a new
+// API access object for each auth with its own redirect url.
 const redirectUri: string = process.env.BASE_URL! + "/spotifyAuthCallback";
 const chance: Chance.Chance = new Chance();
 const app: Express = express();
