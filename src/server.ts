@@ -23,12 +23,6 @@ const ignitionQueue: IgnitionQueue = createIgnitionUpdateQueue();
 const spotifyUpdateQueue: SpotifyUpdateQueue = createSpotifyUpdateQueue();
 const playlistUpdateQueue: PlaylistUpdateQueue = createPlaylistUpdateQueue();
 
-// BUG: This breaks when there are multiple domains that can be used to access a page for a single environment.
-// For example: app.example.com and app2.example.com both point here, but there is only one BASE_URL set.
-// Since cookies are set per-subdomain, the auth flow can be broken since it can't maintain state.
-// Hopefully, this can be fixed by getting the base url from the express request object, then creating a new
-// API access object for each auth with its own redirect url.
-const redirectUri: string = process.env.BASE_URL! + "/spotifyAuthCallback";
 const chance: Chance.Chance = new Chance();
 const app: Express = express();
 const port: number = parseInt(process.env.PORT!, 10);
@@ -41,6 +35,10 @@ app.use(BodyParser.json());
 
 // HACK: __dirname must be inaccurate here in order for webpack to work, but this is a bad work-around since it depends on "dist" naming
 app.use(express.static(path.join(__dirname, '..', 'dist', 'views')));
+
+function getRedirectUri(request: Request): string {
+	return `${request.protocol}://${request.hostname}:${process.env.PORT}/spotifyAuthCallback`;
+}
 
 app.post('/startJob', async (request: Request, response: Response) => {
 	if (!request.body) {
@@ -84,9 +82,9 @@ app.get('/job/:jobType/:id', async (request: Request, response: Response) => {
 });
 
 // Client wants to start Spotify Auth flow
-app.get('/login', (_request: Request, response: Response) => {
+app.get('/login', (request: Request, response: Response) => {
 	const spotifyApi: SpotifyWebApi = new SpotifyWebApi({
-		redirectUri,
+		redirectUri: getRedirectUri(request),
 		clientId: process.env.SPOTIFY_CLIENT_ID
 	});
 
@@ -130,7 +128,7 @@ app.get('/spotifyAuthCallback', (request: Request, response: Response) => {
 		response.clearCookie(stateKey);
 
 		const spotifyApi: SpotifyWebApi = new SpotifyWebApi({
-			redirectUri,
+			redirectUri: getRedirectUri(request),
 			clientId: process.env.SPOTIFY_CLIENT_ID,
 			clientSecret: process.env.SPOTIFY_CLIENT_SECRET
 		});
@@ -149,7 +147,7 @@ app.get('/refreshSpotifyAuth', (request: Request, response: Response) => {
 	const accessToken: string|null = request.cookies ? request.cookies.spotifyAccessToken : null;
 	const refreshToken: string|null = request.cookies ? request.cookies.spotifyRefreshToken : null;
 	const spotifyApi: SpotifyWebApi = new SpotifyWebApi({
-		redirectUri,
+		redirectUri: getRedirectUri(request),
 		clientId: process.env.SPOTIFY_CLIENT_ID,
 		clientSecret: process.env.SPOTIFY_CLIENT_SECRET
 	});

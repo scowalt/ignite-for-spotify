@@ -1,7 +1,7 @@
 import React, { ReactNode } from "react";
 import SpotifyWebApi from 'spotify-web-api-js';
 import { SpotifyAuthInfo } from "./Generator";
-import { Col, Row, Pagination } from "react-bootstrap";
+import { Col, Row, Pagination, ListGroup } from "react-bootstrap";
 import update from 'immutability-helper';
 
 const PLAYLISTS_PER_REQUEST: number = 20;
@@ -79,11 +79,13 @@ export class SpotifySource extends React.Component<SpotifySourceProps, SpotifySo
 				);
 			}
 			return <Col>
-				{
-					this.state.playlists.items.map((playlist: SpotifyApi.PlaylistObjectSimplified, index: number) => {
-						return <Row key={index}>{playlist.name}</Row>;
-					})
-				}
+				<Row><ListGroup>
+					{
+						this.state.playlists.items.map((playlist: SpotifyApi.PlaylistObjectSimplified, index: number) => {
+							return <ListGroup.Item key={index}>{playlist.name}</ListGroup.Item>;
+						})
+					}
+				</ListGroup></Row>
 				<Row>
 					<Pagination>{paginators}</Pagination>
 				</Row>
