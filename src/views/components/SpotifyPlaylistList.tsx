@@ -20,6 +20,7 @@ export class SpotifyPlaylistList extends React.Component<SpotifyPlaylistListProp
 
 	render(): ReactNode {
 		// TODO add playlist images (available from the spotify api)
+		// TODO show number of tracks for each listing
 		const playlists: ReactNode[] = this.props.playlists.items.map((playlist: SpotifyApi.PlaylistObjectSimplified, index: number) => {
 			return <ListGroup.Item
 				key={index}

@@ -42,20 +42,7 @@ export class Generator extends React.Component<GeneratorProps, GeneratorState> {
 				source = <SpotifyToIgnition auth={this.props.spotifyAuth}></SpotifyToIgnition>;
 			}
 			return <>
-				<Col>
-					<Form>
-						<Form.Group controlId="select1">
-							<Form.Label>Direction</Form.Label>
-							<Form.Control as="select" onChange={this.onSourceChange.bind(this)}>
-								<option value={Source.Spotify}>Spotify =&gt; CustomsForge Ignition</option>
-								<option value={Source.CustomsForge}>CustomsForge Ignition =&gt; Spotify</option>
-							</Form.Control>
-						</Form.Group>
-					</Form>
-					<Row>
-						{source}
-					</Row>
-				</Col>
+				{source}
 			</>;
 		}
 	}
