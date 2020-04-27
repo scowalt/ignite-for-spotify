@@ -1,8 +1,7 @@
-import SpotifyWebApi from "spotify-web-api-node";
+import SpotifyWebApi, { RefreshAccessTokenResponse } from "spotify-web-api-node";
 import PromiseQueue from "p-queue";
 import { Logger } from "./Logger";
 import { Song } from "../db/models/Song";
-import { RefreshAccessTokenResponse } from "../../lib/@types/spotify-web-api-node";
 import { Query } from "./Query";
 import { promisify } from 'util';
 

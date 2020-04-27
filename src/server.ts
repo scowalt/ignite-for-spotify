@@ -11,12 +11,11 @@ import Bull from 'bull';
 import { JobType, IgnitionQueue, SpotifyUpdateQueue, PlaylistUpdateQueue } from './types/JobTypes';
 import HttpStatus from 'http-status-codes';
 import { createIgnitionUpdateQueue, createSpotifyUpdateQueue, createPlaylistUpdateQueue } from './shared/queues';
-import SpotifyWebApi from 'spotify-web-api-node';
+import SpotifyWebApi, { AuthorizationCodeGrantResponse } from 'spotify-web-api-node';
 import favicon from 'serve-favicon';
 import path from 'path';
 import { Database } from './db/Database';
 import { Playlist } from './db/models/Playlist';
-import { AuthorizationCodeGrantResponse } from '../lib/@types/spotify-web-api-node';
 import { PlaylistApiInfo } from './types/PlaylistApiInfo';
 
 const ignitionQueue: IgnitionQueue = createIgnitionUpdateQueue();

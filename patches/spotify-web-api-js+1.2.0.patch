@@ -1,0 +1,12 @@
+diff --git a/node_modules/spotify-web-api-js/src/typings/spotify-web-api.d.ts b/node_modules/spotify-web-api-js/src/typings/spotify-web-api.d.ts
+index 0060a28..4895f01 100644
+--- a/node_modules/spotify-web-api-js/src/typings/spotify-web-api.d.ts
++++ b/node_modules/spotify-web-api-js/src/typings/spotify-web-api.d.ts
+@@ -381,6 +381,7 @@ declare namespace SpotifyWebApi {
+          * @return {Object} Null if a callback is provided, a `Promise` object otherwise
+          */
+         getUserPlaylists(userId?: string, options?: Object, callback?: ResultsCallback<SpotifyApi.ListOfUsersPlaylistsResponse>) : Promise<SpotifyApi.ListOfUsersPlaylistsResponse>;
++        getUserPlaylists(options?: Object, callback?: ResultsCallback<SpotifyApi.ListOfUsersPlaylistsResponse>) : Promise<SpotifyApi.ListOfUsersPlaylistsResponse>;
+ 
+         /**
+          * Fetches a specific playlist.

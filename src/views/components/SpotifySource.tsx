@@ -4,7 +4,7 @@ import { SpotifyAuthInfo } from "./Generator";
 import { Col, Row, Pagination, ListGroup } from "react-bootstrap";
 import update from 'immutability-helper';
 
-const PLAYLISTS_PER_REQUEST: number = 20;
+const PLAYLISTS_PER_REQUEST: number = 10;
 
 interface SpotifySourceProps extends React.Props<{}> {
 	auth: SpotifyAuthInfo;
@@ -33,7 +33,7 @@ export class SpotifySource extends React.Component<SpotifySourceProps, SpotifySo
 	}
 
 	getUserSpotifyPlaylists(): Promise<any> {
-		return this.state.spotify.getUserPlaylists(undefined, {
+		return this.state.spotify.getUserPlaylists({
 			limit: PLAYLISTS_PER_REQUEST
 		}).then((value: SpotifyApi.ListOfUsersPlaylistsResponse) => {
 			// TODO handle multiple pages of playlists
