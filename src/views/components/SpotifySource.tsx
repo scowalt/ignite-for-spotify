@@ -3,6 +3,7 @@ import SpotifyWebApi from 'spotify-web-api-js';
 import { SpotifyAuthInfo } from "./Generator";
 import { Col, Row, Pagination, ListGroup } from "react-bootstrap";
 import update from 'immutability-helper';
+import { BasicTrackInfo } from "../../types/BasicTrackInfo";
 
 const PLAYLISTS_PER_REQUEST: number = 10;
 
@@ -94,12 +95,15 @@ export class SpotifySource extends React.Component<SpotifySourceProps, SpotifySo
 				);
 			}
 
+			// TODO add playlist images (available from the spotify api)
 			let playlists: ReactNode;
 			if (this.state.loading) {
 				playlists = <>Loading</>;
 			} else {
 				playlists = this.state.playlists.items.map((playlist: SpotifyApi.PlaylistObjectSimplified, index: number) => {
-					return <ListGroup.Item key={index}>{playlist.name}</ListGroup.Item>;
+					return <ListGroup.Item
+						key={index}
+						onClick={(): void => {this.actOnPlaylist(playlist);}}>{playlist.name}</ListGroup.Item>;
 				});
 			}
 			return <Col>
@@ -112,5 +116,36 @@ export class SpotifySource extends React.Component<SpotifySourceProps, SpotifySo
 			</Col>;
 		}
 		return <>Spotify Source</>;
+	}
+
+	private actOnPlaylist(playlist: SpotifyApi.PlaylistObjectSimplified): void {
+		// TODO handle errors
+		this.state.spotify.getPlaylistTracks(playlist.id).then((playlistTracks: SpotifyApi.PlaylistTrackResponse) => {
+			// scrape just the track info from this response (that's all the server needs)
+			const tracks: SpotifyApi.TrackObjectFull[] = playlistTracks.items.map((playlistTrack: SpotifyApi.PlaylistTrackObject) => { return playlistTrack.track; });
+			const basicTracks: BasicTrackInfo[] = tracks.map((track: SpotifyApi.TrackObjectFull) => {
+				return {
+					album: track.album.name,
+					artists: track.artists.map((artist: SpotifyApi.ArtistObjectSimplified) => { return artist.name; }),
+					title: track.name,
+					spotifyId: track.id
+				};
+			});
+			// eslint-disable-next-line no-console
+			console.log(tracks);
+			return fetch('/getIgnitionInfo', {
+				method: "POST",
+				body: JSON.stringify(basicTracks),
+				signal: this.state.downloadAbort.signal,
+				headers: {
+					'Content-Type': 'application/json'
+				},
+			});
+		}).then((response: Response) => {
+			return response.json();
+		}).then((response: any) => {
+			// eslint-disable-next-line no-console
+			console.log(response);
+		});
 	}
 }

@@ -3,6 +3,7 @@ import { Song } from './models/Song';
 import { Playlist } from './models/Playlist';
 import { Logger } from '../shared/Logger';
 import { Op } from 'sequelize';
+import { BasicTrackInfo } from '../types/BasicTrackInfo';
 
 export class Database {
 	public static async getInstance(): Promise<Database> {
@@ -75,6 +76,20 @@ export class Database {
 
 	tryAddSong(song: object): Promise<boolean> {
 		return Song.upsert(song);
+	}
+
+	public getIgnitionInfo(track: BasicTrackInfo): Promise<Song[]> {
+		return Song.findAll({
+			where: {
+				[Op.or]: [
+					{ spotifyTrackId: track.spotifyId },
+					{
+						title: track.title,
+						artist: track.artists[0] // TODO this could be better
+					}
+				]
+			}
+		});
 	}
 
 	private async init(): Promise<any> {

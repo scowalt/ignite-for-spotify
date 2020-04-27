@@ -17,6 +17,8 @@ import path from 'path';
 import { Database } from './db/Database';
 import { Playlist } from './db/models/Playlist';
 import { PlaylistApiInfo } from './types/PlaylistApiInfo';
+import { Song } from './db/models/Song';
+import { BasicTrackInfo } from './types/BasicTrackInfo';
 
 const ignitionQueue: IgnitionQueue = createIgnitionUpdateQueue();
 const spotifyUpdateQueue: SpotifyUpdateQueue = createSpotifyUpdateQueue();
@@ -140,6 +142,21 @@ app.get('/spotifyAuthCallback', (request: Request, response: Response) => {
 			return response.status(HttpStatus.INTERNAL_SERVER_ERROR).send(JSON.stringify(reason));
 		});
 	}
+});
+
+app.post('/getIgnitionInfo', async (request: Request, response: Response) => {
+	if (database === null) {
+		database = await Database.getInstance();
+	}
+
+	const tracks: BasicTrackInfo[] = request.body;
+	const trackResults: Song[] = [];
+	for (const track of tracks) {
+		const newTracks: Song[] = await database.getIgnitionInfo(track);
+		trackResults.concat(newTracks);
+	}
+
+	return response.status(HttpStatus.OK).send(JSON.stringify(trackResults));
 });
 
 app.get('/refreshSpotifyAuth', (request: Request, response: Response) => {
