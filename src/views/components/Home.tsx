@@ -1,5 +1,5 @@
 import React, { ReactNode } from "react";
-import { Playlists } from "./Playlists";
+import { StaticPlaylists } from "./StaticPlaylists";
 import Cookies from 'js-cookie';
 import { SpotifyAuthInfo, Generator } from "./Generator";
 import { Row } from "react-bootstrap";
@@ -17,7 +17,7 @@ export class Home extends React.Component<{}, {}> {
 		}
 		return <>
 			<Row><Generator spotifyAuth={auth} ></Generator></Row>
-			<Row><Playlists></Playlists></Row>
+			<Row><StaticPlaylists></StaticPlaylists></Row>
 		</>;
 	}
 }

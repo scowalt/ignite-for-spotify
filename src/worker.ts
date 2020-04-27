@@ -5,13 +5,13 @@ dotenvexpand(environment);
 
 import assert from 'assert';
 import throng from 'throng';
-import { createIgnitionUpdateQueue, createSpotifyUpdateQueue, createPlaylistUpdateQueue } from './shared/queues';
 import { SpotifyUpdater } from './jobs/SpotifyUpdater';
 import { IgnitionUpdater } from './jobs/IgnitionUpdater';
 import { Logger } from './shared/Logger';
 import Bull from 'bull';
 import { SpotifyUpdateJobData, IgnitionJobData } from './types/JobTypes';
 import { SpotifyPlaylistUpdater } from './jobs/SpotifyPlaylistUpdater';
+import { QueueManager } from './shared/QueueManager';
 
 const workers: number = Number(process.env.WEB_CONCURRENCY);
 
@@ -44,7 +44,8 @@ function playlistProcessFunction(): Promise<void> {
 }
 
 function start(): void {
-	createIgnitionUpdateQueue().process((job: Bull.Job<IgnitionJobData>) => {
+	const queues: QueueManager = new QueueManager();
+	queues.ignitionQueue.process((job: Bull.Job<IgnitionJobData>) => {
 		Logger.getInstance().info(`Started Ignition job ${job.id}`);
 
 		// BUG There's potentially an issue where all ignition jobs mark as "failed", even if they succeed.
@@ -53,11 +54,11 @@ function start(): void {
 	}).finally(() => {
 		Logger.getInstance().info(`Ignition job finished`);
 	});
-	createSpotifyUpdateQueue().process(spotifyProcessFunction).finally(() => {
+	queues.spotifyUpdateQueue.process(spotifyProcessFunction).finally(() => {
 		Logger.getInstance().info(`Spotify job finished`);
 	});
 
-	createPlaylistUpdateQueue().process(playlistProcessFunction).finally(() => {
+	queues.playlistUpdateQueue.process(playlistProcessFunction).finally(() => {
 		Logger.getInstance().info(`Playlist job finished`);
 	});
 }

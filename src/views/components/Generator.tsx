@@ -1,7 +1,7 @@
 import React, { ReactNode } from "react";
 import { Button, Col, Form, Row } from "react-bootstrap";
 import update from 'immutability-helper';
-import { SpotifySource } from "./SpotifySource";
+import { SpotifyToIgnition } from "./SpotifyToIgnition";
 
 export interface SpotifyAuthInfo {
 	spotifyAccessToken: string;
@@ -39,7 +39,7 @@ export class Generator extends React.Component<GeneratorProps, GeneratorState> {
 		} else {
 			let source: ReactNode;
 			if (this.state.source === Source.Spotify) {
-				source = <SpotifySource auth={this.props.spotifyAuth}></SpotifySource>;
+				source = <SpotifyToIgnition auth={this.props.spotifyAuth}></SpotifyToIgnition>;
 			}
 			return <>
 				<Col>

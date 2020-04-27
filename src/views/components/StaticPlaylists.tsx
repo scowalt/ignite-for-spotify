@@ -6,7 +6,7 @@ interface PlaylistsState {
 	downloadAbort: AbortController;
 	playlists?: PlaylistApiInfo[];
 }
-export class Playlists extends React.Component<{}, PlaylistsState> {
+export class StaticPlaylists extends React.Component<{}, PlaylistsState> {
 	constructor(props: React.Props<{}>) {
 		super(props);
 		this.state = {

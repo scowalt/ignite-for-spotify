@@ -1,13 +1,14 @@
 import React, { ReactNode } from "react";
 import SpotifyWebApi from 'spotify-web-api-js';
 import { SpotifyAuthInfo } from "./Generator";
-import { Col, Row, Pagination, ListGroup } from "react-bootstrap";
+import { Col } from "react-bootstrap";
 import update from 'immutability-helper';
 import { BasicTrackInfo } from "../../types/BasicTrackInfo";
 import { Song } from "../../db/models/Song";
 import { IgnitionResults } from "./IgnitionResults";
+import { SpotifyPlaylistList } from "./SpotifyPlaylistList";
 
-const PLAYLISTS_PER_REQUEST: number = 10;
+export const PLAYLISTS_PER_REQUEST: number = 10;
 
 interface SpotifySourceProps extends React.Props<{}> {
 	auth: SpotifyAuthInfo;
@@ -20,7 +21,7 @@ interface SpotifySourceState {
 	loading: boolean;
 	results?: Song[];
 }
-export class SpotifySource extends React.Component<SpotifySourceProps, SpotifySourceState> {
+export class SpotifyToIgnition extends React.Component<SpotifySourceProps, SpotifySourceState> {
 	constructor(props: SpotifySourceProps) {
 		super(props);
 		this.state = {
@@ -75,51 +76,21 @@ export class SpotifySource extends React.Component<SpotifySourceProps, SpotifySo
 		});
 	}
 
-	// Zero-based page number for playlists
-	static getCurrentPageNumber(playlists: SpotifyApi.ListOfUsersPlaylistsResponse): number {
-		return Math.floor(playlists.offset / PLAYLISTS_PER_REQUEST);
-	}
-
-	static getTotalPages(playlists: SpotifyApi.ListOfUsersPlaylistsResponse): number {
-		return Math.floor(playlists.total / PLAYLISTS_PER_REQUEST)+1;
-	}
-
 	render(): ReactNode {
 		if (this.state.playlists) {
-			const paginators: ReactNode[] = [];
-			for (let index: number = 0; index < SpotifySource.getTotalPages(this.state.playlists); index ++) {
-				paginators.push(
-					<Pagination.Item
-						key={index}
-						active={index === SpotifySource.getCurrentPageNumber(this.state.playlists)}
-						onClick={(): void => {this.getUserSpotifyPlaylists(index*PLAYLISTS_PER_REQUEST);}}>
-						{index+1}
-					</Pagination.Item>
-				);
-			}
-
-			// TODO add playlist images (available from the spotify api)
 			let playlists: ReactNode;
 			if (this.state.loading) {
 				playlists = <>Loading</>;
 			} else {
-				playlists = this.state.playlists.items.map((playlist: SpotifyApi.PlaylistObjectSimplified, index: number) => {
-					return <ListGroup.Item
-						key={index}
-						onClick={(): void => {this.actOnPlaylist(playlist);}}>{playlist.name}</ListGroup.Item>;
-				});
+				playlists = <SpotifyPlaylistList
+					playlists={this.state.playlists}
+					onPageSwitch={this.getUserSpotifyPlaylists.bind(this)}
+					onPlaylistClicked={this.actOnPlaylist.bind(this)}></SpotifyPlaylistList>;
 			}
-			const localResults: ReactNode|null = (this.state.results) ? <IgnitionResults songs={this.state.results}></IgnitionResults> : null;
+			const localResults: ReactNode = (this.state.results) ? <IgnitionResults songs={this.state.results}></IgnitionResults> : null;
 			return <>
-				<Col>
-					<Row><ListGroup>
-						{ playlists }
-					</ListGroup></Row>
-					<Row>
-						<Pagination>{paginators}</Pagination>
-					</Row>
-				</Col>
-				{localResults}
+				<Col>{playlists}</Col>
+				<Col>{localResults}</Col>
 			</>;
 		}
 		return <>Spotify Source</>;
