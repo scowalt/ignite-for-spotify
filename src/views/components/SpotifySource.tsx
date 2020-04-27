@@ -4,6 +4,8 @@ import { SpotifyAuthInfo } from "./Generator";
 import { Col, Row, Pagination, ListGroup } from "react-bootstrap";
 import update from 'immutability-helper';
 import { BasicTrackInfo } from "../../types/BasicTrackInfo";
+import { Song } from "../../db/models/Song";
+import { IgnitionResults } from "./IgnitionResults";
 
 const PLAYLISTS_PER_REQUEST: number = 10;
 
@@ -16,6 +18,7 @@ interface SpotifySourceState {
 	readonly spotify: SpotifyWebApi.SpotifyWebApiJs;
 	playlists?: SpotifyApi.ListOfUsersPlaylistsResponse;
 	loading: boolean;
+	results?: Song[];
 }
 export class SpotifySource extends React.Component<SpotifySourceProps, SpotifySourceState> {
 	constructor(props: SpotifySourceProps) {
@@ -106,14 +109,18 @@ export class SpotifySource extends React.Component<SpotifySourceProps, SpotifySo
 						onClick={(): void => {this.actOnPlaylist(playlist);}}>{playlist.name}</ListGroup.Item>;
 				});
 			}
-			return <Col>
-				<Row><ListGroup>
-					{ playlists }
-				</ListGroup></Row>
-				<Row>
-					<Pagination>{paginators}</Pagination>
-				</Row>
-			</Col>;
+			const localResults: ReactNode|null = (this.state.results) ? <IgnitionResults songs={this.state.results}></IgnitionResults> : null;
+			return <>
+				<Col>
+					<Row><ListGroup>
+						{ playlists }
+					</ListGroup></Row>
+					<Row>
+						<Pagination>{paginators}</Pagination>
+					</Row>
+				</Col>
+				{localResults}
+			</>;
 		}
 		return <>Spotify Source</>;
 	}
@@ -131,8 +138,6 @@ export class SpotifySource extends React.Component<SpotifySourceProps, SpotifySo
 					spotifyId: track.id
 				};
 			});
-			// eslint-disable-next-line no-console
-			console.log(tracks);
 			return fetch('/getIgnitionInfo', {
 				method: "POST",
 				body: JSON.stringify(basicTracks),
@@ -144,8 +149,9 @@ export class SpotifySource extends React.Component<SpotifySourceProps, SpotifySo
 		}).then((response: Response) => {
 			return response.json();
 		}).then((response: any) => {
-			// eslint-disable-next-line no-console
-			console.log(response);
+			this.setState(update(this.state, {
+				results: {$set: response as Song[]}
+			}));
 		});
 	}
 }

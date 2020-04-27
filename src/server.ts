@@ -150,10 +150,10 @@ app.post('/getIgnitionInfo', async (request: Request, response: Response) => {
 	}
 
 	const tracks: BasicTrackInfo[] = request.body;
-	const trackResults: Song[] = [];
+	let trackResults: Song[] = [];
 	for (const track of tracks) {
 		const newTracks: Song[] = await database.getIgnitionInfo(track);
-		trackResults.concat(newTracks);
+		trackResults = trackResults.concat(newTracks);
 	}
 
 	return response.status(HttpStatus.OK).send(JSON.stringify(trackResults));
