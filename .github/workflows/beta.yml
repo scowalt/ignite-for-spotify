@@ -43,6 +43,7 @@ jobs:
       env:
         BRANCH: beta
         PROJECT: spotify-ignition-beta
+        FLAGS: --force
         PORT: 22
         SSH_PRIVATE_KEY: ${{ secrets.DOKKU_PRIVATE_KEY }}
         SSH_PUBLIC_KEY: ${{ secrets.DOKKU_PUBLIC_KEY }}
