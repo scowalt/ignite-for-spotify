@@ -38,7 +38,7 @@ app.use(BodyParser.json());
 app.use(express.static(path.join(__dirname, '..', 'dist', 'views')));
 
 function getRedirectUri(request: Request): string {
-	return `${request.protocol}://${request.get("Host")}/spotifyAuthCallback`;
+	return `${request.header('Referer')}spotifyAuthCallback`;
 }
 
 app.post('/startJob', async (request: Request, response: Response) => {
