@@ -35,7 +35,7 @@ export class Generator extends React.Component<GeneratorProps, GeneratorState> {
 
 	render(): ReactNode {
 		if (!this.props.spotifyAuth) {
-			return <Button onClick={(): any => {window.location.assign(window.location.origin + "/login");}}>Login</Button>;
+			return <Button href="/login">Login</Button>;
 		} else {
 			let source: ReactNode;
 			if (this.state.source === Source.Spotify) {
