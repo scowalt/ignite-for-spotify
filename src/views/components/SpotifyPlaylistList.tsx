@@ -1,6 +1,7 @@
 import React, { ReactNode } from "react";
 import { Row, Pagination, ListGroup } from "react-bootstrap";
 import { PLAYLISTS_PER_REQUEST } from "./SpotifyToIgnition";
+import { PlaylistListItem } from "./PlaylistListItem";
 
 interface SpotifyPlaylistListProps extends React.Props<{}> {
 	playlists: SpotifyApi.ListOfUsersPlaylistsResponse;
@@ -22,9 +23,10 @@ export class SpotifyPlaylistList extends React.Component<SpotifyPlaylistListProp
 		// TODO add playlist images (available from the spotify api)
 		// TODO show number of tracks for each listing
 		const playlists: ReactNode[] = this.props.playlists.items.map((playlist: SpotifyApi.PlaylistObjectSimplified, index: number) => {
-			return <ListGroup.Item
+			return <PlaylistListItem
 				key={index}
-				onClick={(): void => {this.props.onPlaylistClicked(playlist);}}>{playlist.name}</ListGroup.Item>;
+				playlist={playlist}
+				onClick={(): void => {this.props.onPlaylistClicked(playlist);}} />;
 		});
 		const paginators: ReactNode[] = [];
 		for (let index: number = 0; index < SpotifyPlaylistList.getTotalPages(this.props.playlists); index ++) {
@@ -39,7 +41,7 @@ export class SpotifyPlaylistList extends React.Component<SpotifyPlaylistListProp
 		}
 		return <>
 			<Row>
-				<ListGroup>
+				<ListGroup className={"SpotifyPlaylistList"}>
 					{ playlists }
 				</ListGroup>
 			</Row>

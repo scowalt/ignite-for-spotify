@@ -1,6 +1,7 @@
 import React, { ReactNode, ReactElement } from "react";
 import update from 'immutability-helper';
 import { PlaylistApiInfo } from "../../types/PlaylistApiInfo";
+import { Row, Col } from "react-bootstrap";
 
 interface PlaylistsState {
 	downloadAbort: AbortController;
@@ -55,11 +56,14 @@ export class StaticPlaylists extends React.Component<{}, PlaylistsState> {
 		if (!this.state.playlists) {
 			return <>Loading</>;
 		} else {
-			return <>
-				{this.state.playlists.map((playlist: PlaylistApiInfo, index: number) => {
-					return this.createEmbededPlaylist(playlist.spotifyId, index);
-				})}
-			</>;
+			return <Row><Col>
+				<Row><Col>The entire CustomsForge library in {this.state.playlists.length} playlists. Click on each playlist to follow them all!</Col></Row>
+				<Row>
+					{this.state.playlists.map((playlist: PlaylistApiInfo, index: number) => {
+						return <Col key={index}>{this.createEmbededPlaylist(playlist.spotifyId, index)}</Col>;
+					})}
+				</Row>
+			</Col></Row>;
 		}
 	}
 }

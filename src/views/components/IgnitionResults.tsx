@@ -7,6 +7,21 @@ interface IgnitionResultsProps extends React.Props<{}> {
 }
 export class IgnitionResults extends React.Component<IgnitionResultsProps, {}> {
 	render(): ReactNode {
+		let results: ReactNode[] = [];
+		if (this.props.songs.length === 0) {
+			results.push(<tr key="whoopsies"><td>No songs found</td></tr>);
+		} else {
+			results = this.props.songs.map((song: Song, index: number) => {
+				return <tr key={index}>
+					<td>{song.title}</td>
+					<td>{song.artist}</td>
+					<td>{song.album}</td>
+					<td>{song.author}</td>
+					<td><a href={`http://customsforge.com/process.php?id=${song.id}`} target="_blank" rel="noopener noreferrer">Download</a></td>
+				</tr>;
+			});
+		}
+
 		return <Table striped bordered hover>
 			<thead>
 				<tr>
@@ -18,15 +33,7 @@ export class IgnitionResults extends React.Component<IgnitionResultsProps, {}> {
 				</tr>
 			</thead>
 			<tbody>
-				{this.props.songs.map((song: Song, index: number) => {
-					return <tr key={index}>
-						<td>{song.title}</td>
-						<td>{song.artist}</td>
-						<td>{song.album}</td>
-						<td>{song.author}</td>
-						<td><a href={`http://customsforge.com/process.php?id=${song.id}`} target="_blank" rel="noopener noreferrer">Download</a></td>
-					</tr>;
-				})}
+				{results}
 			</tbody>
 		</Table>;
 	}

@@ -2,8 +2,8 @@ import React, { ReactNode } from "react";
 import { StaticPlaylists } from "./StaticPlaylists";
 import Cookies from 'js-cookie';
 import { SpotifyAuthInfo, Generator } from "./Generator";
-import { Row, Accordion, Card, Button } from "react-bootstrap";
-import { SpotifyToIgnition } from "./SpotifyToIgnition";
+import { Accordion, Card, Button } from "react-bootstrap";
+import { FaSpotify } from 'react-icons/fa';
 
 export class Home extends React.Component<{}, {}> {
 	render(): ReactNode {
@@ -20,7 +20,7 @@ export class Home extends React.Component<{}, {}> {
 			<Card>
 				<Card.Header>
 					<Accordion.Toggle as={Button} variant="link" eventKey="0">
-						Use Spotify playlists to search CustomsForge Ignition
+						Use <FaSpotify />Spotify playlists to search CustomsForge Ignition
 					</Accordion.Toggle>
 				</Card.Header>
 				<Accordion.Collapse eventKey="0">
@@ -30,17 +30,17 @@ export class Home extends React.Component<{}, {}> {
 			<Card>
 				<Card.Header>
 					<Accordion.Toggle as={Button} variant="link" eventKey="1">
-					Use CustomsForge Ignition to create a Spotify playlist
+					Use CustomsForge Ignition to create a <FaSpotify />Spotify playlist (coming soon)
 					</Accordion.Toggle>
 				</Card.Header>
-				<Accordion.Collapse eventKey="1">
+				{/* <Accordion.Collapse eventKey="1">
 					<Card.Body>TODO</Card.Body>
-				</Accordion.Collapse>
+				</Accordion.Collapse> */}
 			</Card>
 			<Card>
 				<Card.Header>
 					<Accordion.Toggle as={Button} variant="link" eventKey="2">
-						Follow a Spotify playlist. Pre-generated, constantly updated.
+						Follow a <FaSpotify />Spotify playlist. Pre-generated, constantly updated.
 					</Accordion.Toggle>
 				</Card.Header>
 				<Accordion.Collapse eventKey="2">

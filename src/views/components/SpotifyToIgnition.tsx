@@ -1,7 +1,7 @@
 import React, { ReactNode } from "react";
 import SpotifyWebApi from 'spotify-web-api-js';
 import { SpotifyAuthInfo } from "./Generator";
-import { Col } from "react-bootstrap";
+import { Col, Row } from "react-bootstrap";
 import update from 'immutability-helper';
 import { BasicTrackInfo } from "../../types/BasicTrackInfo";
 import { Song } from "../../db/models/Song";
@@ -88,10 +88,10 @@ export class SpotifyToIgnition extends React.Component<SpotifySourceProps, Spoti
 					onPlaylistClicked={this.actOnPlaylist.bind(this)}></SpotifyPlaylistList>;
 			}
 			const localResults: ReactNode = (this.state.results) ? <IgnitionResults songs={this.state.results}></IgnitionResults> : null;
-			return <>
+			return <Row>
 				<Col>{playlists}</Col>
 				<Col>{localResults}</Col>
-			</>;
+			</Row>;
 		}
 		return <>Spotify Source</>;
 	}
