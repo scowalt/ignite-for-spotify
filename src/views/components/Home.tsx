@@ -1,35 +1,38 @@
 import React, { ReactNode } from "react";
 import { StaticPlaylists } from "./StaticPlaylists/StaticPlaylists";
-import Cookies from 'js-cookie';
 import { SpotifyAuthInfo, SpotifyToIgnitionGenerator as SpotifyToIgnitionGenerator } from "./SpotifyToIgnition/SpotifyToIgnitionGenerator";
 import { Accordion } from "react-bootstrap";
 import { FaSpotify } from 'react-icons/fa';
 import { HomeTile } from "./HomeTile";
+import { RequireSpotifyAuth } from "./shared/RequireSpotifyAuth";
+import { IgnitionToSpotify } from "./IgnitionToSpotify/IgnitionToSpotify";
 
 export class Home extends React.Component<{}, {}> {
 	render(): ReactNode {
-		let auth: SpotifyAuthInfo|undefined;
-		const access: string|undefined = Cookies.get("spotifyAccessToken");
-		const refresh: string|undefined = Cookies.get("spotifyRefreshToken");
-		if (access && refresh) {
-			auth = {
-				spotifyAccessToken: access,
-				spotifyRefreshToken: refresh
-			};
-		}
 		return <Accordion>
 			<HomeTile
 				header={<>Use <FaSpotify />Spotify playlists to search CustomsForge Ignition</>}
-				body={<SpotifyToIgnitionGenerator spotifyAuth={auth}></SpotifyToIgnitionGenerator>}
-				index={0}></HomeTile>
+				index={0}>
+				<RequireSpotifyAuth>
+					{(spotifyAuthInfo: SpotifyAuthInfo): ReactNode => {
+						return <SpotifyToIgnitionGenerator spotifyAuth={spotifyAuthInfo}></SpotifyToIgnitionGenerator>;
+					}}
+				</RequireSpotifyAuth>
+			</HomeTile>
 			<HomeTile
 				header={<>Use CustomsForge Ignition to create a <FaSpotify />Spotify playlist (coming soon)</>}
-				body={<></>}
-				index={1}></HomeTile>
+				index={1}>
+				<RequireSpotifyAuth>
+					{(spotifyAuthInfo: SpotifyAuthInfo): ReactNode => {
+						return <IgnitionToSpotify spotifyAuth={spotifyAuthInfo}></IgnitionToSpotify>;
+					}}
+				</RequireSpotifyAuth>
+			</HomeTile>
 			<HomeTile
 				header={<>Follow a <FaSpotify />Spotify playlist. Pre-generated, constantly updated.</>}
-				body={<StaticPlaylists></StaticPlaylists>}
-				index={2}></HomeTile>
+				index={2}>
+				<StaticPlaylists></StaticPlaylists>
+			</HomeTile>
 		</Accordion>;
 	}
 }

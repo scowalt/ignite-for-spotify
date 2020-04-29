@@ -2,7 +2,6 @@ import React, { ReactElement, ReactNode } from "react";
 import { Card, Accordion, Button } from "react-bootstrap";
 
 interface HomeTileProps extends React.Props<{}> {
-	body: ReactElement;
 	header: ReactElement;
 	index: number;
 }
@@ -15,7 +14,7 @@ export class HomeTile extends React.Component<HomeTileProps> {
 				</Accordion.Toggle>
 			</Card.Header>
 			<Accordion.Collapse eventKey={`${this.props.index}`}>
-				<Card.Body>{this.props.body}</Card.Body>
+				<Card.Body>{this.props.children}</Card.Body>
 			</Accordion.Collapse>
 		</Card>;
 	}

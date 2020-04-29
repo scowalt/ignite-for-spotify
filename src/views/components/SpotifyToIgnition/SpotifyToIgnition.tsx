@@ -3,7 +3,7 @@ import SpotifyWebApi from 'spotify-web-api-js';
 import { SpotifyAuthInfo } from "./SpotifyToIgnitionGenerator";
 import { Col, Row } from "react-bootstrap";
 import update from 'immutability-helper';
-import { IgnitionSearch } from "../IgnitionSearch";
+import { IgnitionSearch } from "./IgnitionSearch";
 import { SpotifyPlaylistList } from "./SpotifyPlaylistList";
 import { handleExpiredSpotifyToken } from "../../common/SpotifyHelpers";
 

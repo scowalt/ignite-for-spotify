@@ -1,10 +1,10 @@
-import { Song } from "../../db/models/Song";
+import { Song } from "../../../db/models/Song";
 import React, { ReactNode } from "react";
 import { Table } from "react-bootstrap";
 import SpotifyWebApi from "spotify-web-api-js";
-import { BasicTrackInfo } from "../../types/BasicTrackInfo";
+import { BasicTrackInfo } from "../../../types/BasicTrackInfo";
 import update from 'immutability-helper';
-import { handleExpiredSpotifyToken } from "../common/SpotifyHelpers";
+import { handleExpiredSpotifyToken } from "../../common/SpotifyHelpers";
 
 interface IgnitionSearchProps extends React.Props<{}> {
 	readonly spotify: SpotifyWebApi.SpotifyWebApiJs;

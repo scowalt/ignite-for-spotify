@@ -1,8 +1,6 @@
 import React, { ReactNode } from "react";
-import { Button } from "react-bootstrap";
 import update from 'immutability-helper';
 import { SpotifyToIgnition } from "./SpotifyToIgnition";
-import { FaSpotify } from "react-icons/fa";
 
 export interface SpotifyAuthInfo {
 	spotifyAccessToken: string;
@@ -36,7 +34,7 @@ export class SpotifyToIgnitionGenerator extends React.Component<GeneratorProps, 
 
 	render(): ReactNode {
 		if (!this.props.spotifyAuth) {
-			return <Button href="/login">Login with <FaSpotify />Spotify to continue</Button>;
+			return ;
 		} else {
 			let source: ReactNode;
 			if (this.state.source === Source.Spotify) {
