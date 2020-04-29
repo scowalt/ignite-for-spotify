@@ -57,7 +57,11 @@ export class StaticPlaylists extends React.Component<{}, PlaylistsState> {
 				<Row><Col>The entire CustomsForge library in {this.state.playlists.length} playlists. Click on each playlist to follow them all!</Col></Row>
 				<Row>
 					{this.state.playlists.map((playlist: PlaylistApiInfo, index: number) => {
-						return <Col key={index}>{this.createEmbededPlaylist(playlist.spotifyId, index)}</Col>;
+						return <Col
+							key={index}
+							className={"spotifyPlaylistEmbedWrapperCol"}>
+							{this.createEmbededPlaylist(playlist.spotifyId, index)}
+						</Col>;
 					})}
 				</Row>
 			</Col></Row>;
