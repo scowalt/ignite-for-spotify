@@ -1,7 +1,8 @@
 import React, { ReactNode, ReactElement } from "react";
 import update from 'immutability-helper';
-import { PlaylistApiInfo } from "../../types/PlaylistApiInfo";
+import { PlaylistApiInfo } from "../../../types/PlaylistApiInfo";
 import { Row, Col } from "react-bootstrap";
+import { EmbededSpotifyPlaylist } from "./EmbededSpotifyPlaylist";
 
 interface PlaylistsState {
 	downloadAbort: AbortController;
@@ -45,11 +46,7 @@ export class StaticPlaylists extends React.Component<{}, PlaylistsState> {
 	}
 
 	createEmbededPlaylist(playlistId: string, key: number): ReactElement {
-		return <iframe
-			key={key}
-			src={`https://open.spotify.com/embed/playlist/${playlistId}`}
-			className="spotifyPlaylistEmbed"
-			allow="encrypted-media"></iframe>;
+		return <EmbededSpotifyPlaylist key={key} playlistId={playlistId}></EmbededSpotifyPlaylist>;
 	}
 
 	render(): ReactNode {

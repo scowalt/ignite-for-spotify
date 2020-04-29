@@ -1,7 +1,7 @@
 import React, { ReactNode } from "react";
 import { Row, Pagination, ListGroup, Spinner } from "react-bootstrap";
 import { PLAYLISTS_PER_REQUEST } from "./SpotifyToIgnition";
-import { PlaylistListItem } from "./PlaylistListItem";
+import { PlaylistListItem } from "../PlaylistListItem";
 
 interface SpotifyPlaylistListProps extends React.Props<{}> {
 	loading: boolean;

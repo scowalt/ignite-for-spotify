@@ -1,7 +1,7 @@
 import React, { ReactNode } from "react";
-import { StaticPlaylists } from "./StaticPlaylists";
+import { StaticPlaylists } from "./StaticPlaylists/StaticPlaylists";
 import Cookies from 'js-cookie';
-import { SpotifyAuthInfo, Generator } from "./Generator";
+import { SpotifyAuthInfo, SpotifyToIgnitionGenerator as SpotifyToIgnitionGenerator } from "./SpotifyToIgnition/SpotifyToIgnitionGenerator";
 import { Accordion } from "react-bootstrap";
 import { FaSpotify } from 'react-icons/fa';
 import { HomeTile } from "./HomeTile";
@@ -20,7 +20,7 @@ export class Home extends React.Component<{}, {}> {
 		return <Accordion>
 			<HomeTile
 				header={<>Use <FaSpotify />Spotify playlists to search CustomsForge Ignition</>}
-				body={<Generator spotifyAuth={auth}></Generator>}
+				body={<SpotifyToIgnitionGenerator spotifyAuth={auth}></SpotifyToIgnitionGenerator>}
 				index={0}></HomeTile>
 			<HomeTile
 				header={<>Use CustomsForge Ignition to create a <FaSpotify />Spotify playlist (coming soon)</>}

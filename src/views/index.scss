@@ -5,10 +5,13 @@
 	margin-left: 5px;
 }
 
+.spotifyPlaylistEmbedWrapper {
+	padding: 0 0 141.42% 0; // https://gordonlesti.com/bootstrap-responsive-embed-aspect-ratio/
+	@extend .embed-responsive;
+}
+
 .spotifyPlaylistEmbed {
-	width: 300px;
-	height: 380px;
-	border: none;
+	@extend .embed-responsive-item;
 }
 
 .SpotifyPlaylistList {

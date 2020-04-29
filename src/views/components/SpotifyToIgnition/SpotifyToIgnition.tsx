@@ -1,11 +1,11 @@
 import React, { ReactNode } from "react";
 import SpotifyWebApi from 'spotify-web-api-js';
-import { SpotifyAuthInfo } from "./Generator";
+import { SpotifyAuthInfo } from "./SpotifyToIgnitionGenerator";
 import { Col, Row } from "react-bootstrap";
 import update from 'immutability-helper';
-import { IgnitionSearch } from "./IgnitionSearch";
+import { IgnitionSearch } from "../IgnitionSearch";
 import { SpotifyPlaylistList } from "./SpotifyPlaylistList";
-import { handleExpiredSpotifyToken } from "../common/SpotifyHelpers";
+import { handleExpiredSpotifyToken } from "../../common/SpotifyHelpers";
 
 export const PLAYLISTS_PER_REQUEST: number = 10;
 
@@ -24,7 +24,6 @@ export class SpotifyToIgnition extends React.Component<SpotifySourceProps, Spoti
 	constructor(props: SpotifySourceProps) {
 		super(props);
 		this.state = {
-			// TODO use this to cancel requests
 			downloadAbort: new AbortController(),
 			spotify: new SpotifyWebApi(),
 			loading: true
@@ -71,6 +70,7 @@ export class SpotifyToIgnition extends React.Component<SpotifySourceProps, Spoti
 	}
 
 	render(): ReactNode {
+		// BUG This all displays really poorly on mobile
 		if (this.state.playlists) {
 			const playlists: ReactNode = <SpotifyPlaylistList
 				loading={this.state.loading}

@@ -19,7 +19,7 @@ interface GeneratorProps extends React.Props<{}> {
 interface GeneratorState {
 	source: Source;
 }
-export class Generator extends React.Component<GeneratorProps, GeneratorState> {
+export class SpotifyToIgnitionGenerator extends React.Component<GeneratorProps, GeneratorState> {
 	constructor(props: React.Props<{}>) {
 		super(props);
 		this.state = {
