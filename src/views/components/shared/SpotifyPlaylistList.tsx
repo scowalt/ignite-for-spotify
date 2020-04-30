@@ -1,11 +1,11 @@
 import React, { ReactNode } from "react";
 import { Row, Pagination, ListGroup, Spinner } from "react-bootstrap";
-import { PLAYLISTS_PER_REQUEST } from "./SpotifyToIgnition";
-import { PlaylistListItem } from "../PlaylistListItem";
+import { PlaylistListItem } from "../SpotifyToIgnition/PlaylistListItem";
+import { PLAYLISTS_PER_REQUEST } from "./SpotifyPlaylistListLoader";
 
 interface SpotifyPlaylistListProps extends React.Props<{}> {
 	loading: boolean;
-	playlists: SpotifyApi.ListOfUsersPlaylistsResponse;
+	playlists?: SpotifyApi.ListOfUsersPlaylistsResponse;
 	onPlaylistClicked: (playlist: SpotifyApi.PlaylistObjectSimplified) => void;
 	onPageSwitch: (offset: number) => void;
 }
@@ -22,7 +22,7 @@ export class SpotifyPlaylistList extends React.Component<SpotifyPlaylistListProp
 
 	render(): ReactNode {
 		let playlists: ReactNode[] = [];
-		if (!this.props.loading) {
+		if (!this.props.loading && this.props.playlists) {
 			playlists = this.props.playlists.items.map((playlist: SpotifyApi.PlaylistObjectSimplified, index: number) => {
 				return <PlaylistListItem
 					key={index}
@@ -38,15 +38,17 @@ export class SpotifyPlaylistList extends React.Component<SpotifyPlaylistListProp
 			}
 		}
 		const paginators: ReactNode[] = [];
-		for (let index: number = 0; index < SpotifyPlaylistList.getTotalPages(this.props.playlists); index ++) {
-			paginators.push(
-				<Pagination.Item
-					key={index}
-					active={index === SpotifyPlaylistList.getCurrentPageNumber(this.props.playlists)}
-					onClick={(): void => {this.props.onPageSwitch(index*PLAYLISTS_PER_REQUEST);}}>
-					{index+1}
-				</Pagination.Item>
-			);
+		if (this.props.playlists) {
+			for (let index: number = 0; index < SpotifyPlaylistList.getTotalPages(this.props.playlists); index ++) {
+				paginators.push(
+					<Pagination.Item
+						key={index}
+						active={index === SpotifyPlaylistList.getCurrentPageNumber(this.props.playlists)}
+						onClick={(): void => {this.props.onPageSwitch(index*PLAYLISTS_PER_REQUEST);}}>
+						{index+1}
+					</Pagination.Item>
+				);
+			}
 		}
 		return <>
 			<Row>

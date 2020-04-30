@@ -1,11 +1,12 @@
 import React, { ReactNode } from "react";
 import { StaticPlaylists } from "./StaticPlaylists/StaticPlaylists";
-import { SpotifyAuthInfo, SpotifyToIgnitionGenerator as SpotifyToIgnitionGenerator } from "./SpotifyToIgnition/SpotifyToIgnitionGenerator";
+import { SpotifyAuthInfo} from "./shared/SpotifyAuthInfo";
 import { Accordion } from "react-bootstrap";
 import { FaSpotify } from 'react-icons/fa';
 import { HomeTile } from "./HomeTile";
 import { RequireSpotifyAuth } from "./shared/RequireSpotifyAuth";
 import { IgnitionToSpotify } from "./IgnitionToSpotify/IgnitionToSpotify";
+import { SpotifyToIgnition } from "./SpotifyToIgnition/SpotifyToIgnition";
 
 export class Home extends React.Component<{}, {}> {
 	render(): ReactNode {
@@ -15,12 +16,12 @@ export class Home extends React.Component<{}, {}> {
 				index={0}>
 				<RequireSpotifyAuth>
 					{(spotifyAuthInfo: SpotifyAuthInfo): ReactNode => {
-						return <SpotifyToIgnitionGenerator spotifyAuth={spotifyAuthInfo}></SpotifyToIgnitionGenerator>;
+						return <SpotifyToIgnition auth={spotifyAuthInfo}></SpotifyToIgnition>;
 					}}
 				</RequireSpotifyAuth>
 			</HomeTile>
 			<HomeTile
-				header={<>Use CustomsForge Ignition to create a <FaSpotify />Spotify playlist (coming soon)</>}
+				header={<>Use CustomsForge Ignition to create a <FaSpotify />Spotify playlist</>}
 				index={1}>
 				<RequireSpotifyAuth>
 					{(spotifyAuthInfo: SpotifyAuthInfo): ReactNode => {

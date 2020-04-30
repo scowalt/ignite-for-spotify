@@ -1,5 +1,5 @@
 import React, { ReactNode } from "react";
-import { SpotifyAuthInfo } from "../SpotifyToIgnition/SpotifyToIgnitionGenerator";
+import { SpotifyAuthInfo } from "./SpotifyAuthInfo";
 import { Button } from "react-bootstrap";
 import Cookies from 'js-cookie';
 import { FaSpotify } from "react-icons/fa";
