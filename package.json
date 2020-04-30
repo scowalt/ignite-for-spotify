@@ -10,7 +10,8 @@
         "clean": "trash dist/**",
         "watch": "concurrently \"webpack --env.development --watch\" \"nodemon --watch dist --inspect=9229 ./dist/server.js\" \"nodemon --watch dist --inspect=9300 ./dist/worker.js\" --prefix \"{time}-{pid}\"",
         "lint": "(eslint \"./src/**/*.{ts,tsx,html}\") && (stylelint \"./src/**/*.scss\")",
-        "run": "concurrently \"node ./dist/server.js\" \"node ./dist/worker.js\""
+        "run": "concurrently \"node ./dist/server.js\" \"node ./dist/worker.js\"",
+        "fix": "eslint --fix \"./src/**/*.{ts,tsx,html}\""
     },
     "engines": {
         "node": "^12.12.0"

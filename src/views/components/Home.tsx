@@ -1,6 +1,6 @@
 import React, { ReactNode } from "react";
 import { StaticPlaylists } from "./StaticPlaylists/StaticPlaylists";
-import { SpotifyAuthInfo} from "./shared/SpotifyAuthInfo";
+import { SpotifyAuthInfo } from "./shared/SpotifyAuthInfo";
 import { FaSpotify } from 'react-icons/fa';
 import { RequireSpotifyAuth } from "./shared/RequireSpotifyAuth";
 import { IgnitionToSpotify } from "./IgnitionToSpotify/IgnitionToSpotify";

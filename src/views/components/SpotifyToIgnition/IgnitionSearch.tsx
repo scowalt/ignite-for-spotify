@@ -57,7 +57,7 @@ export class IgnitionSearch extends React.Component<IgnitionSearchProps, Ignitio
 				return response.json();
 			}).then((response: any) => {
 				this.setState(update(this.state, {
-					songs: {$set: response as Song[]}
+					songs: { $set: response as Song[] }
 				}));
 			});
 	}

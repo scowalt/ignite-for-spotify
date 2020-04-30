@@ -106,6 +106,7 @@ module.exports = {
 		"camelcase": "error",
 		"complexity": "error",
 		"constructor-super": "error",
+		"object-curly-spacing": ["warn", "always"],
 		"curly": "error",
 		"dot-notation": "error",
 		"eqeqeq": [

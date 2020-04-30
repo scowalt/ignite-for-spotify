@@ -34,7 +34,7 @@ export class SpotifyPlaylistListLoader extends React.Component<SpotifyPlaylistLi
 	getUserSpotifyPlaylists(offset: number): Promise<any> {
 		if (!this.state.loading) {
 			this.setState(update(this.state, {
-				loading: {$set: true}
+				loading: { $set: true }
 			}));
 		}
 		return this.props.spotify.getUserPlaylists({
@@ -43,7 +43,7 @@ export class SpotifyPlaylistListLoader extends React.Component<SpotifyPlaylistLi
 		}).then((value: SpotifyApi.ListOfUsersPlaylistsResponse) => {
 			if (!this.state.downloadAbort.signal.aborted) {
 				this.setState(update(this.state, {
-					playlists: {$set: value}
+					playlists: { $set: value }
 				}));
 			}
 		}).catch(handleExpiredSpotifyToken(
@@ -52,7 +52,7 @@ export class SpotifyPlaylistListLoader extends React.Component<SpotifyPlaylistLi
 			() => { return this.getUserSpotifyPlaylists(offset); }
 		)).finally(() => {
 			this.setState(update(this.state, {
-				loading: {$set: false}
+				loading: { $set: false }
 			}));
 		});
 	}

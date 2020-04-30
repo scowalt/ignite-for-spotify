@@ -26,7 +26,7 @@ export class SpotifyToIgnition extends React.Component<SpotifySourceProps, Spoti
 
 	private actOnPlaylist(playlist: SpotifyApi.PlaylistObjectSimplified): void {
 		this.setState(update(this.state, {
-			selectedPlaylist: {$set: playlist}
+			selectedPlaylist: { $set: playlist }
 		}));
 	}
 

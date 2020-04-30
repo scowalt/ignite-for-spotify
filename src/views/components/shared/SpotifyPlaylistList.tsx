@@ -33,7 +33,7 @@ export class SpotifyPlaylistList extends React.Component<SpotifyPlaylistListProp
 	onPlaylistSelected(playlist: SpotifyApi.PlaylistObjectSimplified, index: number): () => void {
 		return (): void => {
 			this.setState(update(this.state, {
-				selected: {$set: index}
+				selected: { $set: index }
 			}));
 			this.props.onPlaylistClicked(playlist);
 		};
@@ -43,7 +43,7 @@ export class SpotifyPlaylistList extends React.Component<SpotifyPlaylistListProp
 		return (): void => {
 			this.setState(update(this.state, {
 				// eslint-disable-next-line id-blacklist
-				selected: {$set: undefined}
+				selected: { $set: undefined }
 			}));
 			this.props.onPageSwitch(index*this.props.playlistsPerRequest);
 		};

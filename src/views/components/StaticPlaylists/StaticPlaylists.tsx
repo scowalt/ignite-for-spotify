@@ -40,7 +40,7 @@ export class StaticPlaylists extends React.Component<{}, PlaylistsState> {
 				return Promise.reject('Request aborted');
 			}
 			this.setState(update(this.state, {
-				playlists: {$set: playlists}
+				playlists: { $set: playlists }
 			}));
 		});
 	}
