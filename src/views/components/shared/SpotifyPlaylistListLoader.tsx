@@ -4,11 +4,10 @@ import { handleExpiredSpotifyToken } from "../../common/SpotifyHelpers";
 import SpotifyWebApi from "spotify-web-api-js";
 import { SpotifyPlaylistList } from "./SpotifyPlaylistList";
 
-export const PLAYLISTS_PER_REQUEST: number = 10;
-
 interface SpotifyPlaylistListLoaderProps extends React.Props<{}> {
 	onPlaylistClicked: (playlist: SpotifyApi.PlaylistObjectSimplified) => void;
 	spotify: SpotifyWebApi.SpotifyWebApiJs;
+	playlistsPerRequest: number;
 }
 
 interface State {
@@ -40,7 +39,7 @@ export class SpotifyPlaylistListLoader extends React.Component<SpotifyPlaylistLi
 		}
 		return this.props.spotify.getUserPlaylists({
 			offset,
-			limit: PLAYLISTS_PER_REQUEST
+			limit: this.props.playlistsPerRequest
 		}).then((value: SpotifyApi.ListOfUsersPlaylistsResponse) => {
 			if (!this.state.downloadAbort.signal.aborted) {
 				this.setState(update(this.state, {
@@ -64,6 +63,7 @@ export class SpotifyPlaylistListLoader extends React.Component<SpotifyPlaylistLi
 			loading={this.state.loading}
 			playlists={this.state.playlists}
 			onPageSwitch={this.getUserSpotifyPlaylists.bind(this)}
+			playlistsPerRequest={this.props.playlistsPerRequest}
 			onPlaylistClicked={this.props.onPlaylistClicked}></SpotifyPlaylistList>;
 	}
 }

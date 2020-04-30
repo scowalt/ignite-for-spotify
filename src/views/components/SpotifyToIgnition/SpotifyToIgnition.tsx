@@ -39,6 +39,7 @@ export class SpotifyToIgnition extends React.Component<SpotifySourceProps, Spoti
 		return <Row>
 			<Col>
 				<SpotifyPlaylistListLoader
+					playlistsPerRequest={10}
 					onPlaylistClicked={this.actOnPlaylist.bind(this)}
 					spotify={this.state.spotify} />
 			</Col>

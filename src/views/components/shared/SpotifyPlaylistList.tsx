@@ -1,23 +1,52 @@
 import React, { ReactNode } from "react";
 import { Row, Pagination, ListGroup, Spinner } from "react-bootstrap";
-import { PlaylistListItem } from "../SpotifyToIgnition/PlaylistListItem";
-import { PLAYLISTS_PER_REQUEST } from "./SpotifyPlaylistListLoader";
+import { PlaylistListItem } from "./PlaylistListItem";
+import update from 'immutability-helper';
 
 interface SpotifyPlaylistListProps extends React.Props<{}> {
 	loading: boolean;
 	playlists?: SpotifyApi.ListOfUsersPlaylistsResponse;
 	onPlaylistClicked: (playlist: SpotifyApi.PlaylistObjectSimplified) => void;
 	onPageSwitch: (offset: number) => void;
+	playlistsPerRequest: number;
 }
 
-export class SpotifyPlaylistList extends React.Component<SpotifyPlaylistListProps,{}> {
-	// Zero-based page number for playlists
-	private static getCurrentPageNumber(playlists: SpotifyApi.ListOfUsersPlaylistsResponse): number {
-		return Math.floor(playlists.offset / PLAYLISTS_PER_REQUEST);
+interface State {
+	selected?: number;
+}
+
+export class SpotifyPlaylistList extends React.Component<SpotifyPlaylistListProps,State> {
+	constructor(props: SpotifyPlaylistListProps) {
+		super(props);
+		this.state = {};
 	}
 
-	private static getTotalPages(playlists: SpotifyApi.ListOfUsersPlaylistsResponse): number {
-		return Math.floor(playlists.total / PLAYLISTS_PER_REQUEST)+1;
+	// Zero-based page number for playlists
+	private getCurrentPageNumber(playlists: SpotifyApi.ListOfUsersPlaylistsResponse): number {
+		return Math.floor(playlists.offset / this.props.playlistsPerRequest);
+	}
+
+	private getTotalPages(playlists: SpotifyApi.ListOfUsersPlaylistsResponse): number {
+		return Math.floor(playlists.total / this.props.playlistsPerRequest)+1;
+	}
+
+	onPlaylistSelected(playlist: SpotifyApi.PlaylistObjectSimplified, index: number): () => void {
+		return (): void => {
+			this.setState(update(this.state, {
+				selected: {$set: index}
+			}));
+			this.props.onPlaylistClicked(playlist);
+		};
+	}
+
+	onPageSwitch(index: number): () => void {
+		return (): void => {
+			this.setState(update(this.state, {
+				// eslint-disable-next-line id-blacklist
+				selected: {$set: undefined}
+			}));
+			this.props.onPageSwitch(index*this.props.playlistsPerRequest);
+		};
 	}
 
 	render(): ReactNode {
@@ -27,10 +56,11 @@ export class SpotifyPlaylistList extends React.Component<SpotifyPlaylistListProp
 				return <PlaylistListItem
 					key={index}
 					playlist={playlist}
-					onClick={(): void => {this.props.onPlaylistClicked(playlist);}} />;
+					selected={this.state.selected === index}
+					onClick={this.onPlaylistSelected(playlist, index).bind(this)} />;
 			});
 		} else {
-			for (let count: number = 0; count < PLAYLISTS_PER_REQUEST; count++) {
+			for (let count: number = 0; count < this.props.playlistsPerRequest; count++) {
 				playlists.push(<ListGroup.Item key={count}>
 					<Spinner animation="border" role="status" className="PlaylistListItemSpinner">
 						<span className="sr-only">Loading...</span>
@@ -39,12 +69,12 @@ export class SpotifyPlaylistList extends React.Component<SpotifyPlaylistListProp
 		}
 		const paginators: ReactNode[] = [];
 		if (this.props.playlists) {
-			for (let index: number = 0; index < SpotifyPlaylistList.getTotalPages(this.props.playlists); index ++) {
+			for (let index: number = 0; index < this.getTotalPages(this.props.playlists); index ++) {
 				paginators.push(
 					<Pagination.Item
 						key={index}
-						active={index === SpotifyPlaylistList.getCurrentPageNumber(this.props.playlists)}
-						onClick={(): void => {this.props.onPageSwitch(index*PLAYLISTS_PER_REQUEST);}}>
+						active={index === this.getCurrentPageNumber(this.props.playlists)}
+						onClick={this.onPageSwitch(index)}>
 						{index+1}
 					</Pagination.Item>
 				);

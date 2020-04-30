@@ -4,6 +4,7 @@ import React, { ReactNode } from "react";
 interface PlaylistListItemProps extends React.Props<{}> {
 	playlist: SpotifyApi.PlaylistObjectSimplified;
 	onClick: () => void;
+	selected: boolean;
 }
 export class PlaylistListItem extends React.Component<PlaylistListItemProps> {
 	constructor(props: PlaylistListItemProps) {
@@ -21,7 +22,8 @@ export class PlaylistListItem extends React.Component<PlaylistListItemProps> {
 
 		return <ListGroup.Item
 			action
-			onClick={this.props.onClick}>
+			onClick={this.props.onClick}
+			className={this.props.selected ? "selectedPlaylist" : ""}>
 			{image}
 			{this.props.playlist.name}
 			<span className="font-italic"> ({this.props.playlist.tracks.total} tracks)</span>
