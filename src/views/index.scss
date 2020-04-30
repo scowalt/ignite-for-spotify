@@ -42,3 +42,7 @@
 .selectedPlaylist {
 	@extend .list-group-item-action, :hover;
 }
+
+.tab-content {
+	margin-top: 1em;
+}
