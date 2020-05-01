@@ -3,26 +3,44 @@ import { SpotifyPlaylistListLoader } from "../shared/SpotifyPlaylistListLoader";
 import SpotifyWebApi from "spotify-web-api-js";
 import { SpotifyAuthInfo } from "../shared/SpotifyAuthInfo";
 import { FaSpotify } from 'react-icons/fa';
+import update from 'immutability-helper';
 
 interface Props extends React.Props<{}> {
 	auth: SpotifyAuthInfo;
+	setPlaylist: (playlistPromiseFunction: (() => Promise<SpotifyApi.PlaylistBaseObject>)) => void;
 }
 
 interface State {
 	readonly spotify: SpotifyWebApi.SpotifyWebApiJs;
+	playlistName: string;
 }
 export class SpotifyPlaylistSelector extends React.Component<Props, State> {
 	constructor(props: Props) {
 		super(props);
 		this.state = {
 			spotify: new SpotifyWebApi(),
+			playlistName: ""
 		};
 		this.state.spotify.setAccessToken(props.auth.spotifyAccessToken);
 	}
 
 	onPlaylistClicked(playlist: SpotifyApi.PlaylistObjectSimplified): void {
-		// TODO
-		playlist.toString();
+		this.props.setPlaylist(() => { return Promise.resolve(playlist); });
+	}
+
+	onCreateNewClicked(): void {
+		this.props.setPlaylist(async (): Promise<SpotifyApi.PlaylistBaseObject> => {
+			const playlistName: string = (this.state.playlistName.length > 0) ? this.state.playlistName : "Playlist";
+			const profile: SpotifyApi.CurrentUsersProfileResponse = await this.state.spotify.getMe();
+			const response: SpotifyApi.CreatePlaylistResponse = await this.state.spotify.createPlaylist(profile.id, { name: playlistName });
+			return Promise.resolve(response);
+		});
+	}
+
+	handlePlaylistNameChange(event: React.ChangeEvent<HTMLInputElement>): void {
+		this.setState(update(this.state, {
+			playlistName: { $set: event.target.value }
+		}));
 	}
 
 	render(): ReactNode {
@@ -32,7 +50,7 @@ export class SpotifyPlaylistSelector extends React.Component<Props, State> {
 					Select an existing <FaSpotify />Spotify playlist
 				</a>
 			</li>
-			<li className="nav-item">
+			<li className="nav-item" onClick={this.onCreateNewClicked.bind(this)}>
 				<a className="nav-link" id="pills-new-tab" href="#pills-new" data-toggle="pill" role="tab" aria-controls="pills-new" aria-selected="false">
 					Create a new <FaSpotify />Spotify playlist
 				</a>
@@ -46,7 +64,7 @@ export class SpotifyPlaylistSelector extends React.Component<Props, State> {
 					playlistsPerRequest={5}/>
 			</div>
 			<div className="tab-pane fade" id="pills-new" role="tabpanel" aria-labelledby="pills-new-tab">
-				New
+				<input className="playlistNameInput" type="text" placeholder="Playlist Name (optional)" onChange={this.handlePlaylistNameChange.bind(this)}></input>
 			</div>
 		</div></>;
 	}

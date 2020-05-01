@@ -35,7 +35,7 @@ export class Home extends React.Component<{}, {}> {
 			<div className="col-3">
 				<div className="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
 					{ this.createTabLink("spotifySource", <>Use <FaSpotify />Spotify playlists to search CustomsForge Ignition</>) }
-					{ this.createTabLink("ignitionSource", <>Use CustomsForge Ignition to create a <FaSpotify />Spotify playlist</>) }
+					{ this.createTabLink("ignitionSource", <>Export CustomsForge Ignition to a <FaSpotify />Spotify playlist</>) }
 					{ this.createTabLink("spotifyStatic", <>Follow a constantly-updated <FaSpotify />Spotify playlist.</>) }
 				</div>
 			</div>

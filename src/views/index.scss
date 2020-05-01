@@ -46,3 +46,13 @@
 .tab-content {
 	margin-top: 1em;
 }
+
+.playlistNameInput {
+	width: 100%;
+}
+
+.goButton {
+	@extend .btn-success;
+
+	width: 100%;
+}
