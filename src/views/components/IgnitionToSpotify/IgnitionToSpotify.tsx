@@ -3,7 +3,8 @@ import { SpotifyAuthInfo } from "../shared/SpotifyAuthInfo";
 import { Col, Row, Button } from "react-bootstrap";
 import { IgnitionSearchForm } from "./IgnitionSearchForm";
 import { SpotifyPlaylistSelector } from "./SpotifyPlaylistSelector";
-import update from 'immutability-helper';
+import update, { Spec } from 'immutability-helper';
+import { IgnitionSearchQuery } from "../../../types/IgnitionSearchQuery";
 
 interface IgnitionToSpotifyProps extends React.Props<{}> {
 	spotifyAuth: SpotifyAuthInfo;
@@ -11,12 +12,20 @@ interface IgnitionToSpotifyProps extends React.Props<{}> {
 
 interface State {
 	getPlaylist?: () => Promise<SpotifyApi.PlaylistBaseObject>;
+	ignitionSearchQuery: IgnitionSearchQuery;
 }
 export class IgnitionToSpotify extends React.Component<IgnitionToSpotifyProps, State> {
 	start(): void {
 		if (!this.state.getPlaylist) {
 			// TODO error here
 		}
+	}
+
+	updateSearchQuery(spec: Spec<IgnitionSearchQuery>): void {
+		const newIgnitionSearchQuery: IgnitionSearchQuery = update<IgnitionSearchQuery>(this.state.ignitionSearchQuery, spec);
+		this.setState(update(this.state, {
+			ignitionSearchQuery: { $set: newIgnitionSearchQuery }
+		}));
 	}
 
 	setPlaylistFunction(playlistPromiseFunction: (() => Promise<SpotifyApi.PlaylistBaseObject>)): void {
@@ -28,7 +37,7 @@ export class IgnitionToSpotify extends React.Component<IgnitionToSpotifyProps, S
 	render(): ReactNode {
 		return <>
 			<Row>
-				<Col><IgnitionSearchForm /></Col>
+				<Col><IgnitionSearchForm update={this.updateSearchQuery.bind(this)}/></Col>
 				<Col>
 					<SpotifyPlaylistSelector
 						setPlaylist={this.setPlaylistFunction.bind(this)}

@@ -1,7 +1,12 @@
 import React, { ReactNode } from "react";
 import { Form, Row, Col } from "react-bootstrap";
+import { Spec } from 'immutability-helper';
+import { IgnitionSearchQuery } from "../../../types/IgnitionSearchQuery";
 
-export class IgnitionSearchForm extends React.Component {
+interface Props extends React.Props<{}> {
+	update: (spec: Spec<IgnitionSearchQuery>) => void;
+}
+export class IgnitionSearchForm extends React.Component<Props> {
 	makeOptionalString(name: string): ReactNode {
 		return 	<Col key={name}>
 			<Form.Group controlId={`ignitionSearchForm.${name}Input`}>
@@ -12,25 +17,27 @@ export class IgnitionSearchForm extends React.Component {
 
 	makeOptionalBoolean(part: string): ReactNode {
 		return <Col key={part}>
-			<fieldset><Form.Group controlId={`ignitionSearchForm.${part}Input`}>
-				<Form.Label>{part}</Form.Label>
-				<Form.Check
-					type="radio"
-					label="Yes"
-					name={`${part}Radio`}
-					id={`${part}RadioYes`}/>
-				<Form.Check
-					type="radio"
-					label="No"
-					name={`${part}Radio`}
-					id={`${part}RadioNo`}/>
-				<Form.Check
-					type="radio"
-					label="Don't care"
-					name={`${part}Radio`}
-					id={`${part}RadioNeutral`}
-					defaultChecked />
-			</Form.Group></fieldset>
+			<fieldset>
+				<Form.Group controlId={`ignitionSearchForm.${part}Input`}>
+					<Form.Label>{part}</Form.Label>
+					<Form.Check
+						type="radio"
+						label="Yes"
+						name={`${part}Radio`}
+						id={`${part}RadioYes`}/>
+					<Form.Check
+						type="radio"
+						label="No"
+						name={`${part}Radio`}
+						id={`${part}RadioNo`}/>
+					<Form.Check
+						type="radio"
+						label="Don't care"
+						name={`${part}Radio`}
+						id={`${part}RadioNeutral`}
+						defaultChecked />
+				</Form.Group>
+			</fieldset>
 		</Col>;
 	}
 
