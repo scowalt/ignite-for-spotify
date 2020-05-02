@@ -56,3 +56,17 @@
 
 	width: 100%;
 }
+
+label {
+	input {
+		@extend .form-control;
+	}
+
+	select {
+		@extend .form-control;
+	}
+}
+
+form .row .col {
+	@extend .col-md-6;
+}

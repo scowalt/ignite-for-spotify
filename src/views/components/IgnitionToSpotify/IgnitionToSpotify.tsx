@@ -22,6 +22,7 @@ export class IgnitionToSpotify extends React.Component<IgnitionToSpotifyProps, S
 	}
 
 	updateSearchQuery(spec: Spec<IgnitionSearchQuery>): void {
+		// https://github.com/kolodny/immutability-helper/issues/150#issuecomment-577738506
 		const newIgnitionSearchQuery: IgnitionSearchQuery = update<IgnitionSearchQuery>(this.state.ignitionSearchQuery, spec);
 		this.setState(update(this.state, {
 			ignitionSearchQuery: { $set: newIgnitionSearchQuery }
