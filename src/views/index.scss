@@ -58,15 +58,15 @@
 }
 
 label {
-	input {
+	> input {
 		@extend .form-control;
 	}
 
-	select {
+	> select {
 		@extend .form-control;
 	}
 }
 
-form .row .col {
-	@extend .col-md-4;
+form > .row > .col {
+	@extend .col-md-6;
 }

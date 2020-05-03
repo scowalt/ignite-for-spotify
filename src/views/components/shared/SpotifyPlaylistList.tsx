@@ -1,5 +1,5 @@
 import React, { ReactNode } from "react";
-import { Row, Pagination, ListGroup, Spinner } from "react-bootstrap";
+import { Row, Pagination, ListGroup, Spinner, Col } from "react-bootstrap";
 import { PlaylistListItem } from "./PlaylistListItem";
 import update from 'immutability-helper';
 
@@ -81,12 +81,12 @@ export class SpotifyPlaylistList extends React.Component<SpotifyPlaylistListProp
 			}
 		}
 		return <>
-			<Row>
+			<Row><Col>
 				<ListGroup className={"SpotifyPlaylistList"}>{ playlists }</ListGroup>
-			</Row>
-			<Row>
+			</Col></Row>
+			<Row><Col>
 				<Pagination>{paginators}</Pagination>
-			</Row>
+			</Col></Row>
 		</>;
 	}
 }
