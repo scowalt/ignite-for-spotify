@@ -3,8 +3,8 @@ import { StaticPlaylists } from "./StaticPlaylists/StaticPlaylists";
 import { SpotifyAuthInfo } from "./shared/SpotifyAuthInfo";
 import { FaSpotify } from 'react-icons/fa';
 import { RequireSpotifyAuth } from "./shared/RequireSpotifyAuth";
-import { IgnitionToSpotify } from "./IgnitionToSpotify/IgnitionToSpotify";
 import { SpotifyToIgnition } from "./SpotifyToIgnition/SpotifyToIgnition";
+import { IgnitionSearchForm } from "./IgnitionToSpotify/IgnitionSearchForm";
 
 export class Home extends React.Component<{}, {}> {
 	createTabLink(id: string, content: ReactNode): ReactNode {
@@ -48,7 +48,7 @@ export class Home extends React.Component<{}, {}> {
 					</RequireSpotifyAuth>) }
 					{ this.createTabContent("ignitionSource", <RequireSpotifyAuth>
 						{(spotifyAuthInfo: SpotifyAuthInfo): ReactNode => {
-							return <IgnitionToSpotify spotifyAuth={spotifyAuthInfo}></IgnitionToSpotify>;
+							return <IgnitionSearchForm spotifyAuth={spotifyAuthInfo}></IgnitionSearchForm>;
 						}}
 					</RequireSpotifyAuth>) }
 					{ this.createTabContent("spotifyStatic", <StaticPlaylists></StaticPlaylists>) }

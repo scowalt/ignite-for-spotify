@@ -23,6 +23,7 @@ export class PlaylistListItem extends React.Component<PlaylistListItemProps> {
 		return <ListGroup.Item
 			action
 			onClick={this.props.onClick}
+			type="button" // Avoid formik errors
 			className={this.props.selected ? "selectedPlaylist" : ""}>
 			{image}
 			{this.props.playlist.name}

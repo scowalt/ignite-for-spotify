@@ -1,20 +1,22 @@
+import { connect, FormikProps } from "formik";
 import React, { ReactNode } from "react";
 import { SpotifyPlaylistListLoader } from "../shared/SpotifyPlaylistListLoader";
 import SpotifyWebApi from "spotify-web-api-js";
 import { SpotifyAuthInfo } from "../shared/SpotifyAuthInfo";
-import { FaSpotify } from 'react-icons/fa';
+import { FaSpotify } from "react-icons/fa";
 import update from 'immutability-helper';
+import { Submission } from "./IgnitionSearchForm";
 
-interface Props extends React.Props<{}> {
+interface Props {
 	auth: SpotifyAuthInfo;
-	setPlaylist: (playlistPromiseFunction: (() => Promise<SpotifyApi.PlaylistBaseObject>)) => void;
+	name: string;
+	formik: FormikProps<Submission>;
 }
-
 interface State {
 	readonly spotify: SpotifyWebApi.SpotifyWebApiJs;
 	playlistName: string;
 }
-export class SpotifyPlaylistSelector extends React.Component<Props, State> {
+class SpotifyPlaylistSelector extends React.Component<Props, State> {
 	constructor(props: Props) {
 		super(props);
 		this.state = {
@@ -24,17 +26,18 @@ export class SpotifyPlaylistSelector extends React.Component<Props, State> {
 		this.state.spotify.setAccessToken(props.auth.spotifyAccessToken);
 	}
 
-	onPlaylistClicked(playlist: SpotifyApi.PlaylistObjectSimplified): void {
-		this.props.setPlaylist(() => { return Promise.resolve(playlist); });
-	}
-
 	onCreateNewClicked(): void {
-		this.props.setPlaylist(async (): Promise<SpotifyApi.PlaylistBaseObject> => {
+		const value: () => Promise<SpotifyApi.PlaylistBaseObject> = async (): Promise<SpotifyApi.PlaylistBaseObject> => {
 			const playlistName: string = (this.state.playlistName.length > 0) ? this.state.playlistName : "Playlist";
 			const profile: SpotifyApi.CurrentUsersProfileResponse = await this.state.spotify.getMe();
 			const response: SpotifyApi.CreatePlaylistResponse = await this.state.spotify.createPlaylist(profile.id, { name: playlistName });
 			return Promise.resolve(response);
-		});
+		};
+		this.props.formik.setFieldValue(this.props.name, value);
+	}
+
+	onPlaylistClicked(playlist: SpotifyApi.PlaylistObjectSimplified): void {
+		this.props.formik.setFieldValue(this.props.name, () => { return Promise.resolve(playlist); });
 	}
 
 	handlePlaylistNameChange(event: React.ChangeEvent<HTMLInputElement>): void {
@@ -69,3 +72,5 @@ export class SpotifyPlaylistSelector extends React.Component<Props, State> {
 		</div></>;
 	}
 }
+
+export default connect(SpotifyPlaylistSelector);
