@@ -10,6 +10,10 @@ export const IgnitionSearchQuerySchema: yup.ObjectSchema = yup.object({
 	bass: yup.boolean().notRequired(),
 	vocals: yup.boolean().notRequired(),
 	dynamicDifficulty: yup.boolean().notRequired(),
+
+	// true if the playlist descriptor is an ID. Otherwise, it's a name
+	havePlaylistId: yup.boolean().required(),
+	playlistDescriptor: yup.string().required().min(1) // NIT this can be more precise and depend on havePlaylistId
 });
 
 // Return the TypeScript type for use internally
