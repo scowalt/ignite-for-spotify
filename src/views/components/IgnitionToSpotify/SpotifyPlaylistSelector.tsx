@@ -6,7 +6,7 @@ import { SpotifyAuthInfo } from "../shared/SpotifyAuthInfo";
 import { FaSpotify } from "react-icons/fa";
 import update from 'immutability-helper';
 import { IgnitionSearchQuery } from "../../../types/IgnitionSearchQuery";
-import { Row, Col, Alert, Nav, TabContent } from "react-bootstrap";
+import { Row, Col, Alert, Nav, TabContent, TabPane } from "react-bootstrap";
 
 interface Props {
 	auth: SpotifyAuthInfo;
@@ -32,6 +32,13 @@ class SpotifyPlaylistSelector extends React.Component<Props, State> {
 			// State updated internal to object. Need to make sure formik receives this state update too.
 			this.onCreateNewClicked();
 		}
+	}
+
+	onSelectExistingClicked(): void {
+		this.props.formik.setFieldValue(this.props.name, {
+			havePlaylistId: true,
+			playlistDescriptor: "" // TODO set this to previously selected playlist
+		});
 	}
 
 	onCreateNewClicked(): void {
@@ -61,7 +68,7 @@ class SpotifyPlaylistSelector extends React.Component<Props, State> {
 				<Alert variant="warning" >Playlist selection required</Alert>
 			</Col></Row> : <></>}
 			<Nav fill variant="pills" className="mb-3" role="tablist" id="pills-tab" defaultActiveKey="#pills-existing">
-				<Nav.Item>
+				<Nav.Item onClick={this.onSelectExistingClicked.bind(this)}>
 					<Nav.Link href="#pills-existing" data-toggle="pill">Select an existing <FaSpotify />Spotify playlist</Nav.Link>
 				</Nav.Item>
 				<Nav.Item onClick={this.onCreateNewClicked.bind(this)}>
@@ -69,15 +76,15 @@ class SpotifyPlaylistSelector extends React.Component<Props, State> {
 				</Nav.Item>
 			</Nav>
 			<TabContent id="pills-tabContent">
-				<div className="tab-pane fade show active" id="pills-existing" role="tabpanel" aria-labelledby="pills-existing-tab">
+				<TabPane active={true} id="pills-existing">
 					<SpotifyPlaylistListLoader
 						spotify={this.state.spotify}
 						onPlaylistClicked={this.onPlaylistClicked.bind(this)}
 						playlistsPerRequest={5}/>
-				</div>
-				<div className="tab-pane fade" id="pills-new" role="tabpanel" aria-labelledby="pills-new-tab">
+				</TabPane>
+				<TabPane id="pills-new">
 					<input className="playlistNameInput" type="text" placeholder="Playlist Name (optional)" onChange={this.handlePlaylistNameChange.bind(this)}></input>
-				</div>
+				</TabPane>
 			</TabContent>
 		</>;
 	}
