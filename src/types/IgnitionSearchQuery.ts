@@ -12,6 +12,11 @@ export const IgnitionSearchQuerySchema: yup.ObjectSchema = yup.object({
 	dynamicDifficulty: yup.boolean().notRequired(),
 
 	// true if the playlist descriptor is an ID. Otherwise, it's a name
+	// TODO make this a single, compound "SPotify Info" object rather than two separate fields.
+	// Trying to set two different field values with a single form in Formik seems like a bit of an anti-pattern.
+	// So, make a new compound type, and set that one type in the playlist picker.
+	// See https://stackoverflow.com/questions/57392290/multiple-field-names-on-single-input, where everyone suggests returning
+	// a single, compound string.
 	havePlaylistId: yup.boolean().required(),
 	playlistDescriptor: yup.string().required().min(1) // NIT this can be more precise and depend on havePlaylistId
 });
