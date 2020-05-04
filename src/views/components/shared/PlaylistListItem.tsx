@@ -5,6 +5,7 @@ interface PlaylistListItemProps extends React.Props<{}> {
 	playlist: SpotifyApi.PlaylistObjectSimplified;
 	onClick: () => void;
 	selected: boolean;
+	disabled?: boolean;
 }
 export class PlaylistListItem extends React.Component<PlaylistListItemProps> {
 	constructor(props: PlaylistListItemProps) {
@@ -22,6 +23,7 @@ export class PlaylistListItem extends React.Component<PlaylistListItemProps> {
 
 		return <ListGroup.Item
 			action
+			disabled={this.props.disabled}
 			onClick={this.props.onClick}
 			type="button" // Avoid formik errors
 			className={this.props.selected ? "selectedPlaylist" : ""}>

@@ -9,6 +9,7 @@ interface SpotifyPlaylistListProps extends React.Props<{}> {
 	onPlaylistClicked: (playlist: SpotifyApi.PlaylistObjectSimplified) => void;
 	onPageSwitch: (offset: number) => void;
 	playlistsPerRequest: number;
+	disabled?: boolean;
 }
 
 interface State {
@@ -54,6 +55,7 @@ export class SpotifyPlaylistList extends React.Component<SpotifyPlaylistListProp
 		if (!this.props.loading && this.props.playlists) {
 			playlists = this.props.playlists.items.map((playlist: SpotifyApi.PlaylistObjectSimplified, index: number) => {
 				return <PlaylistListItem
+					disabled={this.props.disabled}
 					key={index}
 					playlist={playlist}
 					selected={this.state.selected === index}
@@ -72,6 +74,7 @@ export class SpotifyPlaylistList extends React.Component<SpotifyPlaylistListProp
 			for (let index: number = 0; index < this.getTotalPages(this.props.playlists); index ++) {
 				paginators.push(
 					<Pagination.Item
+						disabled={this.props.disabled}
 						key={index}
 						active={index === this.getCurrentPageNumber(this.props.playlists)}
 						onClick={this.onPageSwitch(index)}>

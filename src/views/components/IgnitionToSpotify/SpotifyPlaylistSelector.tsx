@@ -69,10 +69,10 @@ class SpotifyPlaylistSelector extends React.Component<Props, State> {
 			</Col></Row> : <></>}
 			<Nav fill variant="pills" className="mb-3" role="tablist" id="pills-tab" defaultActiveKey="#pills-existing">
 				<Nav.Item onClick={this.onSelectExistingClicked.bind(this)}>
-					<Nav.Link href="#pills-existing" data-toggle="pill">Select an existing <FaSpotify />Spotify playlist</Nav.Link>
+					<Nav.Link href="#pills-existing" data-toggle="pill" disabled={this.props.formik.isSubmitting}>Select an existing <FaSpotify />Spotify playlist</Nav.Link>
 				</Nav.Item>
 				<Nav.Item onClick={this.onCreateNewClicked.bind(this)}>
-					<Nav.Link href="#pills-new" data-toggle="pill">Create a new <FaSpotify />Spotify playlist</Nav.Link>
+					<Nav.Link href="#pills-new" data-toggle="pill" disabled={this.props.formik.isSubmitting}>Create a new <FaSpotify />Spotify playlist</Nav.Link>
 				</Nav.Item>
 			</Nav>
 			<TabContent id="pills-tabContent">
@@ -80,10 +80,16 @@ class SpotifyPlaylistSelector extends React.Component<Props, State> {
 					<SpotifyPlaylistListLoader
 						spotify={this.state.spotify}
 						onPlaylistClicked={this.onPlaylistClicked.bind(this)}
-						playlistsPerRequest={5}/>
+						playlistsPerRequest={5}
+						disabled={this.props.formik.isSubmitting} />
 				</TabPane>
 				<TabPane id="pills-new">
-					<input className="playlistNameInput" type="text" placeholder="Playlist Name (optional)" onChange={this.handlePlaylistNameChange.bind(this)}></input>
+					<input
+						className="playlistNameInput"
+						type="text"
+						placeholder="Playlist Name (optional)"
+						onChange={this.handlePlaylistNameChange.bind(this)}
+						disabled={this.props.formik.isSubmitting} />
 				</TabPane>
 			</TabContent>
 		</>;

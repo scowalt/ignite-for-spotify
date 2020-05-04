@@ -8,6 +8,7 @@ interface SpotifyPlaylistListLoaderProps extends React.Props<{}> {
 	onPlaylistClicked: (playlist: SpotifyApi.PlaylistObjectSimplified) => void;
 	spotify: SpotifyWebApi.SpotifyWebApiJs;
 	playlistsPerRequest: number;
+	disabled?: boolean;
 }
 
 interface State {
@@ -60,6 +61,7 @@ export class SpotifyPlaylistListLoader extends React.Component<SpotifyPlaylistLi
 
 	render(): ReactNode {
 		return <SpotifyPlaylistList
+			disabled={this.props.disabled}
 			loading={this.state.loading}
 			playlists={this.state.playlists}
 			onPageSwitch={this.getUserSpotifyPlaylists.bind(this)}
