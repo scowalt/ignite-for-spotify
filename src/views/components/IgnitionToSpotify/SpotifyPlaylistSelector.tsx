@@ -10,6 +10,7 @@ import { Row, Col, Alert } from "react-bootstrap";
 
 interface Props {
 	auth: SpotifyAuthInfo;
+	name: string;
 	formik: FormikProps<IgnitionSearchQuery>;
 }
 interface State {
@@ -26,14 +27,25 @@ class SpotifyPlaylistSelector extends React.Component<Props, State> {
 		this.state.spotify.setAccessToken(props.auth.spotifyAccessToken);
 	}
 
+	componentDidUpdate(_previousProps: Props, previousState: State): void {
+		if (previousState.playlistName !== this.state.playlistName) {
+			// State updated internal to object. Need to make sure formik receives this state update too.
+			this.onCreateNewClicked();
+		}
+	}
+
 	onCreateNewClicked(): void {
-		this.props.formik.setFieldValue('havePlaylistId', false);
-		this.props.formik.setFieldValue('playlistDescriptor', this.state.playlistName);
+		this.props.formik.setFieldValue(this.props.name, {
+			havePlaylistId: false,
+			playlistDescriptor: this.state.playlistName
+		});
 	}
 
 	onPlaylistClicked(playlist: SpotifyApi.PlaylistObjectSimplified): void {
-		this.props.formik.setFieldValue('havePlaylistId', true);
-		this.props.formik.setFieldValue('playlistDescriptor', playlist.id);
+		this.props.formik.setFieldValue(this.props.name, {
+			havePlaylistId: true,
+			playlistDescriptor: playlist.id
+		});
 	}
 
 	handlePlaylistNameChange(event: React.ChangeEvent<HTMLInputElement>): void {
@@ -44,11 +56,8 @@ class SpotifyPlaylistSelector extends React.Component<Props, State> {
 
 	render(): ReactNode {
 		// BUG this.props.formik.errors doesn't have the right type because of the way I'm inferring IgnitionSearchQuery from the schema
-
-		// eslint-disable-next-line no-console
-		console.log(this.props.formik.errors);
 		return <>
-			{(this.props.formik.errors as any).playlistDescriptor ? <Row><Col>
+			{(this.props.formik.errors as any).playlistInfo ? <Row><Col>
 				<Alert variant="warning" >Playlist selection required</Alert>
 			</Col></Row> : <></>}
 			<ul className="nav nav-pills nav-fill mb-3" id="pills-tab" role="tablist">

@@ -11,8 +11,10 @@ const initialValues: IgnitionSearchQuery = {
 	artist: "",
 	album: "",
 	author: "",
-	havePlaylistId: false,
-	playlistDescriptor: "",
+	playlistInfo: {
+		havePlaylistId: false,
+		playlistDescriptor: ""
+	},
 };
 interface Props extends React.Props<{}> {
 	spotifyAuth: SpotifyAuthInfo;
@@ -52,11 +54,11 @@ export class IgnitionSearchForm extends React.Component<Props> {
 	}
 
 	render(): ReactNode {
-		// TODO replace validation schema
 		return <>
 			<Formik
 				initialValues={initialValues}
 				onSubmit={this.onSubmit.bind(this)}
+				validateOnChange={false} // Only validate on change to avoid noisy errors while the user is entering playlist info
 				validationSchema={IgnitionSearchQuerySchema}>
 				{( formikProps: FormikProps<IgnitionSearchQuery> ): ReactNode => (
 					<Form onSubmit={formikProps.handleSubmit}>
@@ -71,6 +73,7 @@ export class IgnitionSearchForm extends React.Component<Props> {
 							</Col>
 							<Col>
 								<SpotifyPlaylistSelector
+									name="playlistInfo"
 									auth={this.props.spotifyAuth}
 									formik={formikProps}/>
 							</Col>
