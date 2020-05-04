@@ -69,7 +69,7 @@ export class IgnitionSearchForm extends React.Component<Props> {
 				validationSchema={IgnitionSearchQuerySchema}>
 				{( formikProps: FormikProps<IgnitionSearchQuery> ): ReactNode => (
 					<Form onSubmit={formikProps.handleSubmit}>
-						<Row>
+						<Row className="formRow">
 							<Col>
 								<Row>
 									{(['artist', 'album', 'author'] as (keyof IgnitionSearchQuery)[]).map(this.makeOptionalString(formikProps))}
@@ -85,11 +85,11 @@ export class IgnitionSearchForm extends React.Component<Props> {
 									formik={formikProps}/>
 							</Col>
 						</Row>
-						<Row>
+						<Row><Col>
 							<Button type="submit" disabled={formikProps.isSubmitting} block>
 								Submit
 							</Button>
-						</Row>
+						</Col></Row>
 					</Form>
 				)}
 			</Formik>
