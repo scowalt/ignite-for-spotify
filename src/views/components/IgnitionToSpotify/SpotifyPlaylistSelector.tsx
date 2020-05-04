@@ -6,7 +6,7 @@ import { SpotifyAuthInfo } from "../shared/SpotifyAuthInfo";
 import { FaSpotify } from "react-icons/fa";
 import update from 'immutability-helper';
 import { IgnitionSearchQuery } from "../../../types/IgnitionSearchQuery";
-import { Row, Col, Alert, Nav } from "react-bootstrap";
+import { Row, Col, Alert, Nav, TabContent } from "react-bootstrap";
 
 interface Props {
 	auth: SpotifyAuthInfo;
@@ -68,7 +68,7 @@ class SpotifyPlaylistSelector extends React.Component<Props, State> {
 					<Nav.Link href="#pills-new" data-toggle="pill">Create a new <FaSpotify />Spotify playlist</Nav.Link>
 				</Nav.Item>
 			</Nav>
-			<div className="tab-content" id="pills-tabContent">
+			<TabContent id="pills-tabContent">
 				<div className="tab-pane fade show active" id="pills-existing" role="tabpanel" aria-labelledby="pills-existing-tab">
 					<SpotifyPlaylistListLoader
 						spotify={this.state.spotify}
@@ -78,7 +78,7 @@ class SpotifyPlaylistSelector extends React.Component<Props, State> {
 				<div className="tab-pane fade" id="pills-new" role="tabpanel" aria-labelledby="pills-new-tab">
 					<input className="playlistNameInput" type="text" placeholder="Playlist Name (optional)" onChange={this.handlePlaylistNameChange.bind(this)}></input>
 				</div>
-			</div>
+			</TabContent>
 		</>;
 	}
 }
