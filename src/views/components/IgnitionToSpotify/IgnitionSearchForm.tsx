@@ -20,24 +20,28 @@ interface Props extends React.Props<{}> {
 	spotifyAuth: SpotifyAuthInfo;
 }
 export class IgnitionSearchForm extends React.Component<Props> {
-	makeOptionalString(name: keyof IgnitionSearchQuery): ReactNode {
-		return <Col key={name}><label htmlFor={name}>
-			<div>{_.upperFirst(name)}</div>
-			<Field type="text" name={name} placeholder={`optional`}></Field>
-		</label></Col>;
+	makeOptionalString(formikProps: FormikProps<IgnitionSearchQuery>): (name: keyof IgnitionSearchQuery) => ReactNode {
+		return (name: keyof IgnitionSearchQuery): ReactNode => {
+			return <Col key={name}><label htmlFor={name}>
+				<div>{_.upperFirst(name)}</div>
+				<Field type="text" name={name} placeholder={`optional`} disabled={formikProps.isSubmitting}></Field>
+			</label></Col>;
+		};
 	}
 
-	makeOptionalBoolean(part: keyof IgnitionSearchQuery): ReactNode {
-		return <Col key={part}>
-			<label htmlFor={part}>
-				<div>{_.upperFirst(part)}</div>
-				<Field as="select" name={part} placeholder={part}>
-					<option value={""}></option>
-					<option value={"true"}>Yes</option>
-					<option value={"false"}>No</option>
-				</Field>
-			</label>
-		</Col>;
+	makeOptionalBoolean(formikProps: FormikProps<IgnitionSearchQuery>): (part: keyof IgnitionSearchQuery) => ReactNode {
+		return (part: keyof IgnitionSearchQuery): ReactNode => {
+			return <Col key={part}>
+				<label htmlFor={part}>
+					<div>{_.upperFirst(part)}</div>
+					<Field as="select" name={part} placeholder={part} disabled={formikProps.isSubmitting}>
+						<option value={""}></option>
+						<option value={"true"}>Yes</option>
+						<option value={"false"}>No</option>
+					</Field>
+				</label>
+			</Col>;
+		};
 	}
 
 	onSubmit(values: any): Promise<any> {
@@ -50,7 +54,10 @@ export class IgnitionSearchForm extends React.Component<Props> {
 		const query: IgnitionSearchQuery = IgnitionSearchQuerySchema.cast(prunedValues);
 		// eslint-disable-next-line no-console
 		console.log(query); // TODO
-		return Promise.resolve();
+
+		return new Promise<any>((resolve: (value?: any) => void): void => {
+			setTimeout(resolve, 5000);
+		});
 	}
 
 	render(): ReactNode {
@@ -65,10 +72,10 @@ export class IgnitionSearchForm extends React.Component<Props> {
 						<Row>
 							<Col>
 								<Row>
-									{(['artist', 'album', 'author'] as (keyof IgnitionSearchQuery)[]).map(this.makeOptionalString.bind(this))}
+									{(['artist', 'album', 'author'] as (keyof IgnitionSearchQuery)[]).map(this.makeOptionalString(formikProps))}
 								</Row>
 								<Row>
-									{(['lead', 'rhythm', 'bass', 'vocals', 'dynamicDifficulty'] as (keyof IgnitionSearchQuery)[]).map(this.makeOptionalBoolean.bind(this))}
+									{(['lead', 'rhythm', 'bass', 'vocals', 'dynamicDifficulty'] as (keyof IgnitionSearchQuery)[]).map(this.makeOptionalBoolean(formikProps))}
 								</Row>
 							</Col>
 							<Col>

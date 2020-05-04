@@ -6,7 +6,7 @@ import { SpotifyAuthInfo } from "../shared/SpotifyAuthInfo";
 import { FaSpotify } from "react-icons/fa";
 import update from 'immutability-helper';
 import { IgnitionSearchQuery } from "../../../types/IgnitionSearchQuery";
-import { Row, Col, Alert } from "react-bootstrap";
+import { Row, Col, Alert, Nav } from "react-bootstrap";
 
 interface Props {
 	auth: SpotifyAuthInfo;
@@ -60,18 +60,14 @@ class SpotifyPlaylistSelector extends React.Component<Props, State> {
 			{(this.props.formik.errors as any).playlistInfo ? <Row><Col>
 				<Alert variant="warning" >Playlist selection required</Alert>
 			</Col></Row> : <></>}
-			<ul className="nav nav-pills nav-fill mb-3" id="pills-tab" role="tablist">
-				<li className="nav-item">
-					<a className="nav-link active" id="pills-existing-tab" href="#pills-existing" data-toggle="pill" role="tab" aria-controls="pills-existing" aria-selected="true">
-						Select an existing <FaSpotify />Spotify playlist
-					</a>
-				</li>
-				<li className="nav-item" onClick={this.onCreateNewClicked.bind(this)}>
-					<a className="nav-link" id="pills-new-tab" href="#pills-new" data-toggle="pill" role="tab" aria-controls="pills-new" aria-selected="false">
-						Create a new <FaSpotify />Spotify playlist
-					</a>
-				</li>
-			</ul>
+			<Nav fill variant="pills" className="mb-3" role="tablist" id="pills-tab" defaultActiveKey="#pills-existing">
+				<Nav.Item>
+					<Nav.Link href="#pills-existing" data-toggle="pill">Select an existing <FaSpotify />Spotify playlist</Nav.Link>
+				</Nav.Item>
+				<Nav.Item onClick={this.onCreateNewClicked.bind(this)}>
+					<Nav.Link href="#pills-new" data-toggle="pill">Create a new <FaSpotify />Spotify playlist</Nav.Link>
+				</Nav.Item>
+			</Nav>
 			<div className="tab-content" id="pills-tabContent">
 				<div className="tab-pane fade show active" id="pills-existing" role="tabpanel" aria-labelledby="pills-existing-tab">
 					<SpotifyPlaylistListLoader
