@@ -28,8 +28,8 @@ module.exports = {
 		"@typescript-eslint/typedef": [
 			"error",
 			{
-				"arrowParameter": true,
-				"variableDeclaration": true
+				"arrowParameter": false, // Zod makes variable declarations a bit too verbose
+				"variableDeclaration": false, // Zod makes variable declarations a bit too verbose
 			}
 		],
 		"@typescript-eslint/array-type": [

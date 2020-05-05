@@ -1,6 +1,6 @@
 import { Queue } from "bull";
 import Bull from "bull";
-import { IgnitionSearchQuery } from "../types/IgnitionSearchQuery";
+import { IgnitionToSpotifyData } from "../types/IgnitionToSpotifyData";
 
 export interface IgnitionJobData { }
 type IgnitionQueue = Queue<IgnitionJobData>;
@@ -12,7 +12,7 @@ interface PlaylistJobData{ }
 type PlaylistUpdateQueue = Queue<PlaylistJobData>;
 
 interface UserPlaylistCreationJobData {
-	queryInfo: IgnitionSearchQuery;
+	queryInfo: IgnitionToSpotifyData;
 }
 type UserPlaylistCreationQueue = Queue<UserPlaylistCreationJobData>;
 

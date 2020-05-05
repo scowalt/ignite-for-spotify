@@ -5,13 +5,13 @@ import SpotifyWebApi from "spotify-web-api-js";
 import { SpotifyAuthInfo } from "../shared/SpotifyAuthInfo";
 import { FaSpotify } from "react-icons/fa";
 import update from 'immutability-helper';
-import { IgnitionSearchQuery } from "../../../types/IgnitionSearchQuery";
+import { IgnitionToSpotifyData } from "../../../types/IgnitionToSpotifyData";
 import { Row, Col, Alert, Nav, TabContent, TabPane } from "react-bootstrap";
 
 interface Props {
 	auth: SpotifyAuthInfo;
 	name: string;
-	formik: FormikProps<IgnitionSearchQuery>;
+	formik: FormikProps<IgnitionToSpotifyData>;
 }
 interface State {
 	readonly spotify: SpotifyWebApi.SpotifyWebApiJs;

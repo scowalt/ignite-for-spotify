@@ -1,6 +1,6 @@
 import React, { ReactNode } from "react";
 import { Button, Form, Col, Row } from "react-bootstrap";
-import { IgnitionSearchQuerySchema, IgnitionSearchQuery } from "../../../types/IgnitionSearchQuery";
+import { IgnitionToSpotifyDataSchema, IgnitionToSpotifyData } from "../../../types/IgnitionToSpotifyData";
 import { Formik, Field, FormikProps, FormikErrors } from 'formik';
 import _ from 'lodash';
 import SpotifyPlaylistSelector from "./SpotifyPlaylistSelector";
@@ -8,7 +8,7 @@ import { SpotifyAuthInfo } from "../shared/SpotifyAuthInfo";
 import { ZodError } from "zod";
 
 // HACK: Initialize the string values here to avoid "A component is changing an uncontrolled input" errors
-const initialValues: IgnitionSearchQuery = {
+const initialValues: IgnitionToSpotifyData = {
 	artist: "",
 	album: "",
 	author: "",
@@ -21,8 +21,8 @@ interface Props extends React.Props<{}> {
 	spotifyAuth: SpotifyAuthInfo;
 }
 export class IgnitionSearchForm extends React.Component<Props> {
-	makeOptionalString(formikProps: FormikProps<IgnitionSearchQuery>): (name: keyof IgnitionSearchQuery) => ReactNode {
-		return (name: keyof IgnitionSearchQuery): ReactNode => {
+	makeOptionalString(formikProps: FormikProps<IgnitionToSpotifyData>): (name: keyof IgnitionToSpotifyData) => ReactNode {
+		return (name: keyof IgnitionToSpotifyData): ReactNode => {
 			return <Col key={name}><label htmlFor={name}>
 				<div>{_.upperFirst(name)}</div>
 				<Field type="text" name={name} placeholder={`optional`} disabled={formikProps.isSubmitting}></Field>
@@ -30,8 +30,8 @@ export class IgnitionSearchForm extends React.Component<Props> {
 		};
 	}
 
-	makeOptionalBoolean(formikProps: FormikProps<IgnitionSearchQuery>): (part: keyof IgnitionSearchQuery) => ReactNode {
-		return (part: keyof IgnitionSearchQuery): ReactNode => {
+	makeOptionalBoolean(formikProps: FormikProps<IgnitionToSpotifyData>): (part: keyof IgnitionToSpotifyData) => ReactNode {
+		return (part: keyof IgnitionToSpotifyData): ReactNode => {
 			return <Col key={part}>
 				<label htmlFor={part}>
 					<div>{_.upperFirst(part)}</div>
@@ -45,17 +45,13 @@ export class IgnitionSearchForm extends React.Component<Props> {
 		};
 	}
 
-	onSubmit(values: IgnitionSearchQuery): Promise<any> {
+	onSubmit(values: IgnitionToSpotifyData): Promise<any> {
 		// Work-around: All of the fields in Formik will be stored as strings (see https://github.com/jaredpalmer/formik/issues/1525)
 		// yup's `cast` function will help convert these string values into their correct types. One exception to this is with optional
 		// types. Formik must have all values be initialized in order to work. So, remove all empty strings here (treat them as `undefined`)
-		// The casting to `as IgnitionSearchQuery` is necessary according to TS, but ESLint doesn't think so.
-		// Avoid typing property since the types from zod are verbose.
-		// eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion,@typescript-eslint/typedef
-		const prunedValues: IgnitionSearchQuery = _.omitBy(values, (property) => { return typeof property === "string" && property.length === 0;}) as IgnitionSearchQuery;
+		const prunedValues: IgnitionToSpotifyData = _.omitBy(values, (property) => { return typeof property === "string" && property.length === 0;}) as IgnitionToSpotifyData;
 
 		// TODO trim whitespaces
-		// const query: IgnitionSearchQuery = IgnitionSearchQuerySchema.cast(prunedValues);
 		// eslint-disable-next-line no-console
 		console.log(prunedValues); // TODO
 
@@ -64,16 +60,15 @@ export class IgnitionSearchForm extends React.Component<Props> {
 		});
 	}
 
-	validate(values: IgnitionSearchQuery): Promise<FormikErrors<IgnitionSearchQuery>> {
+	validate(values: IgnitionToSpotifyData): Promise<FormikErrors<IgnitionToSpotifyData>> {
 		try {
-			IgnitionSearchQuerySchema.parse(values);
+			IgnitionToSpotifyDataSchema.parse(values);
 		} catch(error) {
-			const formikErrors: FormikErrors<IgnitionSearchQuery> = {};
+			const formikErrors: FormikErrors<IgnitionToSpotifyData> = {};
 			const zodError: ZodError = error as ZodError;
 
-			// eslint-disable-next-line @typescript-eslint/typedef
 			zodError.errors.forEach((subError) => {
-				const key: keyof IgnitionSearchQuery = subError.path[0] as keyof IgnitionSearchQuery;
+				const key: keyof IgnitionToSpotifyData = subError.path[0] as keyof IgnitionToSpotifyData;
 				formikErrors[key] = subError.message;
 			});
 
@@ -90,7 +85,7 @@ export class IgnitionSearchForm extends React.Component<Props> {
 				onSubmit={this.onSubmit.bind(this)}
 				validateOnChange={false} // Only validate on change to avoid noisy errors while the user is entering playlist info
 				validate={this.validate.bind(this)}>
-				{( formikProps: FormikProps<IgnitionSearchQuery> ): ReactNode => (
+				{( formikProps: FormikProps<IgnitionToSpotifyData> ): ReactNode => (
 					<Form onSubmit={formikProps.handleSubmit}>
 						<Row className="formRow">
 							<Col>
@@ -98,10 +93,10 @@ export class IgnitionSearchForm extends React.Component<Props> {
 									<Col><h3>Ignition Search Options</h3></Col>
 								</Row>
 								<Row>
-									{(['artist', 'album', 'author'] as (keyof IgnitionSearchQuery)[]).map(this.makeOptionalString(formikProps))}
+									{(['artist', 'album', 'author'] as (keyof IgnitionToSpotifyData)[]).map(this.makeOptionalString(formikProps))}
 								</Row>
 								<Row>
-									{(['lead', 'rhythm', 'bass', 'vocals', 'dynamicDifficulty'] as (keyof IgnitionSearchQuery)[]).map(this.makeOptionalBoolean(formikProps))}
+									{(['lead', 'rhythm', 'bass', 'vocals', 'dynamicDifficulty'] as (keyof IgnitionToSpotifyData)[]).map(this.makeOptionalBoolean(formikProps))}
 								</Row>
 							</Col>
 							<Col>
