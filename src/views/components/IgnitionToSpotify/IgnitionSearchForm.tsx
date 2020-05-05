@@ -72,6 +72,9 @@ export class IgnitionSearchForm extends React.Component<Props> {
 						<Row className="formRow">
 							<Col>
 								<Row>
+									<Col><h3>Ignition Search Options</h3></Col>
+								</Row>
+								<Row>
 									{(['artist', 'album', 'author'] as (keyof IgnitionSearchQuery)[]).map(this.makeOptionalString(formikProps))}
 								</Row>
 								<Row>

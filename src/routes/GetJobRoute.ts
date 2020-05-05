@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { QueueManager } from '../shared/QueueManager';
 import Bull from 'bull';
-import { JobType } from '../types/JobTypes';
+import { JobType } from '../types/JobType';
 import HttpStatus from 'http-status-codes';
 
 export function GetJobRoute(queues: QueueManager): (request: Request, response: Response) => Promise<any> {

@@ -9,9 +9,8 @@ import { SpotifyUpdater } from './jobs/SpotifyUpdater';
 import { IgnitionUpdater } from './jobs/IgnitionUpdater';
 import { Logger } from './shared/Logger';
 import Bull from 'bull';
-import { SpotifyUpdateJobData, IgnitionJobData } from './types/JobTypes';
 import { SpotifyPlaylistUpdater } from './jobs/SpotifyPlaylistUpdater';
-import { QueueManager } from './shared/QueueManager';
+import { QueueManager, SpotifyUpdateJobData, IgnitionJobData } from './shared/QueueManager';
 
 const workers: number = Number(process.env.WEB_CONCURRENCY);
 
