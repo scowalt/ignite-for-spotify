@@ -62,9 +62,8 @@ class SpotifyPlaylistSelector extends React.Component<Props, State> {
 	}
 
 	render(): ReactNode {
-		// BUG this.props.formik.errors doesn't have the right type because of the way I'm inferring IgnitionSearchQuery from the schema
 		return <>
-			{(this.props.formik.errors as any).playlistInfo ? <Row><Col>
+			{this.props.formik.errors.playlistInfo ? <Row><Col>
 				<Alert variant="warning" >Playlist selection required</Alert>
 			</Col></Row> : <></>}
 			<Nav fill variant="pills" className="mb-3" role="tablist" id="pills-tab" defaultActiveKey="#pills-existing">
