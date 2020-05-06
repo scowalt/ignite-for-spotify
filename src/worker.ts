@@ -45,7 +45,7 @@ function playlistProcessFunction(): Promise<void> {
 	});
 }
 
-async function userPlaylistCreationFunction(job: Bull.Job<UserPlaylistCreationJobData>): Promise<any> {
+async function userPlaylistCreationFunction(job: Bull.Job<UserPlaylistCreationJobData>): Promise<void> {
 	const spotify: SpotifyWebApi = new SpotifyWebApi({
 		clientId: process.env.SPOTIFY_CLIENT_ID,
 		clientSecret: process.env.SPOTIFY_CLIENT_SECRET,
@@ -59,9 +59,9 @@ async function userPlaylistCreationFunction(job: Bull.Job<UserPlaylistCreationJo
 	const db: Database = await Database.getInstance();
 	const totalSongs = await db.getCountSongsFromIgnitionToSpotifyData(job.data.query);
 	if (totalSongs === 0) {
-		return Promise.reject("No songs found. No action taken");
-	} else if (totalSongs >= 10000) {
-		return Promise.reject(`Exceeded manimum allowed playlist size. ${totalSongs} songs found.`);
+		return Promise.reject(new Error("No songs found. No action taken. Try different search parameters."));
+	} else if (totalSongs >= 10900) {
+		return Promise.reject(new Error(`Exceeded manimum allowed playlist size. ${totalSongs} songs found. Try a more narrow search.`));
 	}
 
 	let playlistId: string = job.data.query.playlistInfo.playlistDescriptor;

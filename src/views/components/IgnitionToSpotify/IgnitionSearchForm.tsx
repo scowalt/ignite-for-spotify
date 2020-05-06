@@ -1,5 +1,5 @@
-import React, { ReactNode } from "react";
-import { Button, Form, Col, Row } from "react-bootstrap";
+import React, { ReactNode, ReactElement } from "react";
+import { Button, Form, Col, Row, Alert } from "react-bootstrap";
 import { IgnitionToSpotifyDataSchema, IgnitionToSpotifyData, IgnitionToSpotifyBoolsKeys } from "../../../types/IgnitionToSpotifyData";
 import { Formik, Field, FormikProps, FormikErrors } from 'formik';
 import _ from 'lodash';
@@ -8,6 +8,7 @@ import { SpotifyAuthInfo } from "../shared/SpotifyAuthInfo";
 import { ZodError } from "zod";
 import { JobType } from "../../../types/JobType";
 import Bull from "bull";
+import update from 'immutability-helper';
 
 // HACK: Initialize the string values here to avoid "A component is changing an uncontrolled input" errors
 const initialValues: IgnitionToSpotifyData = {
@@ -19,13 +20,22 @@ const initialValues: IgnitionToSpotifyData = {
 		playlistDescriptor: ""
 	},
 };
-interface Props extends React.Props<{}> {
-	spotifyAuth: SpotifyAuthInfo;
-}
 
 const wait = (time: number): Promise<void> => { return new Promise<void>((resolve) => { setTimeout(resolve, time); }); };
 
-export class IgnitionSearchForm extends React.Component<Props> {
+interface Props extends React.Props<{}> {
+	spotifyAuth: SpotifyAuthInfo;
+}
+interface State {
+	status?: Bull.JobStatus;
+	failedReason?: string;
+}
+export class IgnitionSearchForm extends React.Component<Props, State> {
+	constructor(props: Props) {
+		super(props);
+		this.state = {};
+	}
+
 	makeOptionalString(formikProps: FormikProps<IgnitionToSpotifyData>): (name: keyof IgnitionToSpotifyData) => ReactNode {
 		return (name: keyof IgnitionToSpotifyData): ReactNode => {
 			return <Col key={name}><label htmlFor={name}>
@@ -55,10 +65,18 @@ export class IgnitionSearchForm extends React.Component<Props> {
 		while(true) {
 			await wait(2000);
 			const response: Response = await fetch(`/job/${JobType.UserPlaylistCreate}/${id}`);
-			const status: Bull.JobStatus = (await response.json()).status;
+			const responseBody: any = await response.json(); // TODO make a type for this
+			const status: Bull.JobStatus = responseBody.status;
 			if (status === "completed") {
+				this.setState(update(this.state, {
+					status: { $set: status }
+				}));
 				return Promise.resolve();
 			} else if (status === "failed") {
+				this.setState(update(this.state, {
+					status: { $set: status },
+					failedReason: { $set: responseBody.failedReason }
+				}));
 				return Promise.reject();
 			}
 		}
@@ -85,6 +103,10 @@ export class IgnitionSearchForm extends React.Component<Props> {
 	}
 
 	onSubmit(values: IgnitionToSpotifyData): Promise<any> {
+		this.setState(update(this.state, {
+			status: { $set: undefined },
+			failedReason: { $set: undefined }
+		}));
 		return fetch('/startJob', {
 			method: "POST",
 			body: JSON.stringify({ // TODO make an object for this compound type
@@ -123,43 +145,68 @@ export class IgnitionSearchForm extends React.Component<Props> {
 		return {};
 	}
 
+	onCloseDialog(): void {
+		this.setState(update(this.state, {
+			status: { $set: undefined }
+		}));
+	}
+
+	getDialog(): ReactElement {
+		let result: ReactElement = <></>;
+		if (this.state.status) {
+			if (this.state.status === "completed") {
+				result = <Alert variant="success" onClose={this.onCloseDialog.bind(this)} dismissible><Alert.Heading>Success!</Alert.Heading></Alert>;
+			} else if (this.state.status === "failed") {
+				result = <Alert variant="danger" onClose={this.onCloseDialog.bind(this)} dismissible>
+					<Alert.Heading>Error creating playlist</Alert.Heading><p>{this.state.failedReason}</p>
+				</Alert>;
+			}
+		}
+
+		return result;
+	}
+
 	render(): ReactNode {
+		const dialog: ReactElement = this.getDialog();
 		return <>
-			<Formik
-				initialValues={initialValues}
-				onSubmit={this.onSubmit.bind(this)}
-				validateOnChange={false} // Only validate changes on submit to avoid noisy errors while the user is entering playlist info
-				validateOnBlur={false}
-				validate={this.validate.bind(this)}>
-				{( formikProps: FormikProps<IgnitionToSpotifyData> ): ReactNode => (
-					<Form onSubmit={formikProps.handleSubmit}>
-						<Row className="formRow">
-							<Col>
-								<Row>
-									<Col><h3>Ignition Search Options</h3></Col>
-								</Row>
-								<Row>
-									{(['artist', 'album', 'author'] as (keyof IgnitionToSpotifyData)[]).map(this.makeOptionalString(formikProps))}
-								</Row>
-								<Row>
-									{IgnitionToSpotifyBoolsKeys.map(this.makeOptionalBoolean(formikProps))}
-								</Row>
-							</Col>
-							<Col>
-								<SpotifyPlaylistSelector
-									name="playlistInfo"
-									auth={this.props.spotifyAuth}
-									formik={formikProps}/>
-							</Col>
-						</Row>
-						<Row><Col>
-							<Button type="submit" disabled={formikProps.isSubmitting} block>
-								Submit
-							</Button>
-						</Col></Row>
-					</Form>
-				)}
-			</Formik>
+			{ dialog }
+			<Row>
+				<Formik
+					initialValues={initialValues}
+					onSubmit={this.onSubmit.bind(this)}
+					validateOnChange={false} // Only validate changes on submit to avoid noisy errors while the user is entering playlist info
+					validateOnBlur={false}
+					validate={this.validate.bind(this)}>
+					{( formikProps: FormikProps<IgnitionToSpotifyData> ): ReactNode => (
+						<Form onSubmit={formikProps.handleSubmit}>
+							<Row className="formRow">
+								<Col>
+									<Row>
+										<Col><h3>Ignition Search Options</h3></Col>
+									</Row>
+									<Row>
+										{(['artist', 'album', 'author'] as (keyof IgnitionToSpotifyData)[]).map(this.makeOptionalString(formikProps))}
+									</Row>
+									<Row>
+										{IgnitionToSpotifyBoolsKeys.map(this.makeOptionalBoolean(formikProps))}
+									</Row>
+								</Col>
+								<Col>
+									<SpotifyPlaylistSelector
+										name="playlistInfo"
+										auth={this.props.spotifyAuth}
+										formik={formikProps}/>
+								</Col>
+							</Row>
+							<Row><Col>
+								<Button type="submit" disabled={formikProps.isSubmitting} block>
+									Submit
+								</Button>
+							</Col></Row>
+						</Form>
+					)}
+				</Formik>
+			</Row>
 		</>;
 	}
 }

@@ -124,8 +124,7 @@ module.exports = {
 			"string",
 			"Boolean",
 			"boolean",
-			"Undefined",
-			"undefined"
+			"Undefined"
 		],
 		"id-match": "error",
 		"max-classes-per-file": [
