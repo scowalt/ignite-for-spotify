@@ -20,9 +20,20 @@ export function StartJobRoute(queues: QueueManager): (request: Request, response
 		} else if (type === JobType.PlaylistUpdate) {
 			job = await queues.playlistUpdateQueue.add({ });
 		} else if (type === JobType.UserPlaylistCreate) {
-			const creationInfo: IgnitionToSpotifyData = request.body;
+			const accessToken: string|null = request.cookies ? request.cookies.spotifyAccessToken : null;
+			const refreshToken: string|null = request.cookies ? request.cookies.spotifyRefreshToken : null;
+			if (!accessToken || !refreshToken) {
+				return response.status(HttpStatus.UNAUTHORIZED).end();
+			}
 
-			job = await queues.playlistUpdateQueue.add({ queryInfo: creationInfo });
+			const queryInfo: IgnitionToSpotifyData = request.body.queryInfo;
+			job = await queues.userPlaylistCreationQueue.add({
+				query: queryInfo,
+				auth: {
+					spotifyAccessToken: accessToken,
+					spotifyRefreshToken: refreshToken
+				}
+			});
 		} else {
 			return response.status(HttpStatus.NOT_ACCEPTABLE).end();
 		}

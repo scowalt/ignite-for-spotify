@@ -2,8 +2,10 @@ import { Sequelize } from 'sequelize-typescript';
 import { Song } from './models/Song';
 import { Playlist } from './models/Playlist';
 import { Logger } from '../shared/Logger';
-import { Op } from 'sequelize';
+import { Op, WhereAttributeHash } from 'sequelize';
 import { BasicTrackInfo } from '../types/BasicTrackInfo';
+import { IgnitionToSpotifyData } from '../types/IgnitionToSpotifyData';
+import _ from 'lodash';
 
 export class Database {
 	public static async getInstance(): Promise<Database> {
@@ -78,6 +80,24 @@ export class Database {
 		return Song.upsert(song);
 	}
 
+	public getCountSongsFromIgnitionToSpotifyData(data: IgnitionToSpotifyData): Promise<number> {
+		const where: WhereAttributeHash = _.omit(data, 'playlistInfo') as WhereAttributeHash;
+		where.spotifyTrackId = { [Op.not]: null };
+		return Song.count({
+			where
+		});
+	}
+
+	public getSongsFromIgnitionToSpotifyData(data: IgnitionToSpotifyData, offset: number, limit: number): Promise<Song[]> {
+		const where: WhereAttributeHash = _.omit(data, 'playlistInfo') as WhereAttributeHash;
+		where.spotifyTrackId = { [Op.not]: null };
+		return Song.findAll({
+			limit,
+			offset,
+			where
+		});
+	}
+
 	public getIgnitionInfo(track: BasicTrackInfo): Promise<Song[]> {
 		return Song.findAll({
 			where: {
@@ -98,7 +118,11 @@ export class Database {
 			pool: {
 				max: Number(process.env.MYSQL_POOL_CONNECTION_LIMIT)
 			},
-			dialect: "mysql"
+			dialect: "mysql",
+			define: { // Use case-insensitive collation to allow for case-insensitive searching of database
+				charset: 'utf8',
+				collate: 'utf8_general_ci'
+			},
 		});
 		this.sequelize.addModels([Song, Playlist]);
 

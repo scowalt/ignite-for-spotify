@@ -1,6 +1,7 @@
 import { Queue } from "bull";
 import Bull from "bull";
 import { IgnitionToSpotifyData } from "../types/IgnitionToSpotifyData";
+import { SpotifyAuthInfo } from "../views/components/shared/SpotifyAuthInfo";
 
 export interface IgnitionJobData { }
 type IgnitionQueue = Queue<IgnitionJobData>;
@@ -11,8 +12,9 @@ type SpotifyUpdateQueue = Queue<SpotifyUpdateJobData>;
 interface PlaylistJobData{ }
 type PlaylistUpdateQueue = Queue<PlaylistJobData>;
 
-interface UserPlaylistCreationJobData {
-	queryInfo: IgnitionToSpotifyData;
+export interface UserPlaylistCreationJobData {
+	query: IgnitionToSpotifyData;
+	auth: SpotifyAuthInfo;
 }
 type UserPlaylistCreationQueue = Queue<UserPlaylistCreationJobData>;
 

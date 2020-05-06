@@ -16,14 +16,18 @@ export function GetJobRoute(queues: QueueManager): (request: Request, response: 
 			job = await queues.ignitionQueue.getJob(id);
 		} else if (type === JobType.PlaylistUpdate) {
 			job = await queues.playlistUpdateQueue.getJob(id);
-		}else {
+		} else if (type === JobType.UserPlaylistCreate) {
+			job = await queues.userPlaylistCreationQueue.getJob(id);
+		} else {
 			return response.status(HttpStatus.NOT_ACCEPTABLE).end();
 		}
 
 		if (job === null) {
 			return response.status(HttpStatus.NOT_FOUND).end();
 		}
-		const status: Bull.JobStatus = await job.getState();
-		return response.json({ status });
+		return response.json({
+			status: await job.getState(),
+			failedReason: (job as any).failedReason
+		});
 	};
 }

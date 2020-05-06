@@ -6,6 +6,8 @@ import _ from 'lodash';
 import SpotifyPlaylistSelector from "./SpotifyPlaylistSelector";
 import { SpotifyAuthInfo } from "../shared/SpotifyAuthInfo";
 import { ZodError } from "zod";
+import { JobType } from "../../../types/JobType";
+import Bull from "bull";
 
 // HACK: Initialize the string values here to avoid "A component is changing an uncontrolled input" errors
 const initialValues: IgnitionToSpotifyData = {
@@ -20,6 +22,9 @@ const initialValues: IgnitionToSpotifyData = {
 interface Props extends React.Props<{}> {
 	spotifyAuth: SpotifyAuthInfo;
 }
+
+const wait = (time: number): Promise<void> => { return new Promise<void>((resolve) => { setTimeout(resolve, time); }); };
+
 export class IgnitionSearchForm extends React.Component<Props> {
 	makeOptionalString(formikProps: FormikProps<IgnitionToSpotifyData>): (name: keyof IgnitionToSpotifyData) => ReactNode {
 		return (name: keyof IgnitionToSpotifyData): ReactNode => {
@@ -45,18 +50,43 @@ export class IgnitionSearchForm extends React.Component<Props> {
 		};
 	}
 
+	async waitForCompletedJob(id: number): Promise<any> {
+		// eslint-disable-next-line no-constant-condition
+		while(true) {
+			await wait(2000);
+			const response: Response = await fetch(`/job/${JobType.UserPlaylistCreate}/${id}`);
+			const status: Bull.JobStatus = (await response.json()).status;
+			if (status === "completed") {
+				return Promise.resolve();
+			} else if (status === "failed") {
+				return Promise.reject();
+			}
+		}
+	}
+
 	onSubmit(values: IgnitionToSpotifyData): Promise<any> {
 		// Work-around: All of the fields in Formik will be stored as strings (see https://github.com/jaredpalmer/formik/issues/1525)
-		// yup's `cast` function will help convert these string values into their correct types. One exception to this is with optional
-		// types. Formik must have all values be initialized in order to work. So, remove all empty strings here (treat them as `undefined`)
+		// Formik must have all values be initialized in order to work. So, remove all empty strings here (treat them as `undefined`)
 		const prunedValues: IgnitionToSpotifyData = _.omitBy(values, (property) => { return typeof property === "string" && property.length === 0;}) as IgnitionToSpotifyData;
 
 		// TODO trim whitespaces
-		// eslint-disable-next-line no-console
-		console.log(prunedValues); // TODO
+		return fetch('/startJob', {
+			method: "POST",
+			body: JSON.stringify({ // TODO make an object for this compound type
+				jobType: JobType.UserPlaylistCreate,
+				queryInfo: prunedValues
+			}),
+			headers: {
+				'Content-Type': 'application/json',
+			}
+		}).then((response: Response) => {
+			return response.json();
+		}).then((value: any) => {
+			// TODO make an object for this type
+			const id: number = value.id;
 
-		return new Promise<any>((resolve: (value?: any) => void): void => {
-			setTimeout(resolve, 5000);
+			// Wait for the job to finish
+			return this.waitForCompletedJob(id);
 		});
 	}
 
