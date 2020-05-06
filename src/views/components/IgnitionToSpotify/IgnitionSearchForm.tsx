@@ -189,8 +189,8 @@ export class IgnitionSearchForm extends React.Component<Props, State> {
 	render(): ReactNode {
 		const dialog: ReactElement = this.getDialog();
 		return <>
-			{ dialog }
-			<Row>
+			<Row><Col>{ dialog }</Col></Row>
+			<Row><Col>
 				<Formik
 					initialValues={initialValues}
 					onSubmit={this.onSubmit.bind(this)}
@@ -226,7 +226,7 @@ export class IgnitionSearchForm extends React.Component<Props, State> {
 						</Form>
 					)}
 				</Formik>
-			</Row>
+			</Col></Row>
 		</>;
 	}
 }
