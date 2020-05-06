@@ -1,6 +1,6 @@
 import React, { ReactNode } from "react";
 import { Button, Form, Col, Row } from "react-bootstrap";
-import { IgnitionToSpotifyDataSchema, IgnitionToSpotifyData } from "../../../types/IgnitionToSpotifyData";
+import { IgnitionToSpotifyDataSchema, IgnitionToSpotifyData, IgnitionToSpotifyBoolsKeys } from "../../../types/IgnitionToSpotifyData";
 import { Formik, Field, FormikProps, FormikErrors } from 'formik';
 import _ from 'lodash';
 import SpotifyPlaylistSelector from "./SpotifyPlaylistSelector";
@@ -64,17 +64,32 @@ export class IgnitionSearchForm extends React.Component<Props> {
 		}
 	}
 
-	onSubmit(values: IgnitionToSpotifyData): Promise<any> {
+	tidyData(values: IgnitionToSpotifyData): IgnitionToSpotifyData {
 		// Work-around: All of the fields in Formik will be stored as strings (see https://github.com/jaredpalmer/formik/issues/1525)
 		// Formik must have all values be initialized in order to work. So, remove all empty strings here (treat them as `undefined`)
 		const prunedValues: IgnitionToSpotifyData = _.omitBy(values, (property) => { return typeof property === "string" && property.length === 0;}) as IgnitionToSpotifyData;
 
 		// TODO trim whitespaces
+
+		// HACK The boolean types are stored as string due to formik limitations. These strings cannot be "cast" as booleans
+		// due to limitations of Zod. To compensate, manually iterate over any necessary members to convert
+		IgnitionToSpotifyBoolsKeys.forEach((key: string) => {
+			if ((prunedValues as any)[key] === "true") {
+				(prunedValues as any)[key] = true;
+			} else if ((prunedValues as any)[key] === "false") {
+				(prunedValues as any)[key] = false;
+			}
+		});
+
+		return prunedValues;
+	}
+
+	onSubmit(values: IgnitionToSpotifyData): Promise<any> {
 		return fetch('/startJob', {
 			method: "POST",
 			body: JSON.stringify({ // TODO make an object for this compound type
 				jobType: JobType.UserPlaylistCreate,
-				queryInfo: prunedValues
+				queryInfo: this.tidyData(values)
 			}),
 			headers: {
 				'Content-Type': 'application/json',
@@ -90,9 +105,9 @@ export class IgnitionSearchForm extends React.Component<Props> {
 		});
 	}
 
-	validate(values: IgnitionToSpotifyData): Promise<FormikErrors<IgnitionToSpotifyData>> {
+	validate(values: IgnitionToSpotifyData): FormikErrors<IgnitionToSpotifyData> {
 		try {
-			IgnitionToSpotifyDataSchema.parse(values);
+			IgnitionToSpotifyDataSchema.parse(this.tidyData(values));
 		} catch(error) {
 			const formikErrors: FormikErrors<IgnitionToSpotifyData> = {};
 			const zodError: ZodError = error as ZodError;
@@ -102,10 +117,10 @@ export class IgnitionSearchForm extends React.Component<Props> {
 				formikErrors[key] = subError.message;
 			});
 
-			return Promise.resolve(formikErrors);
+			return formikErrors;
 		}
 
-		return Promise.resolve({});
+		return {};
 	}
 
 	render(): ReactNode {
@@ -113,7 +128,8 @@ export class IgnitionSearchForm extends React.Component<Props> {
 			<Formik
 				initialValues={initialValues}
 				onSubmit={this.onSubmit.bind(this)}
-				validateOnChange={false} // Only validate on change to avoid noisy errors while the user is entering playlist info
+				validateOnChange={false} // Only validate changes on submit to avoid noisy errors while the user is entering playlist info
+				validateOnBlur={false}
 				validate={this.validate.bind(this)}>
 				{( formikProps: FormikProps<IgnitionToSpotifyData> ): ReactNode => (
 					<Form onSubmit={formikProps.handleSubmit}>
@@ -126,7 +142,7 @@ export class IgnitionSearchForm extends React.Component<Props> {
 									{(['artist', 'album', 'author'] as (keyof IgnitionToSpotifyData)[]).map(this.makeOptionalString(formikProps))}
 								</Row>
 								<Row>
-									{(['lead', 'rhythm', 'bass', 'vocals', 'dynamicDifficulty'] as (keyof IgnitionToSpotifyData)[]).map(this.makeOptionalBoolean(formikProps))}
+									{IgnitionToSpotifyBoolsKeys.map(this.makeOptionalBoolean(formikProps))}
 								</Row>
 							</Col>
 							<Col>

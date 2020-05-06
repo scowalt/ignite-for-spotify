@@ -11,18 +11,24 @@ export const PlaylistInfoSchema = zod.object({
 
 export type PlaylistInfo = zod.infer<typeof PlaylistInfoSchema>;
 
-// Since this is a data type that requires user input, write this as a validation schema.
-export const IgnitionToSpotifyDataSchema = zod.object({
-	artist: zod.string().optional(),
-	album: zod.string().optional(),
-	author: zod.string().optional(),
+// booleans need special treatment elsewhere in the code and must be kept separate
+// For now, this list needs to be repeated and manually kept in-sync
+export const IgnitionToSpotifyBoolsKeys: (keyof IgnitionToSpotifyData)[] = ['lead', 'rhythm', 'bass', 'vocals', 'dynamicDifficulty'];
+const IgnitionToSpotifyBoolsSchema = zod.object({
 	lead: zod.boolean().optional(),
 	rhythm: zod.boolean().optional(),
 	bass: zod.boolean().optional(),
 	vocals: zod.boolean().optional(),
 	dynamicDifficulty: zod.boolean().optional(),
-	playlistInfo: PlaylistInfoSchema
 });
+
+// Since this is a data type that requires user input, write this as a validation schema.
+export const IgnitionToSpotifyDataSchema = zod.object({
+	artist: zod.string().optional(),
+	album: zod.string().optional(),
+	author: zod.string().optional(),
+	playlistInfo: PlaylistInfoSchema
+}).merge(IgnitionToSpotifyBoolsSchema);
 
 // Return the TypeScript type for use internally
 export type IgnitionToSpotifyData = zod.infer<typeof IgnitionToSpotifyDataSchema>;

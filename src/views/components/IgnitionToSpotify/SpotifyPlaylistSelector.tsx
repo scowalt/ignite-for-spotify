@@ -86,7 +86,7 @@ class SpotifyPlaylistSelector extends React.Component<Props, State> {
 					<input
 						className="playlistNameInput"
 						type="text"
-						placeholder="Playlist Name (optional)"
+						placeholder="Playlist Name (required)"
 						onChange={this.handlePlaylistNameChange.bind(this)}
 						disabled={this.props.formik.isSubmitting} />
 				</TabPane>
