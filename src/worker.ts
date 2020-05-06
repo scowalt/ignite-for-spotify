@@ -45,7 +45,7 @@ function playlistProcessFunction(): Promise<void> {
 	});
 }
 
-async function userPlaylistCreationFunction(job: Bull.Job<UserPlaylistCreationJobData>): Promise<void> {
+async function userPlaylistCreationFunction(job: Bull.Job<UserPlaylistCreationJobData>): Promise<any> {
 	const spotify: SpotifyWebApi = new SpotifyWebApi({
 		clientId: process.env.SPOTIFY_CLIENT_ID,
 		clientSecret: process.env.SPOTIFY_CLIENT_SECRET,
@@ -81,6 +81,8 @@ async function userPlaylistCreationFunction(job: Bull.Job<UserPlaylistCreationJo
 		}
 		offset += songs.length;
 	} while (songs.length !== 0);
+
+	return Promise.resolve({ playlistId });
 }
 
 function start(): void {

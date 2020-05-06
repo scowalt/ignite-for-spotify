@@ -9,6 +9,7 @@ import { ZodError } from "zod";
 import { JobType } from "../../../types/JobType";
 import Bull from "bull";
 import update from 'immutability-helper';
+import Chance from 'chance';
 
 // HACK: Initialize the string values here to avoid "A component is changing an uncontrolled input" errors
 const initialValues: IgnitionToSpotifyData = {
@@ -29,6 +30,7 @@ interface Props extends React.Props<{}> {
 interface State {
 	status?: Bull.JobStatus;
 	failedReason?: string;
+	playlistId?: string;
 }
 export class IgnitionSearchForm extends React.Component<Props, State> {
 	constructor(props: Props) {
@@ -60,16 +62,26 @@ export class IgnitionSearchForm extends React.Component<Props, State> {
 		};
 	}
 
-	async waitForCompletedJob(id: number): Promise<any> {
+	async waitForCompletedJob(id: number, password: string): Promise<any> {
 		// eslint-disable-next-line no-constant-condition
 		while(true) {
 			await wait(2000);
-			const response: Response = await fetch(`/job/${JobType.UserPlaylistCreate}/${id}`);
+			const response: Response = await fetch(`/getCreatedPlaylist`, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+				},
+				body: JSON.stringify({
+					password,
+					id
+				})
+			});
 			const responseBody: any = await response.json(); // TODO make a type for this
 			const status: Bull.JobStatus = responseBody.status;
 			if (status === "completed") {
 				this.setState(update(this.state, {
-					status: { $set: status }
+					status: { $set: status },
+					playlistId: { $set: responseBody.playlistId }
 				}));
 				return Promise.resolve();
 			} else if (status === "failed") {
@@ -103,15 +115,19 @@ export class IgnitionSearchForm extends React.Component<Props, State> {
 	}
 
 	onSubmit(values: IgnitionToSpotifyData): Promise<any> {
+		const chance: Chance.Chance = new Chance();
+		const password: string = chance.string({ length: 16, alpha: true, numeric: true });
 		this.setState(update(this.state, {
 			status: { $set: undefined },
-			failedReason: { $set: undefined }
+			failedReason: { $set: undefined },
+			playlistId: { $set: undefined },
 		}));
 		return fetch('/startJob', {
 			method: "POST",
 			body: JSON.stringify({ // TODO make an object for this compound type
 				jobType: JobType.UserPlaylistCreate,
-				queryInfo: this.tidyData(values)
+				queryInfo: this.tidyData(values),
+				password
 			}),
 			headers: {
 				'Content-Type': 'application/json',
@@ -123,7 +139,7 @@ export class IgnitionSearchForm extends React.Component<Props, State> {
 			const id: number = value.id;
 
 			// Wait for the job to finish
-			return this.waitForCompletedJob(id);
+			return this.waitForCompletedJob(id, password);
 		});
 	}
 
@@ -155,10 +171,14 @@ export class IgnitionSearchForm extends React.Component<Props, State> {
 		let result: ReactElement = <></>;
 		if (this.state.status) {
 			if (this.state.status === "completed") {
-				result = <Alert variant="success" onClose={this.onCloseDialog.bind(this)} dismissible><Alert.Heading>Success!</Alert.Heading></Alert>;
+				result = <Alert variant="success" onClose={this.onCloseDialog.bind(this)} dismissible>
+					<Alert.Heading>Success!</Alert.Heading>
+					<p><a href={`https://open.spotify.com/playlist/${this.state.playlistId}`}>Go to playlist</a></p>
+				</Alert>;
 			} else if (this.state.status === "failed") {
 				result = <Alert variant="danger" onClose={this.onCloseDialog.bind(this)} dismissible>
-					<Alert.Heading>Error creating playlist</Alert.Heading><p>{this.state.failedReason}</p>
+					<Alert.Heading>Error creating playlist</Alert.Heading>
+					<p>{this.state.failedReason}</p>
 				</Alert>;
 			}
 		}

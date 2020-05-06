@@ -15,6 +15,7 @@ type PlaylistUpdateQueue = Queue<PlaylistJobData>;
 export interface UserPlaylistCreationJobData {
 	query: IgnitionToSpotifyData;
 	auth: SpotifyAuthInfo;
+	password: string;
 }
 type UserPlaylistCreationQueue = Queue<UserPlaylistCreationJobData>;
 

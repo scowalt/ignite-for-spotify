@@ -14,12 +14,13 @@ import { Playlist } from './db/models/Playlist';
 import { PlaylistApiInfo } from './types/PlaylistApiInfo';
 import { Song } from './db/models/Song';
 import { BasicTrackInfo } from './types/BasicTrackInfo';
-import { QueueManager } from './shared/QueueManager';
+import { QueueManager, UserPlaylistCreationJobData } from './shared/QueueManager';
 import { StartJobRoute } from './routes/StartJobRoute';
 import { GetJobRoute } from './routes/GetJobRoute';
 import { LoginRoute } from './routes/LoginRoute';
 import { SpotifyAuthCallbackRoute } from './routes/SpotifyAuthCallbackRoute';
 import { RefreshSpotifyAuthRoute } from './routes/RefreshSpotifyAuthRoute';
+import Bull from 'bull';
 
 const queues: QueueManager = new QueueManager();
 const app: Express = express();
@@ -39,6 +40,22 @@ function getRedirectUri(request: Request): string {
 
 app.post('/startJob', StartJobRoute(queues));
 app.get('/job/:jobType/:id', GetJobRoute(queues));
+app.post('/getCreatedPlaylist', async (request: Request, response: Response) => {
+	const password: string = request.body.password;
+	const id: Bull.JobId = request.body.id;
+	const job: Bull.Job<UserPlaylistCreationJobData> | null = await queues.userPlaylistCreationQueue.getJob(id);
+
+	if (job === null) {
+		return response.status(HttpStatus.NOT_FOUND).end();
+	} else if (job.data.password !== password) {
+		return response.status(HttpStatus.UNAUTHORIZED).end();
+	}
+	return response.json({
+		status: await job.getState(),
+		failedReason: (job as any).failedReason,
+		playlistId: ((job as any).returnvalue) ? (job as any).returnvalue.playlistId : undefined,
+	});
+});
 
 // Client wants to start Spotify Auth flow
 app.get('/login', LoginRoute(getRedirectUri, stateKey));

@@ -27,12 +27,16 @@ export function StartJobRoute(queues: QueueManager): (request: Request, response
 			}
 
 			const queryInfo: IgnitionToSpotifyData = request.body.queryInfo;
+			const password: string = request.body.password;
 			job = await queues.userPlaylistCreationQueue.add({
 				query: queryInfo,
 				auth: {
 					spotifyAccessToken: accessToken,
-					spotifyRefreshToken: refreshToken
-				}
+					spotifyRefreshToken: refreshToken,
+				},
+				password
+			}, {
+				attempts: 1 // Attempting this more than once can cause multiple playlists to be created
 			});
 		} else {
 			return response.status(HttpStatus.NOT_ACCEPTABLE).end();
