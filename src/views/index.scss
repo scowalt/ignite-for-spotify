@@ -70,3 +70,7 @@ label {
 form > .formRow > .col {
 	@extend .col-md-6;
 }
+
+.ignitionQueryOption {
+	@extend .col-md-4;
+}

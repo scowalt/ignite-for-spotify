@@ -40,7 +40,7 @@ export class IgnitionSearchForm extends React.Component<Props, State> {
 
 	makeOptionalString(formikProps: FormikProps<IgnitionToSpotifyData>): (name: keyof IgnitionToSpotifyData) => ReactNode {
 		return (name: keyof IgnitionToSpotifyData): ReactNode => {
-			return <Col key={name}><label htmlFor={name}>
+			return <Col key={name} className="ignitionQueryOption"><label htmlFor={name}>
 				<div>{_.upperFirst(name)}</div>
 				<Field type="text" name={name} placeholder={`optional`} disabled={formikProps.isSubmitting}></Field>
 			</label></Col>;
@@ -49,7 +49,7 @@ export class IgnitionSearchForm extends React.Component<Props, State> {
 
 	makeOptionalBoolean(formikProps: FormikProps<IgnitionToSpotifyData>): (part: keyof IgnitionToSpotifyData) => ReactNode {
 		return (part: keyof IgnitionToSpotifyData): ReactNode => {
-			return <Col key={part}>
+			return <Col key={part} className="ignitionQueryOption">
 				<label htmlFor={part}>
 					<div>{_.upperFirst(part)}</div>
 					<Field as="select" name={part} placeholder={part} disabled={formikProps.isSubmitting}>
