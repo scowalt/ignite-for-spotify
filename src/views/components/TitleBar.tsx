@@ -6,7 +6,7 @@ export class TitleBar extends React.Component<{}, {}> {
 	render(): ReactNode {
 		return <Navbar bg="dark" expand="lg">
 			<Container fluid>
-				<Navbar.Brand href="#">
+				<Navbar.Brand href="/">
 					<img src={Icon} className="brandIcon"></img>
 					Ignite for Spotify
 				</Navbar.Brand>

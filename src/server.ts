@@ -88,5 +88,10 @@ app.post('/getIgnitionInfo', async (request: Request, response: Response) => {
 	return response.status(HttpStatus.OK).send(JSON.stringify(trackResults));
 });
 
+// Catch-all to support react-router-dom processing
+app.get('*', (_request: Request, response: Response) => {
+	return response.sendFile(path.resolve(path.join(__dirname, '..', 'dist', 'views', 'index.html')));
+});
+
 const port: number = parseInt(process.env.PORT!, 10);
 app.listen(port);
