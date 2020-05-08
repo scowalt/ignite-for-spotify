@@ -39,7 +39,7 @@ export class SpotifyUpdater {
 
 	private async initAndStart(accessToken: string, refreshToken: string, redirectUri: string): Promise<any> {
 		Logger.getInstance().info(`SpotifyUpdater.initAndStart()`);
-		this.spotify = await RateLimitedSpotifyWebApi.getInstance(accessToken, refreshToken, redirectUri);
+		this.spotify = await RateLimitedSpotifyWebApi.createInstance(accessToken, refreshToken, redirectUri);
 		this.db = await Database.getInstance();
 
 		const promises: Promise<any>[] = [];

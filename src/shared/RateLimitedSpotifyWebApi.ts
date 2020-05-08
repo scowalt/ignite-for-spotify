@@ -8,27 +8,21 @@ import { promisify } from 'util';
 const wait: (ms: number) => Promise<void> = promisify(setTimeout);
 
 export class RateLimitedSpotifyWebApi {
-	public static async getInstance(accessToken: string, refreshToken: string, redirectUri: string): Promise<RateLimitedSpotifyWebApi> {
-		if (!RateLimitedSpotifyWebApi.instance) {
-			RateLimitedSpotifyWebApi.instance = new RateLimitedSpotifyWebApi(accessToken, refreshToken, redirectUri);
-			await RateLimitedSpotifyWebApi.instance.init();
-		}
-
-		return Promise.resolve(RateLimitedSpotifyWebApi.instance);
+	public static async createInstance(accessToken: string, refreshToken: string, redirectUri: string): Promise<RateLimitedSpotifyWebApi> {
+		const instance: RateLimitedSpotifyWebApi = new RateLimitedSpotifyWebApi(accessToken, refreshToken, redirectUri);
+		await instance.init();
+		return instance;
 	}
-	private static instance: RateLimitedSpotifyWebApi;
 
-	private readonly spotify!: SpotifyWebApi;
-	private readonly queue: PromiseQueue;
+	private readonly spotify: SpotifyWebApi;
+	private static readonly queue: PromiseQueue = new PromiseQueue({
+		concurrency: 5,
+		interval: 1 * 1000, // one second
+		// Spotify doesn't prescribe how many requests are allowed per second. In my testing, I've found that 10/s is too many.
+		intervalCap: 8
+	});;
 
 	private constructor(accessToken: string, refreshToken: string, redirectUri: string) {
-		this.queue = new PromiseQueue({
-			concurrency: 5,
-			interval: 1 * 1000, // one second
-			// Spotify doesn't prescribe how many requests are allowed per second. In my testing, I've found that 10/s is too many.
-			intervalCap: 8
-		});
-
 		this.spotify = new SpotifyWebApi({
 			clientId: process.env.SPOTIFY_CLIENT_ID,
 			clientSecret: process.env.SPOTIFY_CLIENT_SECRET,
@@ -39,7 +33,7 @@ export class RateLimitedSpotifyWebApi {
 	}
 
 	public searchTracks(searchQuery: Query): Promise<SpotifyApi.PagingObject<SpotifyApi.TrackObjectFull> | undefined> {
-		Logger.getInstance().debug(`RateLimitedSpotifyWebApi.serachTracks("${searchQuery.toString()}") [Queue pending promises: ${this.queue.pending}]`);
+		Logger.getInstance().debug(`RateLimitedSpotifyWebApi.serachTracks("${searchQuery.toString()}") [Queue pending promises: ${RateLimitedSpotifyWebApi.queue.pending}]`);
 		return this.enqueue(() => {
 			Logger.getInstance().debug(`Calling this.spotify.searchTracks("${searchQuery.toString()}")`);
 			return this.spotify.searchTracks(searchQuery.toString()).then((value: SpotifyWebApi.Response<SpotifyApi.SearchResponse>) => {
@@ -107,7 +101,7 @@ export class RateLimitedSpotifyWebApi {
 	}
 
 	private enqueue<T>(task: () => Promise<T>): Promise<T> {
-		return this.queue.add(task).catch((reason: any) => {
+		return RateLimitedSpotifyWebApi.queue.add(task).catch((reason: any) => {
 			Logger.getInstance().error(`Spotify API error ${JSON.stringify(reason)}`);
 			let restartCondition: Promise<void>|undefined;
 			if (reason && reason.name === "WebapiError" && reason.statusCode === 401 && reason.message === "Unauthorized") {
@@ -123,9 +117,9 @@ export class RateLimitedSpotifyWebApi {
 			}
 
 			if (restartCondition) {
-				this.queue.pause();
+				RateLimitedSpotifyWebApi.queue.pause();
 				return restartCondition.then(() => {
-					this.queue.start();
+					RateLimitedSpotifyWebApi.queue.start();
 					return task();
 				});
 			}

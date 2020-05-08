@@ -69,6 +69,7 @@ app.get('/getPlaylists', async (_request: Request, response: Response) => {
 		database = await Database.getInstance();
 	}
 
+	// TODO this could use some caching. This will be called on every page load, so having it hit the database constantly isn't ideal
 	const playlists: Playlist[] = await database.getAllPlaylists();
 	return response.json(playlists.map((playlist: Playlist) => { return new PlaylistApiInfo(playlist); }));
 });
@@ -78,6 +79,7 @@ app.post('/getIgnitionInfo', async (request: Request, response: Response) => {
 		database = await Database.getInstance();
 	}
 
+	// TODO This should be done by a job in the worker process instead of in the web process
 	const tracks: BasicTrackInfo[] = request.body;
 	let trackResults: Song[] = [];
 	for (const track of tracks) {

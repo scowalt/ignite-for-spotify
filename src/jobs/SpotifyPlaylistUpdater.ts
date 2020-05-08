@@ -28,7 +28,7 @@ export class SpotifyPlaylistUpdater {
 	private constructor() { }
 	private async run(accessToken: string, refreshToken: string, redirectUri: string): Promise<void> {
 		Logger.getInstance().info(`SpotifyPlaylistUpdater.run(...)`);
-		this.spotify = await RateLimitedSpotifyWebApi.getInstance(accessToken, refreshToken, redirectUri);
+		this.spotify = await RateLimitedSpotifyWebApi.createInstance(accessToken, refreshToken, redirectUri);
 		this.db = await Database.getInstance();
 		return this.ensureTracksInPlaylist();
 	}
