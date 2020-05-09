@@ -13,7 +13,7 @@ import { SpotifyPlaylistUpdater } from './jobs/SpotifyPlaylistUpdater';
 import { QueueManager, SpotifyUpdateJobData, IgnitionJobData, UserPlaylistCreationJobData } from './shared/QueueManager';
 import { Database } from './db/Database';
 import { Song } from './db/models/Song';
-import SpotifyWebApi from 'spotify-web-api-node';
+import { RateLimitedSpotifyWebApi } from './shared/RateLimitedSpotifyWebApi';
 
 const workers: number = Number(process.env.WEB_CONCURRENCY);
 
@@ -47,15 +47,12 @@ function playlistProcessFunction(): Promise<void> {
 
 async function userPlaylistCreationFunction(job: Bull.Job<UserPlaylistCreationJobData>): Promise<any> {
 	// TODO this needs to use a rate-limited spotify API
-	const spotify: SpotifyWebApi = new SpotifyWebApi({
-		clientId: process.env.SPOTIFY_CLIENT_ID,
-		clientSecret: process.env.SPOTIFY_CLIENT_SECRET,
-		redirectUri: '', // TODO
-	});
-	spotify.setAccessToken(job.data.auth.spotifyAccessToken);
-	spotify.setRefreshToken(job.data.auth.spotifyRefreshToken);
-	const refreshResponse: SpotifyWebApi.Response<SpotifyWebApi.RefreshAccessTokenResponse> = await spotify.refreshAccessToken();
-	spotify.setAccessToken(refreshResponse.body.access_token);
+	const spotify: RateLimitedSpotifyWebApi = await RateLimitedSpotifyWebApi.createInstance(
+		job.data.auth.spotifyAccessToken,
+		job.data.auth.spotifyRefreshToken,
+		'' // TODO what do I use as a redirect URI here?
+	);
+	await spotify.updateAccessToken();
 
 	const db: Database = await Database.getInstance();
 	const totalSongs = await db.getCountSongsFromIgnitionToSpotifyData(job.data.query);

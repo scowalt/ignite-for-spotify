@@ -43,7 +43,8 @@ export class RateLimitedSpotifyWebApi {
 		});
 	}
 
-	public async createPlaylist(id: number): Promise<string> {
+	// Create a playlist for the "entire-library constantly-updated" feature
+	public async createEntireLibraryPlaylist(id: number): Promise<string> {
 		const userProfile: SpotifyWebApi.Response<SpotifyApi.CurrentUsersProfileResponse> = await this.enqueue(() => { return this.spotify.getMe(); });
 		const createPlaylistResponse: SpotifyWebApi.Response<SpotifyApi.CreatePlaylistResponse> = await this.enqueue(() => {
 			return this.spotify.createPlaylist(userProfile.body.id, `Rocksmith (C)DLC (part ${id}/?)`, {
@@ -55,12 +56,25 @@ export class RateLimitedSpotifyWebApi {
 		return createPlaylistResponse.body.id;
 	}
 
+	// Create a playlist for a user
+	public createPlaylist(userId: string, playlistName: string): Promise<SpotifyWebApi.Response<SpotifyApi.CreatePlaylistResponse>> {
+		return this.enqueue(() => {
+			return this.spotify.createPlaylist(userId, playlistName);
+		});
+	}
+
 	public async getPlaylistTracks(playlistId: string, offset: number, limit: number): Promise<SpotifyWebApi.Response<SpotifyApi.PlaylistTrackResponse>> {
 		return this.enqueue(() => {
 			return this.spotify.getPlaylistTracks(playlistId, {
 				offset,
 				limit
 			});
+		});
+	}
+
+	public addTracksToPlaylist(playlistId: string, tracks: string[]): Promise<SpotifyWebApi.Response<SpotifyApi.AddTracksToPlaylistResponse>> {
+		return this.enqueue(() => {
+			return this.spotify.addTracksToPlaylist(playlistId, tracks);
 		});
 	}
 
@@ -93,10 +107,16 @@ export class RateLimitedSpotifyWebApi {
 		return this.updateAccessToken();
 	}
 
-	private updateAccessToken(): Promise<void> {
+	public updateAccessToken(): Promise<void> {
 		return this.spotify.refreshAccessToken().then((value: SpotifyWebApi.Response<RefreshAccessTokenResponse>) => {
 			this.spotify.setAccessToken(value.body.access_token);
 			return Promise.resolve();
+		});
+	}
+
+	public getMe(): Promise<SpotifyWebApi.Response<SpotifyApi.CurrentUsersProfileResponse>> {
+		return this.enqueue(() => {
+			return this.spotify.getMe();
 		});
 	}
 

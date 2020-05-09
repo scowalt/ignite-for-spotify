@@ -76,7 +76,7 @@ export class SpotifyPlaylistUpdater {
 		return this.db.getPlaylistById(playlistNumber).then(async (result: Playlist|null) => {
 			if (result === null) {
 				// Playlist doesn't exist. Need to create the playlist in spotify and add the playlist to the database
-				const spotifyPlaylistId: string = await this.spotify.createPlaylist(playlistNumber);
+				const spotifyPlaylistId: string = await this.spotify.createEntireLibraryPlaylist(playlistNumber);
 
 				// Add the spotify playlist to the db
 				return this.db.addPlaylist(playlistNumber, spotifyPlaylistId);
