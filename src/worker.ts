@@ -19,11 +19,11 @@ const workers: number = Number(process.env.WEB_CONCURRENCY);
 
 function spotifyProcessFunction(job: Bull.Job<SpotifyUpdateJobData>): Promise<void> {
 	Logger.getInstance().info(`Started Spotify job ${job.id}`);
-	const redirectUri: string = ""; // TODO need to figure out how to handle this in the spotify API
+	const redirectUri: string = "";
 	if (!process.env.SPOTIFY_ACCOUNT_ACCESS_TOKEN ||
 		!process.env.SPOTIFY_ACCOUNT_REFRESH_TOKEN) {
 		assert(false, "Spotify access and refresh tokens must be set as environment variables");
-		return Promise.reject("Spotify access and refresh tokens must be set as environment variables");
+		return Promise.reject(new Error("Spotify access and refresh tokens must be set as environment variables"));
 	}
 
 	return SpotifyUpdater.update(process.env.SPOTIFY_ACCOUNT_ACCESS_TOKEN, process.env.SPOTIFY_ACCOUNT_REFRESH_TOKEN, redirectUri).finally(() => {
@@ -32,11 +32,11 @@ function spotifyProcessFunction(job: Bull.Job<SpotifyUpdateJobData>): Promise<vo
 }
 
 function playlistProcessFunction(): Promise<void> {
-	const redirectUri: string = ""; // TODO need to figure out how to handle this in the spotify API
+	const redirectUri: string = "";
 	if (!process.env.SPOTIFY_ACCOUNT_ACCESS_TOKEN ||
 		!process.env.SPOTIFY_ACCOUNT_REFRESH_TOKEN) {
 		assert(false, "Spotify access and refresh tokens must be set as environment variables");
-		return Promise.reject("Spotify access and refresh tokens must be set as environment variables");
+		return Promise.reject(new Error("Spotify access and refresh tokens must be set as environment variables"));
 	}
 
 	return SpotifyPlaylistUpdater.update(process.env.SPOTIFY_ACCOUNT_ACCESS_TOKEN, process.env.SPOTIFY_ACCOUNT_REFRESH_TOKEN, redirectUri).catch((reason: any) => {
@@ -49,7 +49,7 @@ async function userPlaylistCreationFunction(job: Bull.Job<UserPlaylistCreationJo
 	const spotify: RateLimitedSpotifyWebApi = await RateLimitedSpotifyWebApi.createInstance(
 		job.data.auth.spotifyAccessToken,
 		job.data.auth.spotifyRefreshToken,
-		'' // TODO what do I use as a redirect URI here?
+		'' // redirectUri
 	);
 	await spotify.updateAccessToken();
 

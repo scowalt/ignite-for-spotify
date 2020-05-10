@@ -43,7 +43,8 @@
 	@extend .list-group-item-action, :hover;
 }
 
-.tab-content {
+.tab-content,
+.container > .row {
 	margin-top: 1em;
 }
 

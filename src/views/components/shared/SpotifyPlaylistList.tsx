@@ -28,7 +28,7 @@ export class SpotifyPlaylistList extends React.Component<SpotifyPlaylistListProp
 	}
 
 	private getTotalPages(playlists: SpotifyApi.ListOfUsersPlaylistsResponse): number {
-		return Math.floor(playlists.total / this.props.playlistsPerRequest)+1;
+		return Math.max(Math.ceil(playlists.total / this.props.playlistsPerRequest), 1);
 	}
 
 	onPlaylistSelected(playlist: SpotifyApi.PlaylistObjectSimplified, index: number): () => void {

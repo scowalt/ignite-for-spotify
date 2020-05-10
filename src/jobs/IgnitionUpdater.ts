@@ -62,8 +62,6 @@ export class IgnitionUpdater {
 	}
 	private initAndStart(): Promise<void|void[]> {
 		Logger.getInstance().info(`IgnitionUpdater.initAndStart()`);
-		// TODO for now, this logic assumes that no songs are removed from Ignition at any time. This isn't true,
-		// since dead links are occasionally removed from Ignition. This logic will need to be updated to account for that
 		return Database.getInstance().then((database: Database) => {
 			this.db = database;
 
@@ -80,8 +78,6 @@ export class IgnitionUpdater {
 				}
 
 				return Promise.all(promises);
-			}).catch((error: any) => {
-				return Promise.reject(error);
 			});
 		});
 	}

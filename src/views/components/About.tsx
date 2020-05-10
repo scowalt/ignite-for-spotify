@@ -4,6 +4,7 @@ import React from "react";
 
 export class About extends React.PureComponent {
 	render(): ReactNode {
+		// TODO expand this
 		return <Container><Row><Col>
 			Made by Scott Walters
 		</Col></Row></Container>;
