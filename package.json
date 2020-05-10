@@ -14,7 +14,7 @@
         "fix": "eslint --fix \"./src/**/*.{ts,tsx,html}\""
     },
     "engines": {
-        "node": "^12.12.0"
+        "node": "^14.2.0"
     },
     "author": "Scott Walters",
     "license": "",
@@ -89,6 +89,7 @@
         "eslint-plugin-react": "^7.19.0",
         "file-loader": "^6.0.0",
         "html-webpack-plugin": "^4.2.0",
+        "nodemon": "^2.0.3",
         "sass": "^1.26.3",
         "sass-loader": "^8.0.2",
         "style-loader": "^1.1.4",

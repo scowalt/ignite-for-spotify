@@ -46,7 +46,6 @@ function playlistProcessFunction(): Promise<void> {
 }
 
 async function userPlaylistCreationFunction(job: Bull.Job<UserPlaylistCreationJobData>): Promise<any> {
-	// TODO this needs to use a rate-limited spotify API
 	const spotify: RateLimitedSpotifyWebApi = await RateLimitedSpotifyWebApi.createInstance(
 		job.data.auth.spotifyAccessToken,
 		job.data.auth.spotifyRefreshToken,
