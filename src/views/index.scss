@@ -43,32 +43,34 @@
 	margin-top: 1em;
 }
 
-.playlistNameInput {
-	width: 100%;
-}
+.tab-pane {
+	form > .formRow > .col {
+		@extend .col-12;
+		@extend .col-md-6;
 
-.goButton {
-	@extend .btn-success;
+		label {
+			> input {
+				@extend .form-control;
+			}
 
-	width: 100%;
-}
+			> select {
+				@extend .form-control;
+			}
+		}
 
-label {
-	> input {
-		@extend .form-control;
+		.playlistNameInput {
+			width: 100%;
+		}
 	}
 
-	> select {
-		@extend .form-control;
+	> .row.spotifyToIgnition > .col {
+		@extend .col-12;
 	}
-}
 
-form > .formRow > .col {
-	@extend .col-md-6;
-}
-
-.ignitionQueryOption {
-	@extend .col-md-4;
+	.ignitionQueryOption {
+		@extend .col-6;
+		@extend .col-lg-4;
+	}
 }
 
 .spinner-border {

@@ -37,7 +37,7 @@ export class SpotifyToIgnition extends React.Component<SpotifySourceProps, Spoti
 			playlist={this.state.selectedPlaylist}
 			spotify={this.state.spotify}
 			key={this.state.selectedPlaylist.id}></IgnitionSearch> : <></>;
-		return <Row>
+		return <Row className="spotifyToIgnition">
 			<Col>
 				<Row><Col>
 					<h3>Choose a <FaSpotify/>Spotify playlist:</h3>

@@ -60,25 +60,23 @@ export class IgnitionUpdater {
 		});
 		Logger.getInstance().info(`new IgnitionUpdater()`);
 	}
-	private initAndStart(): Promise<void|void[]> {
+	private async initAndStart(): Promise<void|void[]> {
 		Logger.getInstance().info(`IgnitionUpdater.initAndStart()`);
-		return Database.getInstance().then((database: Database) => {
-			this.db = database;
+		this.db = await Database.getInstance();
 
-			// Make a request to Ignition. This is just to see how many requests will need to be generated and put into the queue
-			const promises: Promise<any>[] = [];
-			return fetch(ignitionDirectoryUrl, this.generateIgnitionRequestInit(0)).then((ignitionResponse: FetchResponse) => {
-				return ignitionResponse.json();
-			}).then((ignitionResult: IgnitionApiResponse) => {
-				for (let offset: number = 0; offset < ignitionResult.recordsFiltered; offset += IGNITION_PAGE_SIZE) {
-					// Queue a future request to Ignition
-					promises.push(this.ignitionRequestQueue.add(() => {
-						return this.performIgnitionRequest(offset);
-					}));
-				}
+		// Make a request to Ignition. This is just to see how many requests will need to be generated and put into the queue
+		const promises: Promise<any>[] = [];
+		return fetch(ignitionDirectoryUrl, this.generateIgnitionRequestInit(0)).then((ignitionResponse: FetchResponse) => {
+			return ignitionResponse.json();
+		}).then((ignitionResult: IgnitionApiResponse) => {
+			for (let offset: number = 0; offset < ignitionResult.recordsFiltered; offset += IGNITION_PAGE_SIZE) {
+				// Queue a future request to Ignition
+				promises.push(this.ignitionRequestQueue.add(() => {
+					return this.performIgnitionRequest(offset);
+				}));
+			}
 
-				return Promise.all(promises);
-			});
+			return Promise.all(promises);
 		});
 	}
 
@@ -247,10 +245,13 @@ export class IgnitionUpdater {
 		};
 	}
 
-	private performIgnitionRequest(offset: number): Promise<boolean[]> {
+	private performIgnitionRequest(offset: number): Promise<any> {
 		Logger.getInstance().info(`performIgnitionRequest(${offset})`);
 		return fetch(ignitionDirectoryUrl, this.generateIgnitionRequestInit(offset))
 			.then((response: FetchResponse) => {
+				if (!response.ok) {
+					throw new Error('Network response was not ok');
+				}
 				return response.json();
 			})
 			.then(this.addIgnitionTracksToDatabase.bind(this));

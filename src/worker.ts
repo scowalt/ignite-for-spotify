@@ -87,8 +87,7 @@ function start(): void {
 	queues.ignitionQueue.process((job: Bull.Job<IgnitionJobData>) => {
 		Logger.getInstance().info(`Started Ignition job ${job.id}`);
 
-		// BUG There's potentially an issue where all ignition jobs mark as "failed", even if they succeed.
-		// This could be because job success relies on all ~1700 requests to the CustomsForge server completing successfully
+		// This will have a high failure rate, because job success relies on all ~1700 requests to the CustomsForge server completing successfully.
 		return IgnitionUpdater.update();
 	}).finally(() => {
 		Logger.getInstance().info(`Ignition job finished`);

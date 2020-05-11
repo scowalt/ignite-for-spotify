@@ -5,6 +5,7 @@ import SpotifyWebApi from "spotify-web-api-js";
 import { BasicTrackInfo } from "../../../types/BasicTrackInfo";
 import update from 'immutability-helper';
 import { handleExpiredSpotifyToken } from "../../common/SpotifyHelpers";
+import { FaCheckCircle } from "react-icons/fa";
 
 interface IgnitionSearchProps extends React.Props<{}> {
 	readonly spotify: SpotifyWebApi.SpotifyWebApiJs;
@@ -69,26 +70,33 @@ export class IgnitionSearch extends React.Component<IgnitionSearchProps, Ignitio
 		} else if (this.state.songs.length === 0) {
 			results.push(<tr key="whoopsies"><td colSpan={100}>No songs found</td></tr>);
 		} else {
-			// TODO Add more information to this table
 			results = this.state.songs.map((song: Song, index: number) => {
 				return <tr key={index}>
+					<td><a href={`http://customsforge.com/process.php?id=${song.id}`} target="_blank" rel="noopener noreferrer">Download</a></td>
 					<td>{song.title}</td>
 					<td>{song.artist}</td>
 					<td>{song.album}</td>
 					<td>{song.author}</td>
-					<td><a href={`http://customsforge.com/process.php?id=${song.id}`} target="_blank" rel="noopener noreferrer">Download</a></td>
+					<td>{song.lead ? <FaCheckCircle /> : <></>}</td>
+					<td>{song.rhythm ? <FaCheckCircle /> : <></>}</td>
+					<td>{song.bass ? <FaCheckCircle /> : <></>}</td>
+					<td>{song.vocals ? <FaCheckCircle /> : <></>}</td>
 				</tr>;
 			});
 		}
 
-		return <Table striped bordered hover>
+		return <Table striped bordered hover responsive>
 			<thead>
 				<tr>
+					<th>Download link</th>
 					<th>Title</th>
 					<th>Artist</th>
 					<th>Album</th>
 					<th>Author</th>
-					<th>Download link</th>
+					<th>Lead</th>
+					<th>Rhythm</th>
+					<th>Bass</th>
+					<th>Vocals</th>
 				</tr>
 			</thead>
 			<tbody>
