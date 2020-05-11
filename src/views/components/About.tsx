@@ -6,7 +6,8 @@ export class About extends React.PureComponent {
 	render(): ReactNode {
 		// TODO expand this
 		return <Container><Row><Col>
-			Made by Scott Walters
+			Made by Scott Walters. <br />
+			If you like this app, please consider <a href="http://customsforge.com/donate">supporting CustomsForge</a>, which makes Ignite for Spotify possible.
 		</Col></Row></Container>;
 	}
 }

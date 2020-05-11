@@ -5,6 +5,7 @@ import { Col, Row } from "react-bootstrap";
 import update from 'immutability-helper';
 import { IgnitionSearch } from "./IgnitionSearch";
 import { SpotifyPlaylistListLoader } from "../shared/SpotifyPlaylistListLoader";
+import { FaSpotify } from "react-icons/fa";
 
 interface SpotifySourceProps extends React.Props<{}> {
 	auth: SpotifyAuthInfo;
@@ -39,10 +40,15 @@ export class SpotifyToIgnition extends React.Component<SpotifySourceProps, Spoti
 			key={this.state.selectedPlaylist.id}></IgnitionSearch> : <></>;
 		return <Row>
 			<Col>
-				<SpotifyPlaylistListLoader
-					playlistsPerRequest={10}
-					onPlaylistClicked={this.actOnPlaylist.bind(this)}
-					spotify={this.state.spotify} />
+				<Row><Col>
+					<h3>Choose a <FaSpotify/>Spotify playlist:</h3>
+				</Col></Row>
+				<Row><Col>
+					<SpotifyPlaylistListLoader
+						playlistsPerRequest={10}
+						onPlaylistClicked={this.actOnPlaylist.bind(this)}
+						spotify={this.state.spotify} />
+				</Col></Row>
 			</Col>
 			<Col>{localResults}</Col>
 		</Row>;

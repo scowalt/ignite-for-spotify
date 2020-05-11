@@ -19,11 +19,6 @@
 	margin-right: 0.5em;
 }
 
-.PlaylistListItemSpinner.spinner-border {
-	width: 1.5em;
-	height: 1.5em;
-}
-
 @import "~bootswatch/dist/darkly/variables";
 @import "~bootstrap/scss/bootstrap";
 @import "~bootswatch/dist/darkly/bootswatch";
@@ -74,4 +69,9 @@ form > .formRow > .col {
 
 .ignitionQueryOption {
 	@extend .col-md-4;
+}
+
+.spinner-border {
+	width: 1em;
+	height: 1em;
 }

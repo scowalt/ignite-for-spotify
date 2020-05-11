@@ -69,6 +69,7 @@ export class IgnitionSearch extends React.Component<IgnitionSearchProps, Ignitio
 		} else if (this.state.songs.length === 0) {
 			results.push(<tr key="whoopsies"><td colSpan={100}>No songs found</td></tr>);
 		} else {
+			// TODO Add more information to this table
 			results = this.state.songs.map((song: Song, index: number) => {
 				return <tr key={index}>
 					<td>{song.title}</td>

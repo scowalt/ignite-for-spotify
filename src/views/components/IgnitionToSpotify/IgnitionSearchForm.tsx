@@ -1,5 +1,5 @@
 import React, { ReactNode, ReactElement } from "react";
-import { Button, Form, Col, Row, Alert } from "react-bootstrap";
+import { Button, Form, Col, Row, Alert, Spinner } from "react-bootstrap";
 import { IgnitionToSpotifyDataSchema, IgnitionToSpotifyData, IgnitionToSpotifyBoolsKeys } from "../../../types/IgnitionToSpotifyData";
 import { Formik, Field, FormikProps, FormikErrors } from 'formik';
 import _ from 'lodash';
@@ -220,6 +220,7 @@ export class IgnitionSearchForm extends React.Component<Props, State> {
 							</Row>
 							<Row><Col>
 								<Button type="submit" disabled={formikProps.isSubmitting} block>
+									{(formikProps.isSubmitting) ? <Spinner animation="border" /> : <></>}
 									Submit
 								</Button>
 							</Col></Row>
