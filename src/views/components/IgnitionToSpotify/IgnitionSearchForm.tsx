@@ -78,7 +78,7 @@ export class IgnitionSearchForm extends React.Component<Props, State> {
 					id
 				})
 			});
-			const responseBody: any = await response.json(); // TODO make a type for this
+			const responseBody: any = await response.json();
 			const status: Bull.JobStatus = responseBody.status;
 			if (status === "completed") {
 				this.setState(update(this.state, {

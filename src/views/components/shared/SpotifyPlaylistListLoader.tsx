@@ -41,17 +41,20 @@ export class SpotifyPlaylistListLoader extends React.Component<SpotifyPlaylistLi
 		return this.props.spotify.getUserPlaylists({
 			offset,
 			limit: this.props.playlistsPerRequest
-		}).then((value: SpotifyApi.ListOfUsersPlaylistsResponse) => {
+		}).catch(handleExpiredSpotifyToken(
+			this.state.downloadAbort.signal,
+			this.props.spotify,
+			() => { return this.props.spotify.getUserPlaylists({
+				offset,
+				limit: this.props.playlistsPerRequest
+			}); }
+		)).then((value: SpotifyApi.ListOfUsersPlaylistsResponse) => {
 			if (!this.state.downloadAbort.signal.aborted) {
 				this.setState(update(this.state, {
 					playlists: { $set: value }
 				}));
 			}
-		}).catch(handleExpiredSpotifyToken(
-			this.state.downloadAbort.signal,
-			this.props.spotify,
-			() => { return this.getUserSpotifyPlaylists(offset); }
-		)).finally(() => {
+		}).finally(() => {
 			this.setState(update(this.state, {
 				loading: { $set: false }
 			}));

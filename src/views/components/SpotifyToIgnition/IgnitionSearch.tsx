@@ -34,7 +34,7 @@ export class IgnitionSearch extends React.Component<IgnitionSearchProps, Ignitio
 			.catch(handleExpiredSpotifyToken(
 				this.state.downloadAbort.signal,
 				this.props.spotify,
-				() => { return this.performIgnitionSearch(); }
+				() => { return this.props.spotify.getPlaylistTracks(this.props.playlist.id); }
 			)).then((playlistTracks: SpotifyApi.PlaylistTrackResponse) => {
 				// scrape just the track info from this response (that's all the server needs)
 				const tracks: SpotifyApi.TrackObjectFull[] = playlistTracks.items.map((playlistTrack: SpotifyApi.PlaylistTrackObject) => { return playlistTrack.track; });
