@@ -12,7 +12,8 @@ import update from 'immutability-helper';
 import Chance from 'chance';
 import { IgnitionToSpotifyJob } from "../../../types/IgnitionToSpotifyJob";
 
-// HACK: Initialize the string values here to avoid "A component is changing an uncontrolled input" errors
+// Initialize the string values here to avoid "A component is changing an uncontrolled input" errors.
+// This is either a limitation of formik, HTML, or both. For context: https://github.com/jaredpalmer/formik/issues/28#issuecomment-312697214
 const initialValues: IgnitionToSpotifyData = {
 	artist: "",
 	album: "",

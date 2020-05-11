@@ -5,7 +5,7 @@ import { FaSpotify } from 'react-icons/fa';
 import { RequireSpotifyAuth } from "./shared/RequireSpotifyAuth";
 import { SpotifyToIgnition } from "./SpotifyToIgnition/SpotifyToIgnition";
 import { IgnitionSearchForm } from "./IgnitionToSpotify/IgnitionSearchForm";
-import { Container, Row } from "react-bootstrap";
+import { Container, Row, Col } from "react-bootstrap";
 
 export class Home extends React.Component<{}, {}> {
 	createTabLink(id: string, content: ReactNode): ReactNode {
@@ -34,14 +34,14 @@ export class Home extends React.Component<{}, {}> {
 	render(): ReactNode {
 		return <Container fluid>
 			<Row>
-				<div className="col-3">
+				<Col md={3}>
 					<div className="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
 						{ this.createTabLink("spotifySource", <>Use <FaSpotify />Spotify playlists to search CustomsForge Ignition</>) }
 						{ this.createTabLink("ignitionSource", <>Export CustomsForge Ignition to a <FaSpotify />Spotify playlist</>) }
 						{ this.createTabLink("spotifyStatic", <>Follow a constantly-updated <FaSpotify />Spotify playlist.</>) }
 					</div>
-				</div>
-				<div className="col-9">
+				</Col>
+				<Col md={9}>
 					<div className="tab-content" id="v-pills-tabContent">
 						{ this.createTabContent("spotifySource", <RequireSpotifyAuth>
 							{(spotifyAuthInfo: SpotifyAuthInfo): ReactNode => {
@@ -55,7 +55,7 @@ export class Home extends React.Component<{}, {}> {
 						</RequireSpotifyAuth>) }
 						{ this.createTabContent("spotifyStatic", <StaticPlaylists></StaticPlaylists>) }
 					</div>
-				</div>
+				</Col>
 			</Row>
 		</Container>;
 	}

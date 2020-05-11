@@ -5,6 +5,7 @@ interface EmbededSpotifyPlaylistProps extends React.Props<{}> {
 }
 export class EmbededSpotifyPlaylist extends React.Component<EmbededSpotifyPlaylistProps> {
 	render(): ReactNode {
+		// TODO consider removing these, since they load extra stuff to the site
 		return <div className={"spotifyPlaylistEmbedWrapper"}>
 			<iframe
 				src={`https://open.spotify.com/embed/playlist/${this.props.playlistId}`}

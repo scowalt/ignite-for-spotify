@@ -32,7 +32,6 @@ export class SpotifyToIgnition extends React.Component<SpotifySourceProps, Spoti
 	}
 
 	render(): ReactNode {
-		// BUG This all displays really poorly on mobile
 		// TODO playlist options should be disabled while the results are loading
 		const localResults: ReactNode = (this.state.selectedPlaylist) ? <IgnitionSearch
 			playlist={this.state.selectedPlaylist}
