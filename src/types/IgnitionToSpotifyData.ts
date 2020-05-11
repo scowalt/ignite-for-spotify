@@ -6,7 +6,7 @@ import * as zod from 'zod';
 // a single, compound string.
 export const PlaylistInfoSchema = zod.object({
 	havePlaylistId: zod.boolean(), // true if the playlist descriptor is an ID. Otherwise, it's a name
-	playlistDescriptor: zod.string().refine((value: string): boolean => { return value.length >= 1; }, "Playlist descriptor must be included") // NIT this can be more precise and depend on havePlaylistId
+	playlistDescriptor: zod.string().refine((value: string): boolean => { return value.length >= 1; }, "Playlist descriptor must be included")
 });
 
 export type PlaylistInfo = zod.infer<typeof PlaylistInfoSchema>;

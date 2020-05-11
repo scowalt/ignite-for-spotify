@@ -7,7 +7,6 @@ import { About } from "./About";
 
 export class App extends React.Component {
 	render(): ReactNode {
-		// TODO add app version somewhere
 		return <>
 			<TitleBar></TitleBar>
 			<Switch>

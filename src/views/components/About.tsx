@@ -4,9 +4,8 @@ import React from "react";
 
 export class About extends React.PureComponent {
 	render(): ReactNode {
-		// TODO expand this
 		return <Container><Row><Col>
-			Made by Scott Walters. <br />
+			Made by <a href="mailto:ignite-for-spotify@scowalt.com">Scott Walters</a><br />
 			If you like this app, please consider <a href="http://customsforge.com/donate">supporting CustomsForge</a>, which makes Ignite for Spotify possible.
 		</Col></Row></Container>;
 	}

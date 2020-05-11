@@ -3,7 +3,7 @@ import Bull from 'bull';
 import HttpStatus from 'http-status-codes';
 import { JobType } from '../types/JobType';
 import { QueueManager } from '../shared/QueueManager';
-import { IgnitionToSpotifyData } from '../types/IgnitionToSpotifyData';
+import { IgnitionToSpotifyJob } from '../types/IgnitionToSpotifyJob';
 
 export function StartJobRoute(queues: QueueManager): (request: Request, response: Response) => Promise<void> {
 	return async (request: Request, response: Response): Promise<void> => {
@@ -26,15 +26,14 @@ export function StartJobRoute(queues: QueueManager): (request: Request, response
 				return response.status(HttpStatus.UNAUTHORIZED).end();
 			}
 
-			const queryInfo: IgnitionToSpotifyData = request.body.queryInfo;
-			const password: string = request.body.password;
+			const body: IgnitionToSpotifyJob = request.body;
 			job = await queues.userPlaylistCreationQueue.add({
-				query: queryInfo,
+				query: body.queryInfo,
 				auth: {
 					spotifyAccessToken: accessToken,
 					spotifyRefreshToken: refreshToken,
 				},
-				password
+				password: body.password
 			}, {
 				attempts: 1 // Attempting this more than once can cause multiple playlists to be created
 			});

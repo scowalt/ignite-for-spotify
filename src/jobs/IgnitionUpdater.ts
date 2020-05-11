@@ -93,8 +93,9 @@ export class IgnitionUpdater {
 			body: new URLSearchParams({
 				"draw": "5",
 				// Sort results by ID (smallest value first)
-				// This ensures that results won't jump pages if new songs get added during search
-				// HACK Will still break if old songs get deleted during search
+				// This ensures that results won't jump pages if new songs get added during search. This might
+				// still break if songs are removed during the search, but the current database logic is robust enough to handle this.
+				// (If any songs are missed, they will be picked up in the next run)
 				"order[0][column]": "14",
 				"order[0][dir]": "asc",
 

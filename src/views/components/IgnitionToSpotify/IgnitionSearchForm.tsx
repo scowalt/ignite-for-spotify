@@ -10,6 +10,7 @@ import { JobType } from "../../../types/JobType";
 import Bull from "bull";
 import update from 'immutability-helper';
 import Chance from 'chance';
+import { IgnitionToSpotifyJob } from "../../../types/IgnitionToSpotifyJob";
 
 // HACK: Initialize the string values here to avoid "A component is changing an uncontrolled input" errors
 const initialValues: IgnitionToSpotifyData = {
@@ -101,7 +102,7 @@ export class IgnitionSearchForm extends React.Component<Props, State> {
 
 		// TODO trim whitespaces
 
-		// HACK The boolean types are stored as string due to formik limitations. These strings cannot be "cast" as booleans
+		// The boolean types are stored as string due to formik limitations. These strings cannot be "cast" as booleans
 		// due to limitations of Zod. To compensate, manually iterate over any necessary members to convert
 		IgnitionToSpotifyBoolsKeys.forEach((key: string) => {
 			if ((prunedValues as any)[key] === "true") {
@@ -122,20 +123,20 @@ export class IgnitionSearchForm extends React.Component<Props, State> {
 			failedReason: { $set: undefined },
 			playlistId: { $set: undefined },
 		}));
+		const body: IgnitionToSpotifyJob = {
+			jobType: JobType.UserPlaylistCreate,
+			queryInfo: this.tidyData(values),
+			password
+		};
 		return fetch('/startJob', {
 			method: "POST",
-			body: JSON.stringify({ // TODO make an object for this compound type
-				jobType: JobType.UserPlaylistCreate,
-				queryInfo: this.tidyData(values),
-				password
-			}),
+			body: JSON.stringify(body),
 			headers: {
 				'Content-Type': 'application/json',
 			}
 		}).then((response: Response) => {
 			return response.json();
 		}).then((value: any) => {
-			// TODO make an object for this type
 			const id: number = value.id;
 
 			// Wait for the job to finish
