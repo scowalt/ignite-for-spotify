@@ -101,8 +101,6 @@ export class IgnitionSearchForm extends React.Component<Props, State> {
 		// Formik must have all values be initialized in order to work. So, remove all empty strings here (treat them as `undefined`)
 		const prunedValues: IgnitionToSpotifyData = _.omitBy(values, (property) => { return typeof property === "string" && property.length === 0;}) as IgnitionToSpotifyData;
 
-		// TODO trim whitespaces
-
 		// The boolean types are stored as string due to formik limitations. These strings cannot be "cast" as booleans
 		// due to limitations of Zod. To compensate, manually iterate over any necessary members to convert
 		IgnitionToSpotifyBoolsKeys.forEach((key: string) => {
@@ -110,6 +108,13 @@ export class IgnitionSearchForm extends React.Component<Props, State> {
 				(prunedValues as any)[key] = true;
 			} else if ((prunedValues as any)[key] === "false") {
 				(prunedValues as any)[key] = false;
+			}
+		});
+
+		// Trim whitespaces from all strings
+		_.forEach(prunedValues, (value, key) => {
+			if (typeof value === "string") {
+				(prunedValues as any)[key] = value.trim();
 			}
 		});
 
