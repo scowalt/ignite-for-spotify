@@ -94,7 +94,6 @@ export class SpotifyToIgnition extends React.Component<SpotifySourceProps, Spoti
 	}
 
 	render(): ReactNode {
-		// TODO playlist options should be disabled while the results are loading
 		const localResults: ReactNode = (this.state.selectedPlaylist) ? <IgnitionSearch
 			playlist={this.state.selectedPlaylist}
 			spotify={this.state.spotify}
@@ -109,7 +108,8 @@ export class SpotifyToIgnition extends React.Component<SpotifySourceProps, Spoti
 					<SpotifyPlaylistListLoader
 						playlistsPerRequest={10}
 						onPlaylistClicked={this.actOnPlaylist.bind(this)}
-						spotify={this.state.spotify} />
+						spotify={this.state.spotify}
+						disabled={this.state.selectedPlaylist && !this.state.songs}/>
 				</Col></Row>
 			</Col>
 			<Col>{localResults}</Col>
