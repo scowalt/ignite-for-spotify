@@ -16,28 +16,31 @@ interface Props {
 interface State {
 	readonly spotify: SpotifyWebApi.SpotifyWebApiJs;
 	playlistName: string;
+	playlistId?: string;
 }
 class SpotifyPlaylistSelector extends React.Component<Props, State> {
 	constructor(props: Props) {
 		super(props);
 		this.state = {
 			spotify: new SpotifyWebApi(),
-			playlistName: ""
+			playlistName: "",
 		};
 		this.state.spotify.setAccessToken(props.auth.spotifyAccessToken);
 	}
 
 	componentDidUpdate(_previousProps: Props, previousState: State): void {
 		if (previousState.playlistName !== this.state.playlistName) {
-			// State updated internal to object. Need to make sure formik receives this state update too.
+			// Internal object state has updated. Need to make sure formik receives this state update too.
 			this.onCreateNewClicked();
+		} else if (previousState.playlistId !== this.state.playlistId) {
+			this.onSelectExistingClicked();
 		}
 	}
 
 	onSelectExistingClicked(): void {
 		this.props.formik.setFieldValue(this.props.name, {
 			havePlaylistId: true,
-			playlistDescriptor: "" // TODO set this to previously selected playlist
+			playlistDescriptor: this.state.playlistId
 		});
 	}
 
@@ -49,10 +52,9 @@ class SpotifyPlaylistSelector extends React.Component<Props, State> {
 	}
 
 	onPlaylistClicked(playlist: SpotifyApi.PlaylistObjectSimplified): void {
-		this.props.formik.setFieldValue(this.props.name, {
-			havePlaylistId: true,
-			playlistDescriptor: playlist.id
-		});
+		this.setState(update(this.state, {
+			playlistId: { $set: playlist.id }
+		}));
 	}
 
 	handlePlaylistNameChange(event: React.ChangeEvent<HTMLInputElement>): void {
