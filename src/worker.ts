@@ -4,7 +4,6 @@ const environment: dotenv.DotenvConfigOutput = dotenv.config();
 dotenvexpand(environment);
 
 import assert from 'assert';
-import throng from 'throng';
 import { SpotifyUpdater } from './jobs/SpotifyUpdater';
 import { IgnitionUpdater } from './jobs/IgnitionUpdater';
 import { Logger } from './shared/Logger';
@@ -14,8 +13,7 @@ import { QueueManager, SpotifyUpdateJobData, IgnitionJobData, UserPlaylistCreati
 import { Database } from './db/Database';
 import { Song } from './db/models/Song';
 import { RateLimitedSpotifyWebApi } from './shared/RateLimitedSpotifyWebApi';
-
-const workers: number = Number(process.env.WEB_CONCURRENCY);
+import { CronJob } from 'cron';
 
 function spotifyProcessFunction(job: Bull.Job<SpotifyUpdateJobData>): Promise<void> {
 	Logger.getInstance().info(`Started Spotify job ${job.id}`);
@@ -82,25 +80,34 @@ async function userPlaylistCreationFunction(job: Bull.Job<UserPlaylistCreationJo
 	return Promise.resolve({ playlistId });
 }
 
-function start(): void {
-	const queues: QueueManager = new QueueManager();
-	queues.ignitionQueue.process((job: Bull.Job<IgnitionJobData>) => {
-		Logger.getInstance().info(`Started Ignition job ${job.id}`);
+const queues: QueueManager = new QueueManager();
+queues.ignitionQueue.process((job: Bull.Job<IgnitionJobData>) => {
+	Logger.getInstance().info(`Started Ignition job ${job.id}`);
 
-		// This will have a high failure rate, because job success relies on all ~1700 requests to the CustomsForge server completing successfully.
-		return IgnitionUpdater.update();
-	}).finally(() => {
-		Logger.getInstance().info(`Ignition job finished`);
-	});
-	queues.spotifyUpdateQueue.process(spotifyProcessFunction).finally(() => {
-		Logger.getInstance().info(`Spotify job finished`);
-	});
+	// This will have a high failure rate, because job success relies on all ~1700 requests to the CustomsForge server completing successfully.
+	return IgnitionUpdater.update();
+}).finally(() => {
+	Logger.getInstance().info(`Ignition job finished`);
+});
+queues.spotifyUpdateQueue.process(spotifyProcessFunction).finally(() => {
+	Logger.getInstance().info(`Spotify job finished`);
+});
 
-	queues.playlistUpdateQueue.process(playlistProcessFunction).finally(() => {
-		Logger.getInstance().info(`Playlist job finished`);
-	});
+queues.playlistUpdateQueue.process(playlistProcessFunction).finally(() => {
+	Logger.getInstance().info(`Playlist job finished`);
+});
 
-	queues.userPlaylistCreationQueue.process(userPlaylistCreationFunction);
-}
+queues.userPlaylistCreationQueue.process(userPlaylistCreationFunction);
 
-throng({ workers, start });
+new CronJob(
+	`0 0 0 * * *`, // every day at 00:00:00 (midnight)
+	() => {
+		Logger.getInstance().info(`Started Ignition, Spotify, Playlist jobs`);
+		queues.ignitionQueue.add({ });
+		queues.spotifyUpdateQueue.add({ });
+		queues.playlistUpdateQueue.add({ });
+	},
+	null,
+	true,
+	'America/Los_Angeles'
+);
