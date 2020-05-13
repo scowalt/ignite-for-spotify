@@ -21,11 +21,13 @@ import { LoginRoute } from './routes/LoginRoute';
 import { SpotifyAuthCallbackRoute } from './routes/SpotifyAuthCallbackRoute';
 import { RefreshSpotifyAuthRoute } from './routes/RefreshSpotifyAuthRoute';
 import Bull from 'bull';
+import NodeCache from 'node-cache';
 
 const queues: QueueManager = new QueueManager();
 const app: Express = express();
 const stateKey: string = "spotify_auth_state";
 let database: Database|null = null;
+const cache: NodeCache = new NodeCache();
 
 app.use(favicon(path.join(__dirname, '..', 'res', 'icon', 'favicon.ico')));
 app.use(cookieParser());
@@ -69,9 +71,13 @@ app.get('/getPlaylists', async (_request: Request, response: Response) => {
 		database = await Database.getInstance();
 	}
 
-	// TODO this could use some caching. This will be called on every page load, so having it hit the database constantly isn't ideal
-	const playlists: Playlist[] = await database.getAllPlaylists();
-	return response.json(playlists.map((playlist: Playlist) => { return new PlaylistApiInfo(playlist); }));
+	let playlistInfo: PlaylistApiInfo[] | undefined = cache.get('playlistInfo');
+	if (!playlistInfo) {
+		const playlists: Playlist[] = await database.getAllPlaylists();
+		playlistInfo = playlists.map((playlist: Playlist) => { return new PlaylistApiInfo(playlist); });
+		cache.set('playlistInfo', playlistInfo, 1 /* hour */ * 60 /* min per hour */ * 60 /* sec per min */);
+	}
+	return response.json(playlistInfo);
 });
 
 app.post('/getIgnitionInfo', async (request: Request, response: Response) => {
