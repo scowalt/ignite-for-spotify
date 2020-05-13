@@ -10,7 +10,8 @@ export class TitleBar extends React.Component<{}, {}> {
 					<img src={Icon} className="brandIcon"></img>
 					Ignite for Spotify
 				</Navbar.Brand>
-				<Navbar.Collapse className="justify-content-end">
+				<Navbar.Toggle aria-controls="basic-navbar-nav" />
+				<Navbar.Collapse id="basic-navbar-nav" className="justify-content-end">
 					<Nav.Link active={window.location.pathname === "/about"} href="/about">About</Nav.Link>
 				</Navbar.Collapse>
 			</Container>

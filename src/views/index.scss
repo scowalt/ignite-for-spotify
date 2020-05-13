@@ -26,12 +26,12 @@
 div > .row {
 	> .pillColumn {
 		@extend .col-12;
-		@extend .col-md-3;
+		@extend .col-lg-3;
 	}
 
 	> .tabContentColumn {
 		@extend .col-12;
-		@extend .col-md-9;
+		@extend .col-lg-9;
 	}
 }
 
