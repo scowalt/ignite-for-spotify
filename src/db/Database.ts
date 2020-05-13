@@ -98,18 +98,24 @@ export class Database {
 		});
 	}
 
-	public getIgnitionInfo(track: BasicTrackInfo): Promise<Song[]> {
-		return Song.findAll({
-			where: {
-				[Op.or]: [
-					{ spotifyTrackId: track.spotifyId },
-					{
-						title: track.title,
-						artist: track.artists[0] // TODO this could be better
-					}
-				]
-			}
-		});
+	public async getIgnitionInfo(track: BasicTrackInfo): Promise<Song[]> {
+		let index: number = 0;
+		let songs: Song[];
+		do {
+			songs = await Song.findAll({
+				where: {
+					[Op.or]: [
+						{ spotifyTrackId: track.spotifyId },
+						{
+							title: track.title,
+							artist: track.artists[index]
+						}
+					]
+				}
+			});
+			index++;
+		} while (index < track.artists.length && songs.length === 0);
+		return songs;
 	}
 
 	private async init(): Promise<any> {
