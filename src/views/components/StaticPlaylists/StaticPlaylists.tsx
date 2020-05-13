@@ -1,8 +1,8 @@
-import React, { ReactNode, ReactElement } from "react";
+import React, { ReactNode } from "react";
 import update from 'immutability-helper';
 import { PlaylistApiInfo } from "../../../types/PlaylistApiInfo";
 import { Row, Col } from "react-bootstrap";
-import { EmbededSpotifyPlaylist } from "./EmbededSpotifyPlaylist";
+import { FaSpotify } from "react-icons/fa";
 
 interface PlaylistsState {
 	downloadAbort: AbortController;
@@ -45,25 +45,21 @@ export class StaticPlaylists extends React.Component<{}, PlaylistsState> {
 		});
 	}
 
-	createEmbededPlaylist(playlistId: string, key: number): ReactElement {
-		return <EmbededSpotifyPlaylist key={key} playlistId={playlistId}></EmbededSpotifyPlaylist>;
-	}
-
 	render(): ReactNode {
 		if (!this.state.playlists) {
 			return <>Loading</>;
 		} else {
 			return <Row><Col>
-				<Row><Col>The entire CustomsForge library in {this.state.playlists.length} playlists. Click on each playlist to follow them all!</Col></Row>
-				<Row>
-					{this.state.playlists.map((playlist: PlaylistApiInfo, index: number) => {
-						return <Col
-							key={index}
-							className={"spotifyPlaylistEmbedWrapperCol"}>
-							{this.createEmbededPlaylist(playlist.spotifyId, index)}
-						</Col>;
-					})}
-				</Row>
+				<Row><Col>The entire CustomsForge Ignition library in {this.state.playlists.length} playlists.</Col></Row>
+				<Row><Col>
+					<ul>
+						{this.state.playlists.map((playlist: PlaylistApiInfo, index: number) => {
+							return <li key={index}>
+								{<a href={`https://open.spotify.com/playlist/${playlist.spotifyId}`}><FaSpotify />Playlist {playlist.id}</a>}
+							</li>;
+						})}
+					</ul>
+				</Col></Row>
 			</Col></Row>;
 		}
 	}

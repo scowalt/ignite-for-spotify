@@ -42,10 +42,6 @@ div > .row {
 	padding-bottom: 141.42%; // https://gordonlesti.com/bootstrap-responsive-embed-aspect-ratio/
 }
 
-.spotifyPlaylistEmbedWrapperCol {
-	@extend .col-md-4;
-}
-
 .selectedPlaylist {
 	@extend .list-group-item-action, :hover;
 }

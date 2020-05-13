@@ -59,7 +59,9 @@ export class RateLimitedSpotifyWebApi {
 	// Create a playlist for a user
 	public createPlaylist(userId: string, playlistName: string): Promise<SpotifyWebApi.Response<SpotifyApi.CreatePlaylistResponse>> {
 		return this.enqueue(() => {
-			return this.spotify.createPlaylist(userId, playlistName);
+			return this.spotify.createPlaylist(userId, playlistName, {
+				public: false
+			});
 		});
 	}
 

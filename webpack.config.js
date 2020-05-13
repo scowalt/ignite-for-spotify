@@ -1,6 +1,7 @@
 // webpack.config.js
 const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const CspHtmlWebpackPlugin = require('csp-html-webpack-plugin');
 const TerserPlugin = require('terser-webpack-plugin');
 const path = require('path');
 
@@ -95,6 +96,13 @@ module.exports = (env) => {
 				new HtmlWebpackPlugin({
 					template: './src/views/index.html',
 					filename: 'index.html'
+				}),
+				new CspHtmlWebpackPlugin({
+					'base-uri': "'self'",
+					'object-src': "'none'",
+					'frame-src': "'self'",
+					'script-src': ["'unsafe-inline'", "'self'", "'unsafe-eval'"],
+					'style-src': ["'unsafe-inline'", "'self'", "'unsafe-eval'", "fonts.googleapis.com"]
 				})
 			]
 		}
