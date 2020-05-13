@@ -9,6 +9,11 @@ import { FaSpotify } from "react-icons/fa";
 import { handleExpiredSpotifyToken } from "../../common/SpotifyHelpers";
 import { BasicTrackInfo } from "../../../types/BasicTrackInfo";
 import { Song } from "../../../db/models/Song";
+import Chance from 'chance';
+import { IgnitionSearchJobData } from "../../../shared/QueueManager";
+import { JobType } from "../../../types/JobType";
+import Bull from "bull";
+const wait = (time: number): Promise<void> => { return new Promise<void>((resolve) => { setTimeout(resolve, time); }); };
 
 interface SpotifySourceProps extends React.Props<{}> {
 	auth: SpotifyAuthInfo;
@@ -53,38 +58,72 @@ export class SpotifyToIgnition extends React.Component<SpotifySourceProps, Spoti
 		return this.state.spotify.getPlaylistTracks(this.state.selectedPlaylist.id);
 	}
 
-	private performIgnitionSearch(): Promise<any> {
-		return this.startIgnitionSearch()
-			.catch(handleExpiredSpotifyToken(
+	private async waitForCompletedJob(id: number, password: string): Promise<any> {
+		// TODO duplicate code
+		// eslint-disable-next-line no-constant-condition
+		while(true) {
+			await wait(2000);
+			const response: Response = await fetch(`/job/${JobType.IgnitionSearch}/${id}`, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+				},
+				body: JSON.stringify({
+					password
+				})
+			});
+			const responseBody: any = await response.json();
+			const status: Bull.JobStatus = responseBody.status;
+			if (status === "completed") {
+				this.setState(update(this.state, {
+					songs: { $set: responseBody.songs }
+				}));
+				return Promise.resolve();
+			} else if (status === "failed") {
+				// TODO handle failure
+				return Promise.reject();
+			}
+		}
+	}
+
+	private async performIgnitionSearch(): Promise<any> {
+		let playlistTracks: SpotifyApi.PlaylistTrackResponse;
+		try {
+			playlistTracks = await this.startIgnitionSearch();
+		} catch(err) {
+			playlistTracks = await handleExpiredSpotifyToken(
 				this.state.downloadAbort.signal,
 				this.state.spotify,
 				() => { return this.startIgnitionSearch(); }
-			)).then((playlistTracks: SpotifyApi.PlaylistTrackResponse) => {
-				// scrape just the track info from this response (that's all the server needs)
-				const tracks: SpotifyApi.TrackObjectFull[] = playlistTracks.items.map((playlistTrack: SpotifyApi.PlaylistTrackObject) => { return playlistTrack.track; });
-				const basicTracks: BasicTrackInfo[] = tracks.map((track: SpotifyApi.TrackObjectFull) => {
-					return {
-						album: track.album.name,
-						artists: track.artists.map((artist: SpotifyApi.ArtistObjectSimplified) => { return artist.name; }),
-						title: track.name,
-						spotifyId: track.id
-					};
-				});
-				return fetch('/getIgnitionInfo', {
-					method: "POST",
-					body: JSON.stringify(basicTracks),
-					signal: this.state.downloadAbort.signal,
-					headers: {
-						'Content-Type': 'application/json'
-					},
-				});
-			}).then((response: Response) => {
-				return response.json();
-			}).then((response: any) => {
-				this.setState(update(this.state, {
-					songs: { $set: response as Song[] }
-				}));
-			});
+			)(err);
+		}
+
+		const tracks: SpotifyApi.TrackObjectFull[] = playlistTracks.items.map((playlistTrack: SpotifyApi.PlaylistTrackObject) => { return playlistTrack.track; });
+		const basicTracks: BasicTrackInfo[] = tracks.map((track: SpotifyApi.TrackObjectFull) => {
+			return {
+				album: track.album.name,
+				artists: track.artists.map((artist: SpotifyApi.ArtistObjectSimplified) => { return artist.name; }),
+				title: track.name,
+				spotifyId: track.id
+			};
+		});
+
+		const chance: Chance.Chance = new Chance();
+		const password: string = chance.string({ length: 16, alpha: true, numeric: true });
+		const jobData: IgnitionSearchJobData = { password, tracks: basicTracks };
+		const startJobResponse: Response = await fetch('/startJob', {
+			method: "POST",
+			body: JSON.stringify({
+				jobType: JobType.IgnitionSearch,
+				data: jobData
+			}),
+			signal: this.state.downloadAbort.signal,
+			headers: {
+				'Content-Type': 'application/json'
+			},
+		});
+		const startJobResponseBody: any = await startJobResponse.json();
+		return this.waitForCompletedJob(startJobResponseBody.id, password);
 	}
 
 	private actOnPlaylist(playlist: SpotifyApi.PlaylistObjectSimplified): void {

@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { QueueManager, UserPlaylistCreationJobData } from '../shared/QueueManager';
+import { QueueManager, UserPlaylistCreationJobData, IgnitionSearchJobData } from '../shared/QueueManager';
 import Bull from 'bull';
 import { JobType } from '../types/JobType';
 import HttpStatus from 'http-status-codes';
@@ -29,6 +29,21 @@ export function GetJobRoute(queues: QueueManager): (request: Request, response: 
 				status: await userPlaylistJob.getState(),
 				failedReason: (userPlaylistJob as any).failedReason,
 				playlistId: ((userPlaylistJob as any).returnvalue) ? (userPlaylistJob as any).returnvalue.playlistId : undefined,
+			});
+		} else if (type === JobType.IgnitionSearch) {
+			// TODO duplicate code
+			const password: string = request.body.password;
+			const ignitionSearchJob: Bull.Job<IgnitionSearchJobData> | null = await queues.ignitionSearchQueue.getJob(id);
+
+			if (ignitionSearchJob === null) {
+				return response.status(HttpStatus.NOT_FOUND).end();
+			} else if (ignitionSearchJob.data.password !== password) {
+				return response.status(HttpStatus.UNAUTHORIZED).end();
+			}
+			return response.json({
+				status: await ignitionSearchJob.getState(),
+				failedReason: (ignitionSearchJob as any).failedReason,
+				songs: ((ignitionSearchJob as any).returnvalue) ? (ignitionSearchJob as any).returnvalue.songs : undefined
 			});
 		} else {
 			return response.status(HttpStatus.NOT_ACCEPTABLE).end();

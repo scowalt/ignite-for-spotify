@@ -2,6 +2,8 @@ import { Queue } from "bull";
 import Bull from "bull";
 import { IgnitionToSpotifyData } from "../types/IgnitionToSpotifyData";
 import { SpotifyAuthInfo } from "../views/components/shared/SpotifyAuthInfo";
+import { BasicTrackInfo } from "../types/BasicTrackInfo";
+import { JobType } from "../types/JobType";
 
 export interface IgnitionJobData { }
 type IgnitionQueue = Queue<IgnitionJobData>;
@@ -19,17 +21,25 @@ export interface UserPlaylistCreationJobData {
 }
 type UserPlaylistCreationQueue = Queue<UserPlaylistCreationJobData>;
 
+export interface IgnitionSearchJobData {
+	tracks: BasicTrackInfo[];
+	password: string;
+}
+type IgnitionSearchQueue = Queue<IgnitionSearchJobData>;
+
 export class QueueManager {
 	public readonly ignitionQueue: IgnitionQueue;
 	public readonly spotifyUpdateQueue: SpotifyUpdateQueue;
 	public readonly playlistUpdateQueue: PlaylistUpdateQueue;
 	public readonly userPlaylistCreationQueue: UserPlaylistCreationQueue;
+	public readonly ignitionSearchQueue: IgnitionSearchQueue;
 
 	constructor() {
 		this.ignitionQueue = QueueManager.createIgnitionUpdateQueue();
 		this.spotifyUpdateQueue = QueueManager.createSpotifyUpdateQueue();
 		this.playlistUpdateQueue = QueueManager.createPlaylistUpdateQueue();
 		this.userPlaylistCreationQueue = new Bull<UserPlaylistCreationJobData>('userPlaylist', process.env.REDIS_URL!);
+		this.ignitionSearchQueue = new Bull<IgnitionSearchJobData>(JobType.IgnitionSearch, process.env.REDIS_URL!);
 	}
 
 	private static createPlaylistUpdateQueue(): PlaylistUpdateQueue {

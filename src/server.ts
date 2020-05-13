@@ -6,14 +6,11 @@ dotenvexpand(environment);
 import express, { Express, Request, Response } from 'express';
 import BodyParser from 'body-parser';
 import cookieParser from 'cookie-parser';
-import HttpStatus from 'http-status-codes';
 import favicon from 'serve-favicon';
 import path from 'path';
 import { Database } from './db/Database';
 import { Playlist } from './db/models/Playlist';
 import { PlaylistApiInfo } from './types/PlaylistApiInfo';
-import { Song } from './db/models/Song';
-import { BasicTrackInfo } from './types/BasicTrackInfo';
 import { QueueManager } from './shared/QueueManager';
 import { StartJobRoute } from './routes/StartJobRoute';
 import { GetJobRoute } from './routes/GetJobRoute';
@@ -61,22 +58,6 @@ app.get('/getPlaylists', async (_request: Request, response: Response) => {
 		cache.set('playlistInfo', playlistInfo, 1 /* hour */ * 60 /* min per hour */ * 60 /* sec per min */);
 	}
 	return response.json(playlistInfo);
-});
-
-app.post('/getIgnitionInfo', async (request: Request, response: Response) => {
-	if (database === null) {
-		database = await Database.getInstance();
-	}
-
-	// TODO This should be done by a job in the worker process instead of in the web process
-	const tracks: BasicTrackInfo[] = request.body;
-	let trackResults: Song[] = [];
-	for (const track of tracks) {
-		const newTracks: Song[] = await database.getIgnitionInfo(track);
-		trackResults = trackResults.concat(newTracks);
-	}
-
-	return response.status(HttpStatus.OK).send(JSON.stringify(trackResults));
 });
 
 // Catch-all to support react-router-dom processing
