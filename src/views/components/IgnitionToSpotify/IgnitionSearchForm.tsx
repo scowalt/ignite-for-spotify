@@ -68,14 +68,13 @@ export class IgnitionSearchForm extends React.Component<Props, State> {
 		// eslint-disable-next-line no-constant-condition
 		while(true) {
 			await wait(2000);
-			const response: Response = await fetch(`/getCreatedPlaylist`, {
+			const response: Response = await fetch(`/job/${JobType.UserPlaylistCreate}/${id}`, {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',
 				},
 				body: JSON.stringify({
-					password,
-					id
+					password
 				})
 			});
 			const responseBody: any = await response.json();
