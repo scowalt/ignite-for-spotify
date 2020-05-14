@@ -21,7 +21,7 @@ import NodeCache from 'node-cache';
 
 const queues: QueueManager = new QueueManager();
 const app: Express = express();
-const stateKey: string = "spotify_auth_state";
+export const StateKey: string = "spotify_auth_state";
 let database: Database|null = null;
 const cache: NodeCache = new NodeCache();
 
@@ -32,19 +32,15 @@ app.use(BodyParser.json());
 // __dirname must be inaccurate here in order for webpack to work, but this is a bad work-around since it depends on "dist" naming
 app.use(express.static(path.join(__dirname, '..', 'dist', 'views')));
 
-function getRedirectUri(request: Request): string {
-	return `${request.protocol}://${request.header('host')}/spotifyAuthCallback`;
-}
-
 app.post('/startJob', StartJobRoute(queues));
 app.post('/job/:jobType/:id', GetJobRoute(queues));
 
 // Client wants to start Spotify Auth flow
-app.get('/login', LoginRoute(getRedirectUri, stateKey));
+app.get('/login', LoginRoute);
 
 // Client has finished auth on Spotify and credentials have been passed back here.
-app.get('/spotifyAuthCallback', SpotifyAuthCallbackRoute(getRedirectUri, stateKey));
-app.get('/refreshSpotifyAuth', RefreshSpotifyAuthRoute(getRedirectUri));
+app.get('/spotifyAuthCallback', SpotifyAuthCallbackRoute);
+app.get('/refreshSpotifyAuth', RefreshSpotifyAuthRoute);
 
 app.get('/getPlaylists', async (_request: Request, response: Response) => {
 	if (database === null) {
