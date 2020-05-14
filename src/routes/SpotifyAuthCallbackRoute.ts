@@ -2,6 +2,18 @@ import { Request, Response } from 'express';
 import SpotifyWebApi, { AuthorizationCodeGrantResponse } from 'spotify-web-api-node';
 import HttpStatus from 'http-status-codes';
 import { StateKey } from '../server';
+import { Logger } from '../shared/Logger';
+
+function getRedirectUri(request: Request): string {
+	// In some environments, Spotify will provide a 'referer'. Otherwise, it may provide a 'host'.
+	let baseUri: string|undefined = request.header('referer');
+	if (!baseUri) {
+		baseUri = `${request.protocol}://${request.header('host')}/`;
+	}
+	const redirectUri: string = `${baseUri}spotifyAuthCallback`;
+	Logger.getInstance().debug(`Spotify auth using redirectUri '${redirectUri}'`);
+	return redirectUri;
+}
 
 export async function SpotifyAuthCallbackRoute(request: Request, response: Response): Promise<void> {
 	// Request refresh and state tokens
@@ -17,7 +29,7 @@ export async function SpotifyAuthCallbackRoute(request: Request, response: Respo
 	response.clearCookie(StateKey);
 
 	const spotifyApi: SpotifyWebApi = new SpotifyWebApi({
-		redirectUri: `${request.protocol}://${request.header('host')}/spotifyAuthCallback`,
+		redirectUri: getRedirectUri(request),
 		clientId: process.env.SPOTIFY_CLIENT_ID,
 		clientSecret: process.env.SPOTIFY_CLIENT_SECRET
 	});
