@@ -11,6 +11,7 @@ import update from 'immutability-helper';
 import Chance from 'chance';
 import { IgnitionToSpotifyJob } from "../../../types/IgnitionToSpotifyJob";
 import { WaitForCompletedJob } from "../shared/WaitForCompletedJob";
+import ReactGA from 'react-ga';
 
 // Initialize the string values here to avoid "A component is changing an uncontrolled input" errors.
 // This is either a limitation of formik, HTML, or both. For context: https://github.com/jaredpalmer/formik/issues/28#issuecomment-312697214
@@ -37,7 +38,7 @@ export class IgnitionSearchForm extends React.Component<Props, State> {
 		this.state = {};
 	}
 
-	makeOptionalString(formikProps: FormikProps<IgnitionToSpotifyData>): (name: keyof IgnitionToSpotifyData) => ReactNode {
+	private makeOptionalString(formikProps: FormikProps<IgnitionToSpotifyData>): (name: keyof IgnitionToSpotifyData) => ReactNode {
 		return (name: keyof IgnitionToSpotifyData): ReactNode => {
 			return <Col key={name} className="ignitionQueryOption"><label htmlFor={name}>
 				<div>{_.upperFirst(name)}</div>
@@ -46,7 +47,7 @@ export class IgnitionSearchForm extends React.Component<Props, State> {
 		};
 	}
 
-	makeOptionalBoolean(formikProps: FormikProps<IgnitionToSpotifyData>): (part: keyof IgnitionToSpotifyData) => ReactNode {
+	private makeOptionalBoolean(formikProps: FormikProps<IgnitionToSpotifyData>): (part: keyof IgnitionToSpotifyData) => ReactNode {
 		return (part: keyof IgnitionToSpotifyData): ReactNode => {
 			return <Col key={part} className="ignitionQueryOption">
 				<label htmlFor={part}>
@@ -61,7 +62,7 @@ export class IgnitionSearchForm extends React.Component<Props, State> {
 		};
 	}
 
-	tidyData(values: IgnitionToSpotifyData): IgnitionToSpotifyData {
+	private tidyData(values: IgnitionToSpotifyData): IgnitionToSpotifyData {
 		// Work-around: All of the fields in Formik will be stored as strings (see https://github.com/jaredpalmer/formik/issues/1525)
 		// Formik must have all values be initialized in order to work. So, remove all empty strings here (treat them as `undefined`)
 		const prunedValues: IgnitionToSpotifyData = _.omitBy(values, (property) => { return typeof property === "string" && property.length === 0;}) as IgnitionToSpotifyData;
@@ -86,7 +87,12 @@ export class IgnitionSearchForm extends React.Component<Props, State> {
 		return prunedValues;
 	}
 
-	onSubmit(values: IgnitionToSpotifyData): Promise<any> {
+	async onSubmit(values: IgnitionToSpotifyData): Promise<any> {
+		ReactGA.event({
+			category: 'IgnitionToSpotify',
+			action: 'Started playlist creation/amendment'
+		});
+
 		const chance: Chance.Chance = new Chance();
 		const password: string = chance.string({ length: 16, alpha: true, numeric: true });
 		this.setState(update(this.state, {
@@ -98,29 +104,36 @@ export class IgnitionSearchForm extends React.Component<Props, State> {
 			queryInfo: this.tidyData(values),
 			password
 		};
-		return fetch('/startJob', {
+
+		const startJobResponse: Response = await fetch('/startJob', {
 			method: "POST",
 			body: JSON.stringify(body),
 			headers: {
 				'Content-Type': 'application/json',
 			}
-		}).then((response: Response) => {
-			return response.json();
-		}).then(async (value: any) => {
-			const id: number = value.id;
-
-			try {
-				const completedJobBody: any = await WaitForCompletedJob(JobType.UserPlaylistCreate, id, password);
-				this.setState(update(this.state, {
-					playlistId: { $set: completedJobBody.playlistId }
-				}));
-			} catch (failedJobBody) {
-				this.setState(update(this.state, {
-					failedReason: { $set: failedJobBody.failedReason }
-				}));
-			}
-
 		});
+		const startJobResponseBody: any = await startJobResponse.json();
+		const id: number = startJobResponseBody.id;
+		try {
+			const completedJobBody: any = await WaitForCompletedJob(JobType.UserPlaylistCreate, id, password);
+			ReactGA.event({
+				category: 'IgnitionToSpotify',
+				action: 'Successfully completed search',
+				nonInteraction: true
+			});
+			this.setState(update(this.state, {
+				playlistId: { $set: completedJobBody.playlistId }
+			}));
+		} catch (failedJobBody) {
+			ReactGA.event({
+				category: 'IgnitionToSpotify',
+				action: 'Failed search',
+				nonInteraction: true
+			});
+			this.setState(update(this.state, {
+				failedReason: { $set: failedJobBody.failedReason }
+			}));
+		}
 	}
 
 	validate(values: IgnitionToSpotifyData): FormikErrors<IgnitionToSpotifyData> {

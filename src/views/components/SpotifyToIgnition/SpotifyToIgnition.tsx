@@ -13,6 +13,7 @@ import Chance from 'chance';
 import { IgnitionSearchJobData } from "../../../shared/QueueManager";
 import { JobType } from "../../../types/JobType";
 import { WaitForCompletedJob } from "../shared/WaitForCompletedJob";
+import ReactGA from 'react-ga';
 
 interface SpotifySourceProps extends React.Props<{}> {
 	auth: SpotifyAuthInfo;
@@ -58,6 +59,11 @@ export class SpotifyToIgnition extends React.Component<SpotifySourceProps, Spoti
 	}
 
 	private async performIgnitionSearch(): Promise<void> {
+		ReactGA.event({
+			category: 'SpotifyToIgnition',
+			action: 'Started a search'
+		});
+
 		let playlistTracks: SpotifyApi.PlaylistTrackResponse;
 		try {
 			playlistTracks = await this.startIgnitionSearch();
@@ -95,6 +101,11 @@ export class SpotifyToIgnition extends React.Component<SpotifySourceProps, Spoti
 		});
 		const startJobResponseBody: any = await startJobResponse.json();
 		const completedJobBody: any = await WaitForCompletedJob(JobType.IgnitionSearch, startJobResponseBody.id, password);
+		ReactGA.event({
+			category: 'SpotifyToIgnition',
+			action: 'Completed successful search',
+			nonInteraction: true
+		});
 		this.setState(update(this.state, {
 			songs: { $set: completedJobBody.songs }
 		}));
