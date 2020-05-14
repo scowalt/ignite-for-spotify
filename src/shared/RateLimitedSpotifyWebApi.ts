@@ -50,7 +50,7 @@ export class RateLimitedSpotifyWebApi {
 			return this.spotify.createPlaylist(userProfile.body.id, `Rocksmith (C)DLC (part ${id}/?)`, {
 				public: false, // Start the playlist private, manually make public later
 				collaborative: false,
-				description: `Rocksmith and Rocksmith 2014 DLC and CDLC. Mirrors the database found at CustomsForge Ignition.`
+				description: `Rocksmith and Rocksmith 2014 DLC and CDLC. Mirrors the database found at CustomsForge Ignition. More info at https://ignite-for-spotify.scowalt.com/`
 			});
 		});
 		return createPlaylistResponse.body.id;
