@@ -5,12 +5,9 @@ import { StateKey } from '../server';
 import { Logger } from '../shared/Logger';
 
 function getRedirectUri(request: Request): string {
-	// In some environments, Spotify will provide a 'referer'. Otherwise, it may provide a 'host'.
-	let baseUri: string|undefined = request.header('referer');
-	if (!baseUri) {
-		baseUri = `${request.protocol}://${request.header('host')}/`;
-	}
-	const redirectUri: string = `${baseUri}spotifyAuthCallback`;
+	// Since this is an auth callback, the `referer` header will be Spotify's server.
+	// Use other parts of the request to get the current deployment's baseUri.
+	const redirectUri: string = `${request.protocol}://${request.header('host')}/spotifyAuthCallback`;
 	Logger.getInstance().debug(`Spotify auth using redirectUri '${redirectUri}'`);
 	return redirectUri;
 }
