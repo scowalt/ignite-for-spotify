@@ -7,10 +7,10 @@ import SpotifyPlaylistSelector from "./SpotifyPlaylistSelector";
 import { SpotifyAuthInfo } from "../shared/SpotifyAuthInfo";
 import { ZodError } from "zod";
 import { JobType } from "../../../types/JobType";
-import Bull from "bull";
 import update from 'immutability-helper';
 import Chance from 'chance';
 import { IgnitionToSpotifyJob } from "../../../types/IgnitionToSpotifyJob";
+import { WaitForCompletedJob } from "../shared/WaitForCompletedJob";
 
 // Initialize the string values here to avoid "A component is changing an uncontrolled input" errors.
 // This is either a limitation of formik, HTML, or both. For context: https://github.com/jaredpalmer/formik/issues/28#issuecomment-312697214
@@ -24,13 +24,10 @@ const initialValues: IgnitionToSpotifyData = {
 	},
 };
 
-const wait = (time: number): Promise<void> => { return new Promise<void>((resolve) => { setTimeout(resolve, time); }); };
-
 interface Props extends React.Props<{}> {
 	spotifyAuth: SpotifyAuthInfo;
 }
 interface State {
-	status?: Bull.JobStatus;
 	failedReason?: string;
 	playlistId?: string;
 }
@@ -64,37 +61,6 @@ export class IgnitionSearchForm extends React.Component<Props, State> {
 		};
 	}
 
-	async waitForCompletedJob(id: number, password: string): Promise<any> {
-		// eslint-disable-next-line no-constant-condition
-		while(true) {
-			await wait(2000);
-			const response: Response = await fetch(`/job/${JobType.UserPlaylistCreate}/${id}`, {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json',
-				},
-				body: JSON.stringify({
-					password
-				})
-			});
-			const responseBody: any = await response.json();
-			const status: Bull.JobStatus = responseBody.status;
-			if (status === "completed") {
-				this.setState(update(this.state, {
-					status: { $set: status },
-					playlistId: { $set: responseBody.playlistId }
-				}));
-				return Promise.resolve();
-			} else if (status === "failed") {
-				this.setState(update(this.state, {
-					status: { $set: status },
-					failedReason: { $set: responseBody.failedReason }
-				}));
-				return Promise.reject();
-			}
-		}
-	}
-
 	tidyData(values: IgnitionToSpotifyData): IgnitionToSpotifyData {
 		// Work-around: All of the fields in Formik will be stored as strings (see https://github.com/jaredpalmer/formik/issues/1525)
 		// Formik must have all values be initialized in order to work. So, remove all empty strings here (treat them as `undefined`)
@@ -124,7 +90,6 @@ export class IgnitionSearchForm extends React.Component<Props, State> {
 		const chance: Chance.Chance = new Chance();
 		const password: string = chance.string({ length: 16, alpha: true, numeric: true });
 		this.setState(update(this.state, {
-			status: { $set: undefined },
 			failedReason: { $set: undefined },
 			playlistId: { $set: undefined },
 		}));
@@ -141,11 +106,20 @@ export class IgnitionSearchForm extends React.Component<Props, State> {
 			}
 		}).then((response: Response) => {
 			return response.json();
-		}).then((value: any) => {
+		}).then(async (value: any) => {
 			const id: number = value.id;
 
-			// Wait for the job to finish
-			return this.waitForCompletedJob(id, password);
+			try {
+				const completedJobBody: any = await WaitForCompletedJob(JobType.UserPlaylistCreate, id, password);
+				this.setState(update(this.state, {
+					playlistId: { $set: completedJobBody.playlistId }
+				}));
+			} catch (failedJobBody) {
+				this.setState(update(this.state, {
+					failedReason: { $set: failedJobBody.failedReason }
+				}));
+			}
+
 		});
 	}
 
@@ -169,24 +143,23 @@ export class IgnitionSearchForm extends React.Component<Props, State> {
 
 	onCloseDialog(): void {
 		this.setState(update(this.state, {
-			status: { $set: undefined }
+			failedReason: { $set: undefined },
+			playlistId: { $set: undefined },
 		}));
 	}
 
 	getDialog(): ReactElement {
 		let result: ReactElement = <></>;
-		if (this.state.status) {
-			if (this.state.status === "completed") {
-				result = <Alert variant="success" onClose={this.onCloseDialog.bind(this)} dismissible>
-					<Alert.Heading>Success!</Alert.Heading>
-					<p><a href={`https://open.spotify.com/playlist/${this.state.playlistId}`}>Go to playlist</a></p>
-				</Alert>;
-			} else if (this.state.status === "failed") {
-				result = <Alert variant="danger" onClose={this.onCloseDialog.bind(this)} dismissible>
-					<Alert.Heading>Error creating playlist</Alert.Heading>
-					<p>{this.state.failedReason}</p>
-				</Alert>;
-			}
+		if (this.state.playlistId) {
+			result = <Alert variant="success" onClose={this.onCloseDialog.bind(this)} dismissible>
+				<Alert.Heading>Success!</Alert.Heading>
+				<p><a href={`https://open.spotify.com/playlist/${this.state.playlistId}`}>Go to playlist</a></p>
+			</Alert>;
+		} else if (this.state.failedReason) {
+			result = <Alert variant="danger" onClose={this.onCloseDialog.bind(this)} dismissible>
+				<Alert.Heading>Error creating playlist</Alert.Heading>
+				<p>{this.state.failedReason}</p>
+			</Alert>;
 		}
 
 		return result;

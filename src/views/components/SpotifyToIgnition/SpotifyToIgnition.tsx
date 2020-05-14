@@ -12,8 +12,7 @@ import { Song } from "../../../db/models/Song";
 import Chance from 'chance';
 import { IgnitionSearchJobData } from "../../../shared/QueueManager";
 import { JobType } from "../../../types/JobType";
-import Bull from "bull";
-const wait = (time: number): Promise<void> => { return new Promise<void>((resolve) => { setTimeout(resolve, time); }); };
+import { WaitForCompletedJob } from "../shared/WaitForCompletedJob";
 
 interface SpotifySourceProps extends React.Props<{}> {
 	auth: SpotifyAuthInfo;
@@ -58,35 +57,7 @@ export class SpotifyToIgnition extends React.Component<SpotifySourceProps, Spoti
 		return this.state.spotify.getPlaylistTracks(this.state.selectedPlaylist.id);
 	}
 
-	private async waitForCompletedJob(id: number, password: string): Promise<any> {
-		// TODO duplicate code
-		// eslint-disable-next-line no-constant-condition
-		while(true) {
-			await wait(2000);
-			const response: Response = await fetch(`/job/${JobType.IgnitionSearch}/${id}`, {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json',
-				},
-				body: JSON.stringify({
-					password
-				})
-			});
-			const responseBody: any = await response.json();
-			const status: Bull.JobStatus = responseBody.status;
-			if (status === "completed") {
-				this.setState(update(this.state, {
-					songs: { $set: responseBody.songs }
-				}));
-				return Promise.resolve();
-			} else if (status === "failed") {
-				// TODO handle failure
-				return Promise.reject();
-			}
-		}
-	}
-
-	private async performIgnitionSearch(): Promise<any> {
+	private async performIgnitionSearch(): Promise<void> {
 		let playlistTracks: SpotifyApi.PlaylistTrackResponse;
 		try {
 			playlistTracks = await this.startIgnitionSearch();
@@ -123,7 +94,10 @@ export class SpotifyToIgnition extends React.Component<SpotifySourceProps, Spoti
 			},
 		});
 		const startJobResponseBody: any = await startJobResponse.json();
-		return this.waitForCompletedJob(startJobResponseBody.id, password);
+		const completedJobBody: any = await WaitForCompletedJob(JobType.IgnitionSearch, startJobResponseBody.id, password);
+		this.setState(update(this.state, {
+			songs: { $set: completedJobBody.songs }
+		}));
 	}
 
 	private actOnPlaylist(playlist: SpotifyApi.PlaylistObjectSimplified): void {
