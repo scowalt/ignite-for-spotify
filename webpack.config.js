@@ -1,4 +1,8 @@
-// webpack.config.js
+const dotenv = require('dotenv');
+const dotenvexpand = require('dotenv-expand');
+const environment = dotenv.config();
+dotenvexpand(environment);
+
 const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CspHtmlWebpackPlugin = require('csp-html-webpack-plugin');
@@ -101,9 +105,10 @@ module.exports = (env) => {
 					'base-uri': "'self'",
 					'object-src': "'none'",
 					'frame-src': "'self'",
-					'script-src': ["'unsafe-inline'", "'self'", "'unsafe-eval'"],
+					'script-src': ["'unsafe-inline'", "'self'", "'unsafe-eval'", "www.google-analytics.com"],
 					'style-src': ["'unsafe-inline'", "'self'", "'unsafe-eval'", "fonts.googleapis.com"]
-				})
+				}),
+				new webpack.EnvironmentPlugin(['GA_TRACKING_ID']),
 			]
 		}
 	];

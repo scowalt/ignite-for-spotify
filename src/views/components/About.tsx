@@ -1,8 +1,13 @@
 import { ReactNode } from "react";
 import { Container, Col, Row } from "react-bootstrap";
 import React from "react";
+import ReactGA from 'react-ga';
 
 export class About extends React.PureComponent {
+	componentDidMount(): void {
+		ReactGA.pageview('/about');
+	}
+
 	render(): ReactNode {
 		return <Container><Row><Col>
 			Made by <a href="mailto:ignite-for-spotify@scowalt.com">Scott Walters</a><br />

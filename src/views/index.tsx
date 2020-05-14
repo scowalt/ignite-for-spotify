@@ -1,5 +1,7 @@
-import ReactDOM from 'react-dom';
+import ReactGA from 'react-ga';
+ReactGA.initialize(process.env.GA_TRACKING_ID!, { debug: true });
 
+import ReactDOM from 'react-dom';
 import 'bootstrap';
 import './index.scss';
 import { BrowserRouter } from 'react-router-dom';

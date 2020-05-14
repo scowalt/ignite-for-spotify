@@ -6,9 +6,14 @@ import { RequireSpotifyAuth } from "./shared/RequireSpotifyAuth";
 import { SpotifyToIgnition } from "./SpotifyToIgnition/SpotifyToIgnition";
 import { IgnitionSearchForm } from "./IgnitionToSpotify/IgnitionSearchForm";
 import { Container, Row, Col, TabContent } from "react-bootstrap";
+import ReactGA from 'react-ga';
 
 export class Home extends React.Component<{}, {}> {
-	createTabLink(id: string, content: ReactNode): ReactNode {
+	componentDidMount(): void {
+		ReactGA.pageview('/');
+	}
+
+	private createTabLink(id: string, content: ReactNode): ReactNode {
 		return <a
 			className="nav-link"
 			id={`v-pills-${id}-tab`}
@@ -16,12 +21,13 @@ export class Home extends React.Component<{}, {}> {
 			href={`#v-pills-${id}`}
 			role="tab"
 			aria-controls={`v-pills-${id}`}
-			aria-selected="false">
+			aria-selected="false"
+			onClick={(): void => { ReactGA.modalview(`/${id}`); }}>
 			{content}
 		</a>;
 	}
 
-	createTabContent(id: string, content: ReactNode): ReactNode {
+	private createTabContent(id: string, content: ReactNode): ReactNode {
 		return <div
 			className="tab-pane fade"
 			id={`v-pills-${id}`}

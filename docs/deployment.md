@@ -13,9 +13,10 @@ These instructions are not complete. They provide general guidence and a referen
 8. Set any other environment variables that aren't explicitly mentioned elsewhere here.
 9. Link a redis server instance to the app to get `REDIS_URL` set: `dokku redis:create $REDISSERVICENAME` followed by `dokku redis:link $REDISSERVICENAME $NAME`
 10. Link a MySQL server instance to the app to get `DATABASE_URL` set: `dokku mysql:create $MYSQLSERVICENAME` followed by `dokku mysql:link $MMYSQLSERVICENAME $NAME`
-11. Start the instance
-12. Login with the master account
-13. Set the `SPOTIFY_ACCOUNT_ACCESS_TOKEN` and `SPOTIFY_ACCOUNT_REFRESH_TOKEN` variables.
+11. Create a GA app and set `GA_TRACKING_ID`
+12. Start the instance
+13. Login with the master account
+14. Set the `SPOTIFY_ACCOUNT_ACCESS_TOKEN` and `SPOTIFY_ACCOUNT_REFRESH_TOKEN` variables.
 
 ### Optional: configure automated database backups
 
