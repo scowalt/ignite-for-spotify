@@ -3,7 +3,16 @@
         "strict": true,
         "jsx": "react",
         "rootDir": "src",
-        "outDir": "./bin/",
-        "sourceMap": true
+        "outDir": "./dist/",
+        "sourceMap": true,
+        "esModuleInterop": true, // required for express
+        "noImplicitAny": true,
+        "target": "es6", // required for sequelize-typescript syntax
+        "module": "commonjs", // https://github.com/microsoft/TypeScript-Node-Starter/issues/256#issuecomment-606121570
+        "experimentalDecorators": true, // required for sequelize-typescript syntax
+        "emitDecoratorMetadata": true, // required for sequelize-typescript syntax
+        "moduleResolution": "node", // https://github.com/request/request-promise-native/issues/5#issuecomment-260282496
+        "noUnusedLocals": true,
+        "noUnusedParameters": true
     }
 }

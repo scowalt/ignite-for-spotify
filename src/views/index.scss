@@ -1,0 +1,87 @@
+.brandIcon {
+	width: 30px;
+	height: 30px;
+	margin-right: 5px;
+	margin-left: 5px;
+}
+
+.spotifyPlaylistEmbed {
+	@extend .embed-responsive-item;
+}
+
+.SpotifyPlaylistList {
+	width: 100%;
+}
+
+.PlaylistListItemImage {
+	width: 1.5em;
+	height: 1.5em;
+	margin-right: 0.5em;
+}
+
+@import "~bootswatch/dist/darkly/variables";
+@import "~bootstrap/scss/bootstrap";
+@import "~bootswatch/dist/darkly/bootswatch";
+
+div > .row {
+	> .pillColumn {
+		@extend .col-12;
+		@extend .col-lg-3;
+	}
+
+	> .tabContentColumn {
+		@extend .col-12;
+		@extend .col-lg-9;
+	}
+}
+
+// This must come after the bootstrap imports to correctly override. See https://stackoverflow.com/a/50343665/1222411
+.spotifyPlaylistEmbedWrapper {
+	@extend .embed-responsive;
+
+	padding-bottom: 141.42%; // https://gordonlesti.com/bootstrap-responsive-embed-aspect-ratio/
+}
+
+.selectedPlaylist {
+	@extend .list-group-item-action, :hover;
+}
+
+.tab-content,
+.container > .row {
+	margin-top: 1em;
+}
+
+.tab-pane {
+	form > .formRow > .col {
+		@extend .col-12;
+		@extend .col-md-6;
+
+		label {
+			> input {
+				@extend .form-control;
+			}
+
+			> select {
+				@extend .form-control;
+			}
+		}
+
+		.playlistNameInput {
+			width: 100%;
+		}
+	}
+
+	> .row.spotifyToIgnition > .col {
+		@extend .col-12;
+	}
+
+	.ignitionQueryOption {
+		@extend .col-6;
+		@extend .col-lg-4;
+	}
+}
+
+.spinner-border {
+	width: 1em;
+	height: 1em;
+}
