@@ -33,14 +33,7 @@ app.use(BodyParser.json());
 app.use(express.static(path.join(__dirname, '..', 'dist', 'views')));
 
 function getRedirectUri(request: Request): string {
-	let baseUri: string|undefined = request.header('Referer');
-
-	// In Spotify auth scenarios, the referer header may not be set
-	if (!baseUri) {
-		baseUri = `${request.protocol}://${request.header('host')}/`;
-	}
-
-	return `${baseUri}spotifyAuthCallback`;
+	return `${request.protocol}://${request.header('host')}/spotifyAuthCallback`;
 }
 
 app.post('/startJob', StartJobRoute(queues));
