@@ -62,7 +62,7 @@ export class RateLimitedSpotifyWebApi {
 			return this.spotify.createPlaylist(userId, playlistName, {
 				public: false
 			});
-		});
+		}, 3);
 	}
 
 	public async getPlaylistTracks(playlistId: string, offset: number, limit: number): Promise<SpotifyWebApi.Response<SpotifyApi.PlaylistTrackResponse>> {
@@ -119,11 +119,13 @@ export class RateLimitedSpotifyWebApi {
 	public getMe(): Promise<SpotifyWebApi.Response<SpotifyApi.CurrentUsersProfileResponse>> {
 		return this.enqueue(() => {
 			return this.spotify.getMe();
-		});
+		}, 3);
 	}
 
-	private enqueue<T>(task: () => Promise<T>): Promise<T> {
-		return RateLimitedSpotifyWebApi.queue.add(task).catch((reason: any) => {
+	private enqueue<T>(task: () => Promise<T>, priority?: number): Promise<T> {
+		return RateLimitedSpotifyWebApi.queue.add(task, {
+			priority
+		}).catch((reason: any) => {
 			Logger.getInstance().error(`Spotify API error ${JSON.stringify(reason)}`);
 			let restartCondition: Promise<void>|undefined;
 			if (reason && reason.name === "WebapiError" && reason.statusCode === 401 && reason.message === "Unauthorized") {
