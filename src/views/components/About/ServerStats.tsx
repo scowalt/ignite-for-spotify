@@ -18,11 +18,15 @@ export class ServerStats extends React.Component<React.Props<{}>, State> {
 	}
 
 	private async fetchServerStats(): Promise<void> {
-		const response: Response = await fetch('/getStats');
+		const response: Response = await fetch('/getStats', {
+			signal: this.state.downloadAbort.signal
+		});
 		const stats: ServerStatsData = await response.json();
-		this.setState(update(this.state, {
-			stats: { $set: stats }
-		}));
+		if (!this.state.downloadAbort.signal.aborted) {
+			this.setState(update(this.state, {
+				stats: { $set: stats }
+			}));
+		}
 	}
 
 	componentWillUnmount(): void {
