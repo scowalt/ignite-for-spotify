@@ -25,6 +25,10 @@ export const StateKey: string = "spotify_auth_state";
 let database: Database|null = null;
 const cache: NodeCache = new NodeCache();
 
+// This application likely sits behind a CloudFlare proxy. Set 'trust proxy' for the request protocol to be accurate.
+// See https://stackoverflow.com/a/46475726/1222411
+app.enable('trust proxy');
+
 app.use(favicon(path.join(__dirname, '..', 'res', 'icon', 'favicon.ico')));
 app.use(cookieParser());
 app.use(BodyParser.json());
