@@ -7,6 +7,12 @@ import { promisify } from 'util';
 
 const wait: (ms: number) => Promise<void> = promisify(setTimeout);
 
+enum Priority {
+	UserTask = 3,
+	PlaylistUpdate = 2,
+	SpotifyUpdate = 0,
+}
+
 export class RateLimitedSpotifyWebApi {
 	public static async createInstance(accessToken: string, refreshToken: string, redirectUri: string): Promise<RateLimitedSpotifyWebApi> {
 		const instance: RateLimitedSpotifyWebApi = new RateLimitedSpotifyWebApi(accessToken, refreshToken, redirectUri);
@@ -40,19 +46,19 @@ export class RateLimitedSpotifyWebApi {
 				Logger.getInstance().debug(`this.spotify.searchTracks("${searchQuery}") SUCCEEDED`);
 				return Promise.resolve(value.body.tracks);
 			});
-		});
+		}, Priority.SpotifyUpdate);
 	}
 
 	// Create a playlist for the "entire-library constantly-updated" feature
 	public async createEntireLibraryPlaylist(id: number): Promise<string> {
-		const userProfile: SpotifyWebApi.Response<SpotifyApi.CurrentUsersProfileResponse> = await this.enqueue(() => { return this.spotify.getMe(); });
+		const userProfile: SpotifyWebApi.Response<SpotifyApi.CurrentUsersProfileResponse> = await this.getMe();
 		const createPlaylistResponse: SpotifyWebApi.Response<SpotifyApi.CreatePlaylistResponse> = await this.enqueue(() => {
 			return this.spotify.createPlaylist(userProfile.body.id, `Rocksmith (C)DLC (part ${id}/?)`, {
 				public: false, // Start the playlist private, manually make public later
 				collaborative: false,
 				description: `Rocksmith and Rocksmith 2014 DLC and CDLC. Mirrors the database found at CustomsForge Ignition. More info at https://ignite-for-spotify.scowalt.com/`
 			});
-		});
+		}, Priority.PlaylistUpdate);
 		return createPlaylistResponse.body.id;
 	}
 
@@ -62,28 +68,19 @@ export class RateLimitedSpotifyWebApi {
 			return this.spotify.createPlaylist(userId, playlistName, {
 				public: false
 			});
-		}, 3);
-	}
-
-	public async getPlaylistTracks(playlistId: string, offset: number, limit: number): Promise<SpotifyWebApi.Response<SpotifyApi.PlaylistTrackResponse>> {
-		return this.enqueue(() => {
-			return this.spotify.getPlaylistTracks(playlistId, {
-				offset,
-				limit
-			});
-		});
+		}, Priority.UserTask);
 	}
 
 	public addTracksToPlaylist(playlistId: string, tracks: string[]): Promise<SpotifyWebApi.Response<SpotifyApi.AddTracksToPlaylistResponse>> {
 		return this.enqueue(() => {
 			return this.spotify.addTracksToPlaylist(playlistId, tracks);
-		});
+		}, Priority.UserTask);
 	}
 
 	public async addSongsToPlaylist(playlistId: string, songs: Song[], position: number): Promise<SpotifyWebApi.Response<SpotifyApi.AddTracksToPlaylistResponse>> {
 		return this.enqueue(() => {
 			return this.spotify.addTracksToPlaylist(playlistId, songs.map((song: Song) => { return `spotify:track:${song.spotifyTrackId}`; }), { position });
-		});
+		}, Priority.PlaylistUpdate);
 	}
 
 	public async removePlaylistTracksAtPosition(playlistId: string, playlistOffset: number, count: number): Promise<SpotifyWebApi.Response<SpotifyApi.RemoveTracksFromPlaylistResponse>> {
@@ -99,7 +96,7 @@ export class RateLimitedSpotifyWebApi {
 			} else {
 				return Promise.resolve(playlistResponse);
 			}
-		}).catch((reason: any) => {
+		}, Priority.PlaylistUpdate).catch((reason: any) => {
 			Logger.getInstance().error(`Spotify API error ${reason.toString}`);
 			return Promise.reject(reason);
 		});
@@ -119,10 +116,10 @@ export class RateLimitedSpotifyWebApi {
 	public getMe(): Promise<SpotifyWebApi.Response<SpotifyApi.CurrentUsersProfileResponse>> {
 		return this.enqueue(() => {
 			return this.spotify.getMe();
-		}, 3);
+		}, Priority.UserTask);
 	}
 
-	private enqueue<T>(task: () => Promise<T>, priority?: number): Promise<T> {
+	private enqueue<T>(task: () => Promise<T>, priority: Priority): Promise<T> {
 		return RateLimitedSpotifyWebApi.queue.add(task, {
 			priority
 		}).catch((reason: any) => {
