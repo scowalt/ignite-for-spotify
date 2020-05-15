@@ -18,11 +18,11 @@ import { LoginRoute } from './routes/LoginRoute';
 import { SpotifyAuthCallbackRoute } from './routes/SpotifyAuthCallbackRoute';
 import { RefreshSpotifyAuthRoute } from './routes/RefreshSpotifyAuthRoute';
 import NodeCache from 'node-cache';
+import { ServerStatsData } from './types/ServerStatsData';
 
 const queues: QueueManager = new QueueManager();
 const app: Express = express();
 export const StateKey: string = "spotify_auth_state";
-let database: Database|null = null;
 const cache: NodeCache = new NodeCache();
 
 // This application likely sits behind a CloudFlare proxy. Set 'trust proxy' for the request protocol to be accurate.
@@ -47,17 +47,26 @@ app.get('/spotifyAuthCallback', SpotifyAuthCallbackRoute);
 app.get('/refreshSpotifyAuth', RefreshSpotifyAuthRoute);
 
 app.get('/getPlaylists', async (_request: Request, response: Response) => {
-	if (database === null) {
-		database = await Database.getInstance();
-	}
-
-	let playlistInfo: PlaylistApiInfo[] | undefined = cache.get('playlistInfo');
+	const KEY: string = 'playlistInfo';
+	const database = await Database.getInstance();
+	let playlistInfo: PlaylistApiInfo[] | undefined = cache.get(KEY);
 	if (!playlistInfo) {
 		const playlists: Playlist[] = await database.getAllPlaylists();
 		playlistInfo = playlists.map((playlist: Playlist) => { return new PlaylistApiInfo(playlist); });
-		cache.set('playlistInfo', playlistInfo, 1 /* hour */ * 60 /* min per hour */ * 60 /* sec per min */);
+		cache.set(KEY, playlistInfo, 1 /* hour */ * 60 /* min per hour */ * 60 /* sec per min */);
 	}
 	return response.json(playlistInfo);
+});
+
+app.get('/getStats', async (_request: Request, response: Response) => {
+	const KEY: string = 'serverStatsData';
+	const database = await Database.getInstance();
+	let stats: ServerStatsData | undefined = cache.get(KEY);
+	if (!stats) {
+		stats = await database.getServerStats();
+		cache.set(KEY, stats, 1 /* hour */ * 60 /* min per hour */ * 60 /* sec per min */);
+	}
+	return response.json(stats);
 });
 
 // Catch-all to support react-router-dom processing

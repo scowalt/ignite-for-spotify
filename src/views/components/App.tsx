@@ -3,7 +3,7 @@ import { TitleBar } from "./TitleBar";
 import { Home } from "./Home";
 import { Switch, Route } from "react-router-dom";
 import { NotFound } from "./NotFound";
-import { About } from "./About";
+import { About } from "./About/About";
 
 export class App extends React.Component {
 	render(): ReactNode {
