@@ -3,9 +3,15 @@ import SpotifyWebApi from 'spotify-web-api-node';
 import Chance from 'chance';
 import { StateKey } from '../server';
 
+function getRedirectUri(request: Request): string {
+	// If this page is accessed directly, the `referer` header won't be set.
+	// Use other parts of the request to get the current deployment's baseUri.
+	return `${request.protocol}://${request.header('host')}/spotifyAuthCallback`;
+}
+
 export function LoginRoute(request: Request, response: Response): void {
 	const spotifyApi: SpotifyWebApi = new SpotifyWebApi({
-		redirectUri: `${request.header('Referer')}spotifyAuthCallback`,
+		redirectUri: getRedirectUri(request),
 		clientId: process.env.SPOTIFY_CLIENT_ID
 	});
 

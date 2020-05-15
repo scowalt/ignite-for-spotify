@@ -6,6 +6,7 @@ import { Op, WhereAttributeHash } from 'sequelize';
 import { BasicTrackInfo } from '../types/BasicTrackInfo';
 import { IgnitionToSpotifyData } from '../types/IgnitionToSpotifyData';
 import _ from 'lodash';
+import { ServerStatsData } from '../types/ServerStatsData';
 
 export class Database {
 	public static async getInstance(): Promise<Database> {
@@ -74,6 +75,15 @@ export class Database {
 				}
 			}
 		});
+	}
+
+	public async getServerStats(): Promise<ServerStatsData> {
+		return {
+			totalSongs: await Song.count(),
+			songsWithSpotifyTrack: await Song.count(
+				{ where: { spotifyTrackId: { [Op.not]: null } } }
+			)
+		};
 	}
 
 	tryAddSong(song: object): Promise<boolean> {

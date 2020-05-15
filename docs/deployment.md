@@ -15,8 +15,8 @@ These instructions are not complete. They provide general guidence and a referen
 10. Link a MySQL server instance to the app to get `DATABASE_URL` set: `dokku mysql:create $MYSQLSERVICENAME` followed by `dokku mysql:link $MMYSQLSERVICENAME $NAME`
 11. Create a GA app and set `GA_TRACKING_ID`
 12. Start the instance
-13. Login with the master account
-14. Set the `SPOTIFY_ACCOUNT_ACCESS_TOKEN` and `SPOTIFY_ACCOUNT_REFRESH_TOKEN` variables.
+13. Login with the master account.
+14. Set the `SPOTIFY_ACCOUNT_ACCESS_TOKEN` and `SPOTIFY_ACCOUNT_REFRESH_TOKEN` variables. Based on the cookie values set in the browser.
 
 ### Optional: configure automated database backups
 
