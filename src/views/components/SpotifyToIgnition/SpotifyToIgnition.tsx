@@ -67,7 +67,7 @@ export class SpotifyToIgnition extends React.Component<SpotifySourceProps, Spoti
 		let playlistTracks: SpotifyApi.PlaylistTrackResponse;
 		try {
 			playlistTracks = await this.startIgnitionSearch();
-		} catch(err) {
+		} catch (err) {
 			playlistTracks = await handleExpiredSpotifyToken(
 				this.state.downloadAbort.signal,
 				this.state.spotify,

@@ -164,6 +164,7 @@ module.exports = {
 		"radix": "error",
 		"spaced-comment": "error",
 		"use-isnan": "error",
-		"valid-typeof": "error"
+		"valid-typeof": "error",
+		"keyword-spacing": "warn"
 	}
 };

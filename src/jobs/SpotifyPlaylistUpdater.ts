@@ -32,6 +32,7 @@ export class SpotifyPlaylistUpdater {
 		this.db = await Database.getInstance();
 		return this.ensureTracksInPlaylist();
 	}
+
 	private async ensureTracksInPlaylist(): Promise<void> {
 		// Strategy: Grab a "chunk" of songs of length N with spotify track IDs
 		// 				Remove N songs from the spotify playlist
@@ -73,16 +74,15 @@ export class SpotifyPlaylistUpdater {
 	}
 
 	private async getPlaylist(playlistNumber: number): Promise<Playlist> {
-		return this.db.getPlaylistById(playlistNumber).then(async (result: Playlist|null) => {
-			if (result === null) {
-				// Playlist doesn't exist. Need to create the playlist in spotify and add the playlist to the database
-				const spotifyPlaylistId: string = await this.spotify.createEntireLibraryPlaylist(playlistNumber);
+		const currentPlaylist: Playlist|null = await this.db.getPlaylistById(playlistNumber);
+		if (currentPlaylist === null) {
+			// Playlist doesn't exist. Need to create the playlist in spotify and add the playlist to the database
+			const spotifyPlaylistId: string = await this.spotify.createEntireLibraryPlaylist(playlistNumber);
 
-				// Add the spotify playlist to the db
-				return this.db.addPlaylist(playlistNumber, spotifyPlaylistId);
-			}
+			// Add the spotify playlist to the db
+			return this.db.addPlaylist(playlistNumber, spotifyPlaylistId);
+		}
 
-			return result;
-		});
+		return currentPlaylist;
 	}
 }

@@ -139,7 +139,7 @@ export class IgnitionSearchForm extends React.Component<Props, State> {
 	validate(values: IgnitionToSpotifyData): FormikErrors<IgnitionToSpotifyData> {
 		try {
 			IgnitionToSpotifyDataSchema.parse(this.tidyData(values));
-		} catch(error) {
+		} catch (error) {
 			const formikErrors: FormikErrors<IgnitionToSpotifyData> = {};
 			const zodError: ZodError = error as ZodError;
 
