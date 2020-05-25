@@ -51,11 +51,42 @@ export class SpotifyToIgnition extends React.Component<SpotifySourceProps, Spoti
 		this.state.downloadAbort.abort();
 	}
 
-	private startIgnitionSearch(): Promise<SpotifyApi.PlaylistTrackResponse> {
+	private async getAllPlaylistTracks(): Promise<SpotifyApi.PlaylistTrackObject[]> {
 		if (!this.state.selectedPlaylist) {
 			return Promise.reject(new Error("Playlist selection required"));
 		}
-		return this.state.spotify.getPlaylistTracks(this.state.selectedPlaylist.id);
+
+		let offset: number = 0;
+		const tracks: SpotifyApi.PlaylistTrackObject[] = [];
+		do {
+			let playlistTracks: SpotifyApi.PlaylistTrackResponse;
+			try {
+				playlistTracks = await this.getPageOfPlaylistTracks(offset);
+			} catch (err) {
+				playlistTracks = await handleExpiredSpotifyToken(
+					this.state.downloadAbort.signal,
+					this.state.spotify,
+					() => { return this.getPageOfPlaylistTracks(offset); }
+				)(err);
+			}
+
+			if (playlistTracks.items.length === 0) {
+				break;
+			}
+
+			tracks.push(...playlistTracks.items);
+			offset += playlistTracks.items.length;
+		// eslint-disable-next-line no-constant-condition
+		} while (true);
+
+		return tracks;
+	}
+
+	private getPageOfPlaylistTracks(offset: number): Promise<SpotifyApi.PlaylistTrackResponse> {
+		if (!this.state.selectedPlaylist) {
+			return Promise.reject(new Error("Playlist selection required"));
+		}
+		return this.state.spotify.getPlaylistTracks(this.state.selectedPlaylist.id, { offset });
 	}
 
 	private async performIgnitionSearch(): Promise<void> {
@@ -64,24 +95,13 @@ export class SpotifyToIgnition extends React.Component<SpotifySourceProps, Spoti
 			action: 'Started a search'
 		});
 
-		let playlistTracks: SpotifyApi.PlaylistTrackResponse;
-		try {
-			playlistTracks = await this.startIgnitionSearch();
-		} catch (err) {
-			playlistTracks = await handleExpiredSpotifyToken(
-				this.state.downloadAbort.signal,
-				this.state.spotify,
-				() => { return this.startIgnitionSearch(); }
-			)(err);
-		}
-
-		const tracks: SpotifyApi.TrackObjectFull[] = playlistTracks.items.map((playlistTrack: SpotifyApi.PlaylistTrackObject) => { return playlistTrack.track; });
-		const basicTracks: BasicTrackInfo[] = tracks.map((track: SpotifyApi.TrackObjectFull) => {
+		const tracks: SpotifyApi.PlaylistTrackObject[] = await this.getAllPlaylistTracks();
+		const basicTracks: BasicTrackInfo[] = tracks.map((track: SpotifyApi.PlaylistTrackObject) => {
 			return {
-				album: track.album.name,
-				artists: track.artists.map((artist: SpotifyApi.ArtistObjectSimplified) => { return artist.name; }),
-				title: track.name,
-				spotifyId: track.id
+				album: track.track.album.name,
+				artists: track.track.artists.map((artist: SpotifyApi.ArtistObjectSimplified) => { return artist.name; }),
+				title: track.track.name,
+				spotifyId: track.track.id
 			};
 		});
 
