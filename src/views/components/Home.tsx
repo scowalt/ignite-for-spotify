@@ -5,7 +5,7 @@ import { FaSpotify } from 'react-icons/fa';
 import { RequireSpotifyAuth } from "./shared/RequireSpotifyAuth";
 import { SpotifyToIgnition } from "./SpotifyToIgnition/SpotifyToIgnition";
 import { IgnitionSearchForm } from "./IgnitionToSpotify/IgnitionSearchForm";
-import { Container, Row, Col, TabContent } from "react-bootstrap";
+import { Container, Row, Col, TabContent, Nav, TabPane, Fade } from "react-bootstrap";
 import ReactGA from 'react-ga';
 
 export class Home extends React.Component<{}, {}> {
@@ -13,9 +13,9 @@ export class Home extends React.Component<{}, {}> {
 		ReactGA.pageview('/');
 	}
 
-	private createTabLink(id: string, content: ReactNode): ReactNode {
-		return <a
-			className="nav-link"
+	private createTabLink(id: string, content: ReactNode, active?: boolean): ReactNode {
+		return <Nav.Link
+			active={active}
 			id={`v-pills-${id}-tab`}
 			data-toggle="pill"
 			href={`#v-pills-${id}`}
@@ -24,28 +24,29 @@ export class Home extends React.Component<{}, {}> {
 			aria-selected="false"
 			onClick={(): void => { ReactGA.modalview(`/${id}`); }}>
 			{content}
-		</a>;
+		</Nav.Link>;
 	}
 
-	private createTabContent(id: string, content: ReactNode): ReactNode {
-		return <div
-			className="tab-pane fade"
+	private createTabContent(id: string, content: ReactNode, active?: boolean): ReactNode {
+		return <TabPane
+			active={active}
+			transition={Fade}
 			id={`v-pills-${id}`}
 			role="tabpanel"
 			aria-labelledby={`v-pills-${id}-tab`}>
 			{content}
-		</div>;
+		</TabPane>;
 	}
 
 	render(): ReactNode {
 		return <Container fluid>
 			<Row>
 				<Col className="pillColumn">
-					<div className="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
-						{ this.createTabLink("spotifySource", <>Use <FaSpotify />Spotify playlists to search CustomsForge Ignition</>) }
+					<Nav variant="pills" className="flex-column" id="v-pills-tab">
+						{ this.createTabLink("spotifySource", <>Use <FaSpotify />Spotify playlists to search CustomsForge Ignition</>, true) }
 						{ this.createTabLink("ignitionSource", <>Export CustomsForge Ignition to a <FaSpotify />Spotify playlist</>) }
 						{ this.createTabLink("spotifyStatic", <>Follow a constantly-updated <FaSpotify />Spotify playlist.</>) }
-					</div>
+					</Nav>
 				</Col>
 				<Col className="tabContentColumn">
 					<TabContent id="v-pills-tabContent">
@@ -53,7 +54,7 @@ export class Home extends React.Component<{}, {}> {
 							{(spotifyAuthInfo: SpotifyAuthInfo): ReactNode => {
 								return <SpotifyToIgnition auth={spotifyAuthInfo}></SpotifyToIgnition>;
 							}}
-						</RequireSpotifyAuth>) }
+						</RequireSpotifyAuth>, true) }
 						{ this.createTabContent("ignitionSource", <RequireSpotifyAuth>
 							{(spotifyAuthInfo: SpotifyAuthInfo): ReactNode => {
 								return <IgnitionSearchForm spotifyAuth={spotifyAuthInfo}></IgnitionSearchForm>;
