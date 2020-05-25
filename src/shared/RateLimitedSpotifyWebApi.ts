@@ -138,6 +138,7 @@ export class RateLimitedSpotifyWebApi {
 				// See https://stackoverflow.com/a/30557896/1222411
 				restartCondition = wait(4*1000);
 			} else {
+				// TODO Retry requests that give a 500 error. There seems to be some flakiness in the Spotify APIs
 				Logger.getInstance().error(`Unrecognized Spotify API error ${JSON.stringify(reason)}`);
 			}
 
