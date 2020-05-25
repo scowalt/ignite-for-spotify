@@ -4,7 +4,7 @@ const wait = (time: number): Promise<void> => { return new Promise<void>((resolv
 
 export async function WaitForCompletedJob(jobType: JobType, id: number, password: string): Promise<any> {
 	// eslint-disable-next-line no-constant-condition
-	while(true) {
+	while (true) {
 		await wait(2000);
 		const response: Response = await fetch(`/job/${jobType}/${id}`, {
 			method: 'POST',

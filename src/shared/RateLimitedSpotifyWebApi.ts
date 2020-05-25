@@ -25,7 +25,7 @@ export class RateLimitedSpotifyWebApi {
 		concurrency: 5,
 		interval: 1 * 1000, // one second
 		// Spotify doesn't prescribe how many requests are allowed per second. In my testing, I've found that 10/s is too many.
-		intervalCap: 8
+		intervalCap: 7
 	});;
 
 	private constructor(accessToken: string, refreshToken: string, redirectUri: string) {
@@ -97,7 +97,8 @@ export class RateLimitedSpotifyWebApi {
 				return Promise.resolve(playlistResponse);
 			}
 		}, Priority.PlaylistUpdate).catch((reason: any) => {
-			Logger.getInstance().error(`Spotify API error ${reason.toString}`);
+			Logger.getInstance().error(`Spotify API error ${reason.toString()}`);
+			Logger.getInstance().error(`Failure at removePlaylistTracksAtPosition("${playlistId}", ${playlistOffset}, ${count})`);
 			return Promise.reject(reason);
 		});
 	}
@@ -123,18 +124,21 @@ export class RateLimitedSpotifyWebApi {
 		return RateLimitedSpotifyWebApi.queue.add(task, {
 			priority
 		}).catch((reason: any) => {
-			Logger.getInstance().error(`Spotify API error ${JSON.stringify(reason)}`);
 			let restartCondition: Promise<void>|undefined;
 			if (reason && reason.name === "WebapiError" && reason.statusCode === 401 && reason.message === "Unauthorized") {
 				// This action likely failed because the access token expired. Pause execution of tasks in the queue while
 				// the auth token updates to avoid other failures. Retry this task, since it likely only failed due to the
 				// expired token, and return the new result;
 				restartCondition = this.updateAccessToken();
-			}else if (reason && reason.name === `WebapiError` && reason.statusCode === 429 && reason.message === "Too Many Requests") {
+			} else if (reason && reason.name === `WebapiError` && reason.statusCode === 429 && reason.message === "Too Many Requests") {
+				Logger.getInstance().warn(`Spotify API error 429: Too many requests`);
+
 				// The Spotify API returns a "Retry-After" header that prescribes the exact amount of time that should pass before more requests are sent.
 				// Unfortunately, this information isn't exposed by the spotify api wrapper. So, for now, just wait a constant amount of seconds.
 				// See https://stackoverflow.com/a/30557896/1222411
 				restartCondition = wait(4*1000);
+			} else {
+				Logger.getInstance().error(`Unrecognized Spotify API error ${JSON.stringify(reason)}`);
 			}
 
 			if (restartCondition) {
