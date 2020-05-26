@@ -18,6 +18,13 @@ async function handleAuthenticatedJob<T>(id: Bull.JobId, password: string, queue
 		failedReason: (job as any).failedReason,
 	};
 	responseBody[property] = ((job as any).returnvalue) ? (job as any).returnvalue[property] : undefined;
+
+	// To conserve memory, remove completed jobs from the database when they are retrieved.
+	if (responseBody.status === 'completed' ||
+		responseBody.status === 'failed') {
+		await job.remove();
+	}
+
 	return response.json(responseBody).end();
 }
 
