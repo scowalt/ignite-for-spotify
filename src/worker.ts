@@ -13,7 +13,6 @@ import { QueueManager, SpotifyUpdateJobData, IgnitionJobData, UserPlaylistCreati
 import { Database } from './db/Database';
 import { Song } from './db/models/Song';
 import { RateLimitedSpotifyWebApi } from './shared/RateLimitedSpotifyWebApi';
-import { CronJob } from 'cron';
 
 function spotifyProcessFunction(job: Bull.Job<SpotifyUpdateJobData>): Promise<void> {
 	Logger.getInstance().info(`Started Spotify job ${job.id}`);
@@ -108,16 +107,3 @@ queues.ignitionSearchQueue.process(async (job: Bull.Job<IgnitionSearchJobData>):
 	}
 	return Promise.resolve({ songs: trackResults });
 });
-
-new CronJob(
-	`0 0 0 * * *`, // every day at 00:00:00 (midnight)
-	() => {
-		Logger.getInstance().info(`Started Ignition, Spotify, Playlist jobs`);
-		queues.ignitionQueue.add({ });
-		queues.spotifyUpdateQueue.add({ });
-		queues.playlistUpdateQueue.add({ });
-	},
-	null,
-	true,
-	'America/Los_Angeles'
-);

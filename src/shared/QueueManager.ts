@@ -42,6 +42,14 @@ export class QueueManager {
 		this.ignitionSearchQueue = new Bull<IgnitionSearchJobData>(JobType.IgnitionSearch, process.env.REDIS_URL!);
 	}
 
+	public forEach(eachFunc: (queue: Queue) => void): void {
+		eachFunc(this.ignitionQueue);
+		eachFunc(this.spotifyUpdateQueue);
+		eachFunc(this.playlistUpdateQueue);
+		eachFunc(this.userPlaylistCreationQueue);
+		eachFunc(this.ignitionSearchQueue);
+	}
+
 	private static createPlaylistUpdateQueue(): PlaylistUpdateQueue {
 		return (new Bull<SpotifyUpdateJobData>('playlistUpdate', process.env.REDIS_URL!)) as PlaylistUpdateQueue;
 	}

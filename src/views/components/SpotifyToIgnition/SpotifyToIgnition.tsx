@@ -96,7 +96,9 @@ export class SpotifyToIgnition extends React.Component<SpotifySourceProps, Spoti
 		});
 
 		const tracks: SpotifyApi.PlaylistTrackObject[] = await this.getAllPlaylistTracks();
-		const basicTracks: BasicTrackInfo[] = tracks.map((track: SpotifyApi.PlaylistTrackObject) => {
+		const basicTracks: BasicTrackInfo[] = tracks.filter((track: SpotifyApi.PlaylistTrackObject): boolean => {
+			return track.track !== null;
+		}).map((track: SpotifyApi.PlaylistTrackObject): BasicTrackInfo => {
 			return {
 				album: track.track.album.name,
 				artists: track.track.artists.map((artist: SpotifyApi.ArtistObjectSimplified) => { return artist.name; }),

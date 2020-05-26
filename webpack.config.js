@@ -59,6 +59,7 @@ module.exports = (env) => {
 	let configs = [
 		buildNodeConfig('./src/server.ts', 'server.js'),
 		buildNodeConfig('./src/worker.ts', 'worker.js'),
+		buildNodeConfig('./src/cronJobs.ts', 'cronJobs.js'),
 		{
 			mode: 'development',
 			entry: './src/views/index.tsx',
