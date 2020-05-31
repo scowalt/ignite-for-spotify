@@ -100,7 +100,8 @@ module.exports = (env) => {
 			plugins: [
 				new HtmlWebpackPlugin({
 					template: './src/views/index.html',
-					filename: 'index.html'
+					filename: 'index.html',
+					hash: true // cache busting
 				}),
 				new CspHtmlWebpackPlugin({
 					'base-uri': "'self'",
