@@ -9,7 +9,7 @@ import { IgnitionUpdater } from './jobs/IgnitionUpdater';
 import { Logger } from './shared/Logger';
 import Bull from 'bull';
 import { SpotifyPlaylistUpdater } from './jobs/SpotifyPlaylistUpdater';
-import { QueueManager, SpotifyUpdateJobData, IgnitionJobData, UserPlaylistCreationJobData, IgnitionSearchJobData } from './shared/QueueManager';
+import { QueueManager, SpotifyUpdateJobData, IgnitionJobData, UserPlaylistCreationJobData } from './shared/QueueManager';
 import { Database } from './db/Database';
 import { Song } from './db/models/Song';
 import { RateLimitedSpotifyWebApi } from './shared/RateLimitedSpotifyWebApi';
@@ -97,13 +97,3 @@ queues.playlistUpdateQueue.process(playlistProcessFunction).finally(() => {
 });
 
 queues.userPlaylistCreationQueue.process(userPlaylistCreationFunction);
-
-queues.ignitionSearchQueue.process(async (job: Bull.Job<IgnitionSearchJobData>): Promise<any> => {
-	const database: Database = await Database.getInstance();
-	let trackResults: Song[] = [];
-	for (const track of job.data.tracks) {
-		const newTracks: Song[] = await database.getIgnitionInfo(track);
-		trackResults = trackResults.concat(newTracks);
-	}
-	return Promise.resolve({ songs: trackResults });
-});
