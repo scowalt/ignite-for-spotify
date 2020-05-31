@@ -16,18 +16,15 @@ interface SpotifySourceProps extends React.Props<{}> {
 
 interface SpotifySourceState {
 	readonly spotify: SpotifyWebApi.SpotifyWebApiJs;
-	downloadAbort: AbortController;
 	selectedPlaylist?: SpotifyApi.PlaylistObjectSimplified;
 	songs: Song[];
-	done: boolean;
+	eventSource?: EventSource;
 }
 export class SpotifyToIgnition extends React.Component<SpotifySourceProps, SpotifySourceState> {
 	constructor(props: SpotifySourceProps) {
 		super(props);
 		this.state = {
 			spotify: new SpotifyWebApi(),
-			downloadAbort: new AbortController(),
-			done: true,
 			songs: []
 		};
 		this.state.spotify.setAccessToken(props.auth.spotifyAccessToken);
@@ -37,16 +34,16 @@ export class SpotifyToIgnition extends React.Component<SpotifySourceProps, Spoti
 		if (this.state.selectedPlaylist !== previousState.selectedPlaylist) {
 			// New playlist selected. Start a new search
 			this.setState(update(this.state, {
-				downloadAbort: { $set: new AbortController() },
 				songs: { $set: [] },
-				done: { $set: false }
+				eventSource: { $set: undefined }
 			}));
 
-			this.performIgnitionSearch();
-			return;
+			return this.performIgnitionSearch();
 		}
 
-		if (!previousState.done && this.state.done) {
+		if (previousState.eventSource !== undefined && this.state.eventSource === undefined) {
+			previousState.eventSource.close();
+
 			ReactGA.event({
 				category: 'SpotifyToIgnition',
 				action: 'Completed search',
@@ -56,12 +53,26 @@ export class SpotifyToIgnition extends React.Component<SpotifySourceProps, Spoti
 	}
 
 	componentWillUnmount(): void {
-		this.state.downloadAbort.abort();
+		if (this.state.eventSource) {
+			this.state.eventSource.close();
+
+			ReactGA.event({
+				category: 'SpotifyToIgnition',
+				action: 'Canceled search',
+				nonInteraction: true
+			});
+		}
 	}
 
-	private async performIgnitionSearch(): Promise<void> {
+	unsetEventSource(): void {
+		this.setState(update(this.state, {
+			eventSource: { $set: undefined }
+		}));
+	}
+
+	private performIgnitionSearch(): void {
 		if (!this.state.selectedPlaylist) {
-			return Promise.reject(new Error("No playlist selected"));
+			return;
 		}
 
 		ReactGA.event({
@@ -73,10 +84,7 @@ export class SpotifyToIgnition extends React.Component<SpotifySourceProps, Spoti
 		const eventSource: EventSource = new EventSource('/searchUsingPlaylist');
 		eventSource.addEventListener('message', (event: MessageEvent) => {
 			if (event.data === "done") {
-				eventSource.close();
-				this.setState(update(this.state, {
-					done: { $set: true }
-				}));
+				this.unsetEventSource();
 			} else {
 				const song: Song = JSON.parse(event.data);
 				this.setState(update(this.state, {
@@ -84,11 +92,11 @@ export class SpotifyToIgnition extends React.Component<SpotifySourceProps, Spoti
 				}));
 			}
 		});
-		eventSource.onerror = (): void => {
-			this.setState(update(this.state, {
-				done: { $set: true }
-			}));
-		};
+		eventSource.onerror = this.unsetEventSource.bind(this);
+
+		this.setState(update(this.state, {
+			eventSource: { $set: eventSource }
+		}));
 	}
 
 	private actOnPlaylist(playlist: SpotifyApi.PlaylistObjectSimplified): void {
@@ -101,7 +109,7 @@ export class SpotifyToIgnition extends React.Component<SpotifySourceProps, Spoti
 		const localResults: ReactNode = (this.state.selectedPlaylist) ? <IgnitionSearchResults
 			key={this.state.selectedPlaylist.id}
 			songs={this.state.songs}
-			done={this.state.done} /> : <></>;
+			done={this.state.eventSource === undefined} /> : <></>;
 		return <Row className="spotifyToIgnition">
 			<Col>
 				<Row><Col>
@@ -112,7 +120,7 @@ export class SpotifyToIgnition extends React.Component<SpotifySourceProps, Spoti
 						playlistsPerRequest={10}
 						onPlaylistClicked={this.actOnPlaylist.bind(this)}
 						spotify={this.state.spotify}
-						disabled={this.state.selectedPlaylist && !this.state.done}/>
+						disabled={this.state.selectedPlaylist && this.state.eventSource !== undefined}/>
 				</Col></Row>
 			</Col>
 			<Col>{localResults}</Col>
