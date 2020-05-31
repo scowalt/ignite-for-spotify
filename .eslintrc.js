@@ -157,14 +157,13 @@ module.exports = {
 		"no-unused-labels": "error",
 		"object-shorthand": "error",
 		"@typescript-eslint/no-unused-vars": "warn",
-		"one-var": [
-			"error",
-			"never"
-		],
+		"one-var": [ "error", "never" ],
 		"radix": "error",
 		"spaced-comment": "error",
 		"use-isnan": "error",
 		"valid-typeof": "error",
-		"keyword-spacing": "warn"
+		"keyword-spacing": "warn",
+		"eol-last": ["warn", "always"],
+		"space-infix-ops": "warn"
 	}
 };

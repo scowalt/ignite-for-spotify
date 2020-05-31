@@ -79,6 +79,10 @@ div > .row {
 		@extend .col-6;
 		@extend .col-lg-4;
 	}
+
+	.table {
+		margin-bottom: 0;
+	}
 }
 
 .spinner-border {

@@ -59,6 +59,7 @@ module.exports = (env) => {
 	let configs = [
 		buildNodeConfig('./src/server.ts', 'server.js'),
 		buildNodeConfig('./src/worker.ts', 'worker.js'),
+		buildNodeConfig('./src/cronJobs.ts', 'cronJobs.js'),
 		{
 			mode: 'development',
 			entry: './src/views/index.tsx',
@@ -99,7 +100,8 @@ module.exports = (env) => {
 			plugins: [
 				new HtmlWebpackPlugin({
 					template: './src/views/index.html',
-					filename: 'index.html'
+					filename: 'index.html',
+					hash: true // cache busting
 				}),
 				new CspHtmlWebpackPlugin({
 					'base-uri': "'self'",

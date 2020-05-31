@@ -1,6 +1,6 @@
 {
     "name": "ignite-for-spotify",
-    "version": "1.0.6",
+    "version": "1.1.1",
     "description": "",
     "main": "index.js",
     "scripts": {
@@ -8,13 +8,13 @@
         "build": "webpack --env.development",
         "heroku-postbuild": "webpack --env.production",
         "clean": "trash dist/**",
-        "watch": "concurrently \"webpack --env.development --watch\" \"nodemon --watch dist --inspect=9229 ./dist/server.js\" \"nodemon --watch dist --inspect=9300 ./dist/worker.js\" --prefix \"{time}-{pid}\"",
+        "watch": "concurrently \"webpack --env.development --watch\" \"nodemon --watch dist/server.js --inspect=9229 ./dist/server.js\" \"nodemon --watch dist/worker.js --inspect=9300 ./dist/worker.js\" \"nodemon --watch dist/cronJobs.js --inspect=9301 ./dist/cronJobs.js\" --prefix \"{time}-{pid}\"",
         "lint": "(eslint \"./src/**/*.{ts,tsx,html}\") && (stylelint \"./src/**/*.scss\")",
-        "run": "concurrently \"node ./dist/server.js\" \"node ./dist/worker.js\"",
+        "run": "concurrently \"node ./dist/server.js\" \"node ./dist/worker.js\" \"node ./dist/cronJobs.js\"",
         "fix": "eslint --fix \"./src/**/*.{ts,tsx,html}\""
     },
     "engines": {
-        "node": "^14.2.0"
+        "node": "^14.3.0"
     },
     "author": "Scott Walters",
     "license": "",

@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import Bull from 'bull';
 import HttpStatus from 'http-status-codes';
 import { JobType } from '../types/JobType';
-import { QueueManager, IgnitionSearchJobData } from '../shared/QueueManager';
+import { QueueManager } from '../shared/QueueManager';
 import { IgnitionToSpotifyJob } from '../types/IgnitionToSpotifyJob';
 
 export function StartJobRoute(queues: QueueManager): (request: Request, response: Response) => Promise<void> {
@@ -37,9 +37,6 @@ export function StartJobRoute(queues: QueueManager): (request: Request, response
 			}, {
 				attempts: 1 // Attempting this more than once can cause multiple playlists to be created
 			});
-		} else if (type === JobType.IgnitionSearch) {
-			const data: IgnitionSearchJobData = request.body.data;
-			job = await queues.ignitionSearchQueue.add(data);
 		} else {
 			return response.status(HttpStatus.NOT_ACCEPTABLE).end();
 		}

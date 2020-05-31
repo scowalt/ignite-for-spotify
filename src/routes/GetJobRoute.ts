@@ -42,8 +42,6 @@ export function GetJobRoute(queues: QueueManager): (request: Request, response: 
 			job = await queues.playlistUpdateQueue.getJob(id);
 		} else if (type === JobType.UserPlaylistCreate) {
 			return await handleAuthenticatedJob(id, request.body.password, queues.userPlaylistCreationQueue, 'playlistId', response);
-		} else if (type === JobType.IgnitionSearch) {
-			return await handleAuthenticatedJob(id, request.body.password, queues.ignitionSearchQueue, 'songs', response);
 		} else {
 			return response.status(HttpStatus.NOT_ACCEPTABLE).end();
 		}
