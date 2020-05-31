@@ -89,23 +89,32 @@ export async function SearchUsingPlaylistRoute(request: Request, response: Respo
 		}
 
 		for (const value of playlistTracks.body.items) {
-			if (value.track !== null) {
-				const basicTrack: BasicTrackInfo = {
-					album: value.track.album.name,
-					artists: value.track.artists.map((artist: SpotifyApi.ArtistObjectSimplified) => { return artist.name; }),
-					title: value.track.name,
-					spotifyId: value.track.id
-				};
+			if (value.track === null) {
+				// It's possible to have a null playlist track.
+				continue;
+			}
 
-				const newTracks: Song[] = await database.getIgnitionInfo(basicTrack);
+			if (value.track.id === null) {
+				// TODO Some playlists may have local tracks, or tracks unavailable on Spotify. These can horribly break my database search logic.
+				// For now, skip these. In the future, a "fuzzy search" might help.
+				continue;
+			}
 
-				if (newTracks.length > 2) {
-					Logger.getInstance().warn(`More than two results for track ${JSON.stringify(basicTrack)}`);
-				}
+			const basicTrack: BasicTrackInfo = {
+				album: value.track.album.name,
+				artists: value.track.artists.map((artist: SpotifyApi.ArtistObjectSimplified) => { return artist.name; }),
+				title: value.track.name,
+				spotifyId: value.track.id
+			};
 
-				for (const song of newTracks) {
-					response.write(`data: ${JSON.stringify(song)}\n\n`);
-				}
+			const newTracks: Song[] = await database.getIgnitionInfo(basicTrack);
+
+			if (newTracks.length > 2) {
+				Logger.getInstance().warn(`More than two results for track ${JSON.stringify(basicTrack)}`);
+			}
+
+			for (const song of newTracks) {
+				response.write(`data: ${JSON.stringify(song)}\n\n`);
 			}
 		}
 
