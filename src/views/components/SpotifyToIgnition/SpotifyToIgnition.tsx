@@ -43,6 +43,15 @@ export class SpotifyToIgnition extends React.Component<SpotifySourceProps, Spoti
 			}));
 
 			this.performIgnitionSearch();
+			return;
+		}
+
+		if (!previousState.done && this.state.done) {
+			ReactGA.event({
+				category: 'SpotifyToIgnition',
+				action: 'Completed search',
+				nonInteraction: true
+			});
 		}
 	}
 
