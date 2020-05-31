@@ -109,8 +109,8 @@ export async function SearchUsingPlaylistRoute(request: Request, response: Respo
 
 			const newTracks: Song[] = await database.getIgnitionInfo(basicTrack);
 
-			if (newTracks.length > 2) {
-				Logger.getInstance().warn(`More than two results for track ${JSON.stringify(basicTrack)}`);
+			if (newTracks.length > 5) {
+				Logger.getInstance().warn(`More than five results for track ${JSON.stringify(basicTrack)}`);
 			}
 
 			for (const song of newTracks) {
