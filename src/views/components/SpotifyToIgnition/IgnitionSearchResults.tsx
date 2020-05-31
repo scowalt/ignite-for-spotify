@@ -11,7 +11,8 @@ interface IgnitionSearchProps extends React.Props<{}> {
 	done: boolean;
 }
 
-export class IgnitionSearch extends React.Component<IgnitionSearchProps> {
+export class IgnitionSearchResults extends React.Component<IgnitionSearchProps> {
+	// TODO I need to paginate this element for large playlist performance to be acceptable
 	render(): ReactNode {
 		const results: ReactNode[] = this.props.songs.map((song: Song, index: number) => {
 			return <tr key={index}>
@@ -37,23 +38,28 @@ export class IgnitionSearch extends React.Component<IgnitionSearchProps> {
 			</td></tr>);
 		}
 
-		return <Table striped bordered hover responsive>
-			<thead>
-				<tr>
-					<th>Download link</th>
-					<th>Title</th>
-					<th>Artist</th>
-					<th>Album</th>
-					<th>Author</th>
-					<th>Lead</th>
-					<th>Rhythm</th>
-					<th>Bass</th>
-					<th>Vocals</th>
-				</tr>
-			</thead>
-			<tbody>
-				{results}
-			</tbody>
-		</Table>;
+		return <>
+			{ this.props.done ? <></> : <Spinner animation="border" role="status" className="PlaylistListItemSpinner">
+				<span className="sr-only">Loading...</span>
+			</Spinner>}
+			<Table striped bordered hover responsive>
+				<thead>
+					<tr>
+						<th>Download link</th>
+						<th>Title</th>
+						<th>Artist</th>
+						<th>Album</th>
+						<th>Author</th>
+						<th>Lead</th>
+						<th>Rhythm</th>
+						<th>Bass</th>
+						<th>Vocals</th>
+					</tr>
+				</thead>
+				<tbody>
+					{results}
+				</tbody>
+			</Table>
+		</>;
 	}
 }

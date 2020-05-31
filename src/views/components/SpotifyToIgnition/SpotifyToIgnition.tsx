@@ -3,7 +3,7 @@ import SpotifyWebApi from 'spotify-web-api-js';
 import { SpotifyAuthInfo } from "../shared/SpotifyAuthInfo";
 import { Col, Row } from "react-bootstrap";
 import update from 'immutability-helper';
-import { IgnitionSearch } from "./IgnitionSearch";
+import { IgnitionSearchResults } from "./IgnitionSearchResults";
 import { SpotifyPlaylistListLoader } from "../shared/SpotifyPlaylistListLoader";
 import { FaSpotify } from "react-icons/fa";
 import { Song } from "../../../db/models/Song";
@@ -89,7 +89,7 @@ export class SpotifyToIgnition extends React.Component<SpotifySourceProps, Spoti
 	}
 
 	render(): ReactNode {
-		const localResults: ReactNode = (this.state.selectedPlaylist) ? <IgnitionSearch
+		const localResults: ReactNode = (this.state.selectedPlaylist) ? <IgnitionSearchResults
 			playlist={this.state.selectedPlaylist}
 			spotify={this.state.spotify}
 			key={this.state.selectedPlaylist.id}
