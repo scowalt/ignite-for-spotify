@@ -19,6 +19,7 @@ import { SpotifyAuthCallbackRoute } from './routes/SpotifyAuthCallbackRoute';
 import { RefreshSpotifyAuthRoute } from './routes/RefreshSpotifyAuthRoute';
 import NodeCache from 'node-cache';
 import { ServerStatsData } from './types/ServerStatsData';
+import { SearchUsingPlaylistRoute } from './routes/SearchUsingPlaylistRoute';
 
 const queues: QueueManager = new QueueManager();
 const app: Express = express();
@@ -68,6 +69,8 @@ app.get('/getStats', async (_request: Request, response: Response) => {
 	}
 	return response.json(stats);
 });
+
+app.get('/searchUsingPlaylist', SearchUsingPlaylistRoute);
 
 // Catch-all to support react-router-dom processing
 app.get('*', (_request: Request, response: Response) => {
