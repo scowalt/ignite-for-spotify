@@ -30,7 +30,7 @@ function setupEventStreamConnection(response: Response): NodeJS.Timeout {
 	// Establish the event stream connection with the client
 	response.writeHead(200, {
 		'Content-Type': 'text/event-stream',
-		'Cache-Control': 'no-cache',
+		'Cache-Control': 'no-cache, no-transform',
 		Connection: 'keep-alive' // by default, Node keeps the connection alive. But the client must as well
 	});
 
@@ -123,6 +123,7 @@ export async function SearchUsingPlaylistRoute(request: Request, response: Respo
 	} while (!closed);
 
 	response.write(`data: done\n\n`);
+	response.end();
 	cleanup(heartbeat);
 }
 
