@@ -46,7 +46,7 @@ export class SpotifyPlaylistList extends React.Component<SpotifyPlaylistListProp
 				// eslint-disable-next-line id-blacklist
 				selected: { $set: undefined }
 			}));
-			this.props.onPageSwitch(index*this.props.playlistsPerRequest);
+			this.props.onPageSwitch(index * this.props.playlistsPerRequest);
 		};
 	}
 
@@ -78,7 +78,7 @@ export class SpotifyPlaylistList extends React.Component<SpotifyPlaylistListProp
 						key={index}
 						active={index === this.getCurrentPageNumber(this.props.playlists)}
 						onClick={this.onPageSwitch(index)}>
-						{index+1}
+						{index + 1}
 					</Pagination.Item>
 				);
 			}

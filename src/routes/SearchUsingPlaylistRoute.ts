@@ -126,4 +126,3 @@ export async function SearchUsingPlaylistRoute(request: Request, response: Respo
 	response.end();
 	cleanup(heartbeat);
 }
-

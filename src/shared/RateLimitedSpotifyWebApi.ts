@@ -138,7 +138,7 @@ export class RateLimitedSpotifyWebApi {
 				// The Spotify API returns a "Retry-After" header that prescribes the exact amount of time that should pass before more requests are sent.
 				// Unfortunately, this information isn't exposed by the spotify api wrapper. So, for now, just wait a constant amount of seconds.
 				// See https://stackoverflow.com/a/30557896/1222411
-				restartCondition = wait(4*1000);
+				restartCondition = wait(4 * 1000);
 			} else {
 				// TODO Retry requests that give a 500 error. There seems to be some flakiness in the Spotify APIs
 				Logger.getInstance().error(`Unrecognized Spotify API error ${JSON.stringify(reason)}`);

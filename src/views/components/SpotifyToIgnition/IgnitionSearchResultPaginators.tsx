@@ -17,7 +17,7 @@ export class IgnitionSearchResultPaginators extends React.Component<Props> {
 					key={index}
 					active={index === this.props.currentPage}
 					onClick={this.props.onSwitch(index)}>
-					{index+1}
+					{index + 1}
 				</Pagination.Item>
 			);
 		}
