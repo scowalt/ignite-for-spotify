@@ -90,8 +90,6 @@ export class SpotifyToIgnition extends React.Component<SpotifySourceProps, Spoti
 
 	render(): ReactNode {
 		const localResults: ReactNode = (this.state.selectedPlaylist) ? <IgnitionSearchResults
-			playlist={this.state.selectedPlaylist}
-			spotify={this.state.spotify}
 			key={this.state.selectedPlaylist.id}
 			songs={this.state.songs}
 			done={this.state.done} /> : <></>;

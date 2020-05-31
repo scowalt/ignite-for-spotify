@@ -1,65 +1,43 @@
 import { Song } from "../../../db/models/Song";
 import React, { ReactNode } from "react";
-import { Table, Spinner } from "react-bootstrap";
-import SpotifyWebApi from "spotify-web-api-js";
-import { FaCheckCircle } from "react-icons/fa";
+import { IgnitionSearchResultsTable } from "./IgnitionSearchResultsTable";
+import update from 'immutability-helper';
+import { IgnitionSearchResultPaginators } from "./IgnitionSearchResultPaginators";
 
-interface IgnitionSearchProps extends React.Props<{}> {
-	readonly spotify: SpotifyWebApi.SpotifyWebApiJs;
-	playlist: SpotifyApi.PlaylistObjectSimplified;
+const RESULTS_PER_PAGE: number = 10;
+
+interface Props extends React.Props<{}> {
 	songs: Song[];
 	done: boolean;
 }
 
-export class IgnitionSearchResults extends React.Component<IgnitionSearchProps> {
-	// TODO I need to paginate this element for large playlist performance to be acceptable
-	render(): ReactNode {
-		const results: ReactNode[] = this.props.songs.map((song: Song, index: number) => {
-			return <tr key={index}>
-				<td><a href={`http://customsforge.com/process.php?id=${song.id}`} target="_blank" rel="noopener noreferrer">Download</a></td>
-				<td>{song.title}</td>
-				<td>{song.artist}</td>
-				<td>{song.album}</td>
-				<td>{song.author}</td>
-				<td>{song.lead ? <FaCheckCircle /> : <></>}</td>
-				<td>{song.rhythm ? <FaCheckCircle /> : <></>}</td>
-				<td>{song.bass ? <FaCheckCircle /> : <></>}</td>
-				<td>{song.vocals ? <FaCheckCircle /> : <></>}</td>
-			</tr>;
-		});
-		if (this.props.songs.length === 0 && this.props.done){
-			results.push(<tr key="whoopsies"><td colSpan={100}>No songs found</td></tr>);
-		}
-		if (!this.props.done) {
-			results.push(<tr key="loading"><td colSpan={100}>
-				<Spinner animation="border" role="status" className="PlaylistListItemSpinner">
-					<span className="sr-only">Loading...</span>
-				</Spinner>
-			</td></tr>);
-		}
+interface State {
+	page: number;
+}
 
+export class IgnitionSearchResults extends React.Component<Props, State> {
+	constructor(props: Props) {
+		super(props);
+		this.state = {
+			page: 0
+		};
+	}
+
+	onPageSwitch(page: number): (() => void) {
+		return (): void => {
+			this.setState(update(this.state, {
+				page: { $set: page }
+			}));
+		};
+	}
+
+	render(): ReactNode {
+		const startingIndex: number = this.state.page*RESULTS_PER_PAGE;
+		const pageCount: number = Math.ceil(this.props.songs.length / RESULTS_PER_PAGE);
+		const lastPage: boolean = this.state.page+1 === pageCount;
 		return <>
-			{ this.props.done ? <></> : <Spinner animation="border" role="status" className="PlaylistListItemSpinner">
-				<span className="sr-only">Loading...</span>
-			</Spinner>}
-			<Table striped bordered hover responsive>
-				<thead>
-					<tr>
-						<th>Download link</th>
-						<th>Title</th>
-						<th>Artist</th>
-						<th>Album</th>
-						<th>Author</th>
-						<th>Lead</th>
-						<th>Rhythm</th>
-						<th>Bass</th>
-						<th>Vocals</th>
-					</tr>
-				</thead>
-				<tbody>
-					{results}
-				</tbody>
-			</Table>
+			<IgnitionSearchResultsTable lastPage={lastPage} songs={this.props.songs.slice(startingIndex, startingIndex+RESULTS_PER_PAGE)} done={this.props.done} />
+			<IgnitionSearchResultPaginators currentPage={this.state.page} pageCount={pageCount} onSwitch={this.onPageSwitch.bind(this)} done={this.props.done} />
 		</>;
 	}
 }

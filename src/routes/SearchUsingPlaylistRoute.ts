@@ -6,6 +6,7 @@ import _ from 'lodash';
 import { BasicTrackInfo } from '../types/BasicTrackInfo';
 import { Database } from '../db/Database';
 import { Song } from '../db/models/Song';
+import { Logger } from '../shared/Logger';
 
 const HEARTBEAT_INTERVAL_MS: number = 15 * 1000;
 
@@ -97,6 +98,11 @@ export async function SearchUsingPlaylistRoute(request: Request, response: Respo
 				};
 
 				const newTracks: Song[] = await database.getIgnitionInfo(basicTrack);
+
+				if (newTracks.length > 2) {
+					Logger.getInstance().warn(`More than two results for track ${JSON.stringify(basicTrack)}`);
+				}
+
 				for (const song of newTracks) {
 					response.write(`data: ${JSON.stringify(song)}\n\n`);
 				}
