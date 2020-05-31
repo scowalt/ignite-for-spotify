@@ -34,7 +34,7 @@ export class IgnitionSearchResults extends React.Component<Props, State> {
 	render(): ReactNode {
 		const startingIndex: number = this.state.page*RESULTS_PER_PAGE;
 		const pageCount: number = Math.ceil(this.props.songs.length / RESULTS_PER_PAGE);
-		const lastPage: boolean = this.state.page+1 === pageCount;
+		const lastPage: boolean = (pageCount === 0) || (this.state.page+1 === pageCount);
 		return <>
 			<IgnitionSearchResultsTable lastPage={lastPage} songs={this.props.songs.slice(startingIndex, startingIndex+RESULTS_PER_PAGE)} done={this.props.done} />
 			<IgnitionSearchResultPaginators currentPage={this.state.page} pageCount={pageCount} onSwitch={this.onPageSwitch.bind(this)} done={this.props.done} />
