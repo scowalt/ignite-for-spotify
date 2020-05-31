@@ -88,7 +88,7 @@ export class SpotifyPlaylistList extends React.Component<SpotifyPlaylistListProp
 				<ListGroup className={"SpotifyPlaylistList"}>{ playlists }</ListGroup>
 			</Col></Row>
 			<Row><Col>
-				<Pagination>{paginators}</Pagination>
+				<Pagination className={"flex-wrap"}>{paginators}</Pagination>
 			</Col></Row>
 		</>;
 	}
