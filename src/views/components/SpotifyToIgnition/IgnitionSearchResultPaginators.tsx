@@ -30,7 +30,7 @@ export class IgnitionSearchResultPaginators extends React.Component<Props> {
 			);
 		}
 		return <Row><Col>
-			<Pagination>{paginators}</Pagination>
+			<Pagination className={"flex-wrap"}>{paginators}</Pagination>
 		</Col></Row>;
 	}
 }

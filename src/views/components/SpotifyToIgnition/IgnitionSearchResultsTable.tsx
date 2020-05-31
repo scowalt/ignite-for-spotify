@@ -10,6 +10,7 @@ interface Props extends React.Props<{}> {
 }
 export class IgnitionSearchResultsTable extends React.Component<Props> {
 	render(): ReactNode {
+		// TODO make this table sortable
 		const results: ReactNode[] = this.props.songs.map((song: Song, index: number) => {
 			return <tr key={index}>
 				<td><a href={`http://customsforge.com/process.php?id=${song.id}`} target="_blank" rel="noopener noreferrer">Download</a></td>
