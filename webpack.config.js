@@ -60,6 +60,7 @@ module.exports = (env) => {
 		buildNodeConfig('./src/server.ts', 'server.js'),
 		buildNodeConfig('./src/worker.ts', 'worker.js'),
 		buildNodeConfig('./src/cronJobs.ts', 'cronJobs.js'),
+		buildNodeConfig('./src/webSocketServer.ts', 'webSocketServer.js'),
 		{
 			mode: 'development',
 			entry: './src/views/index.tsx',
@@ -109,7 +110,7 @@ module.exports = (env) => {
 					'script-src': ["'unsafe-inline'", "'self'", "'unsafe-eval'", "www.google-analytics.com"],
 					'style-src': ["'unsafe-inline'", "'self'", "'unsafe-eval'", "fonts.googleapis.com"]
 				}),
-				new webpack.EnvironmentPlugin(['GA_TRACKING_ID']),
+				new webpack.EnvironmentPlugin(['GA_TRACKING_ID', 'WEBSOCKET_SERVER_PORT']),
 			]
 		}
 	];

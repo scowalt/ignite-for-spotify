@@ -8,9 +8,9 @@
         "build": "webpack --env.development",
         "heroku-postbuild": "webpack --env.production",
         "clean": "trash dist/**",
-        "watch": "concurrently \"webpack --env.development --watch\" \"nodemon --watch dist/server.js --inspect=9229 ./dist/server.js\" \"nodemon --watch dist/worker.js --inspect=9300 ./dist/worker.js\" \"nodemon --watch dist/cronJobs.js --inspect=9301 ./dist/cronJobs.js\" --prefix \"{time}-{pid}\"",
+        "watch": "concurrently \"webpack --env.development --watch\" \"nodemon --watch dist/server.js --inspect=9229 ./dist/server.js\" \"nodemon --watch dist/worker.js --inspect=9300 ./dist/worker.js\" \"nodemon --watch dist/cronJobs.js --inspect=9301 ./dist/cronJobs.js\" \"nodemon --watch dist/webSocketServer.js --inspect=9302 ./dist/webSocketServer.js\" --prefix \"{time}-{pid}\"",
         "lint": "(eslint \"./src/**/*.{ts,tsx,html}\") && (stylelint \"./src/**/*.scss\")",
-        "run": "concurrently \"node ./dist/server.js\" \"node ./dist/worker.js\" \"node ./dist/cronJobs.js\"",
+        "run": "concurrently \"node ./dist/server.js\" \"node ./dist/worker.js\" \"node ./dist/cronJobs.js\" \"node ./dist/webSocketServer.js\"",
         "fix": "eslint --fix \"./src/**/*.{ts,tsx,html}\""
     },
     "engines": {
