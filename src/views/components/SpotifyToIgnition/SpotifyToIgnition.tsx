@@ -32,23 +32,11 @@ export class SpotifyToIgnition extends React.Component<SpotifySourceProps, Spoti
 
 	componentDidUpdate(_previousProps: SpotifySourceProps, previousState: SpotifySourceState): void {
 		if (this.state.selectedPlaylist !== previousState.selectedPlaylist) {
-			// New playlist selected. Start a new search
-			this.setState(update(this.state, {
-				songs: { $set: [] },
-				eventSource: { $set: undefined }
-			}));
-
-			return this.performIgnitionSearch();
+			this.performIgnitionSearch();
 		}
 
 		if (previousState.eventSource !== undefined && this.state.eventSource === undefined) {
 			previousState.eventSource.close();
-
-			ReactGA.event({
-				category: 'SpotifyToIgnition',
-				action: 'Completed search',
-				nonInteraction: true
-			});
 		}
 	}
 
@@ -101,7 +89,9 @@ export class SpotifyToIgnition extends React.Component<SpotifySourceProps, Spoti
 
 	private actOnPlaylist(playlist: SpotifyApi.PlaylistObjectSimplified): void {
 		this.setState(update(this.state, {
-			selectedPlaylist: { $set: playlist }
+			selectedPlaylist: { $set: playlist },
+			songs: { $set: [] },
+			eventSource: { $set: undefined }
 		}));
 	}
 
