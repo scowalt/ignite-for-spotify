@@ -14,11 +14,11 @@ function getRedirectUri(request: Request): string {
 
 export async function SpotifyAuthCallbackRoute(request: Request, response: Response): Promise<void> {
 	// Request refresh and state tokens
-	const code: string = request.query.code || null;
+	const code: string|null = request.query.code || null;
 	const state: string|null = request.query.state || null;
 	const storedState: string|null = request.cookies ? request.cookies[StateKey] : null;
 
-	if (state === null || state !== storedState) {
+	if (code === null || state === null || state !== storedState) {
 		return response.status(HttpStatus.INTERNAL_SERVER_ERROR).send("Invalid auth state").end();
 	}
 
