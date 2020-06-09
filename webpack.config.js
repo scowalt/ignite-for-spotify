@@ -7,7 +7,6 @@ const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CspHtmlWebpackPlugin = require('csp-html-webpack-plugin');
 const TerserPlugin = require('terser-webpack-plugin');
-const path = require('path');
 
 module.exports = (env) => {
 	function buildNodeConfig(entry, output, dirname) {

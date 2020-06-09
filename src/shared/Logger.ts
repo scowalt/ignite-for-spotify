@@ -23,7 +23,7 @@ export class Logger {
 				}),
 				new winston.transports.File({ filename: 'werror.log', level: 'warn' }),
 				new winston.transports.File({ filename: 'info.log', level: 'info' }),
-				new winston.transports.File({ filename: 'debug.log', level: 'debug' })
+				new winston.transports.File({ filename: 'debug.log', level: 'debug', maxsize: 20 * 1024 * 1024, maxFiles: 10 })
 			]
 		});
 	}
