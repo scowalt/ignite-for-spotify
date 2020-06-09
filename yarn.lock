@@ -438,10 +438,15 @@
     "@types/node" "*"
     form-data "^3.0.0"
 
-"@types/node@*", "@types/node@^14.0.11":
+"@types/node@*":
   version "14.0.11"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-14.0.11.tgz#61d4886e2424da73b7b25547f59fdcb534c165a3"
   integrity sha512-lCvvI24L21ZVeIiyIUHZ5Oflv1hhHQ5E1S25IRlKIXaRkVgmXpJMI3wUJkmym2bTbCe+WoIibQnMVAU3FguaOg==
+
+"@types/node@^14.0.12":
+  version "14.0.12"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-14.0.12.tgz#9c1d8ffb8084e8936603a6122a7649e40e68e04b"
+  integrity sha512-/sjzehvjkkpvLpYtN6/2dv5kg41otMGuHQUt9T2aiAuIfleCQRQHXXzF1eAw/qkZTj5Kcf4JSTf7EIizHocy6Q==
 
 "@types/normalize-package-data@^2.4.0":
   version "2.4.0"
@@ -6126,10 +6131,10 @@ react-fast-compare@^2.0.1:
   resolved "https://registry.yarnpkg.com/react-fast-compare/-/react-fast-compare-2.0.4.tgz#e84b4d455b0fec113e0402c329352715196f81f9"
   integrity sha512-suNP+J1VU1MWFKcyt7RtjiSWUjvidmQSlqu+eHslq+342xCbGTYmC0mEhPCOHxlW0CywylOC1u2DFAT+bv4dBw==
 
-react-ga@^2.7.0:
-  version "2.7.0"
-  resolved "https://registry.yarnpkg.com/react-ga/-/react-ga-2.7.0.tgz#24328f157f31e8cffbf4de74a3396536679d8d7c"
-  integrity sha512-AjC7UOZMvygrWTc2hKxTDvlMXEtbmA0IgJjmkhgmQQ3RkXrWR11xEagLGFGaNyaPnmg24oaIiaNPnEoftUhfXA==
+react-ga@^3.0.0:
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/react-ga/-/react-ga-3.0.0.tgz#4d665389cf0c489c36c5fdf97722a7e53efdfc5b"
+  integrity sha512-IKqqCtSMe0IfSRNvbHAiwXwIXbuza4VvHvB/2N3hEiMFGSjv8fNI6obPH6bkDdIjDpwzbUqKs8895OxBckWJ2g==
 
 react-icons@^3.10.0:
   version "3.10.0"
