@@ -8321,7 +8321,7 @@ yn@3.1.1:
   resolved "https://registry.yarnpkg.com/yn/-/yn-3.1.1.tgz#1e87401a09d767c1d5eab26a6e4c185182d2eb50"
   integrity sha512-Ux4ygGWsu2c7isFWe8Yu1YluJmqVhxqK2cLXNQA5AcC3QfbGNpM7fu0Y8b/z16pXLnFxZYvWhd3fhBY9DLmC6Q==
 
-zod@^1.5.0:
-  version "1.7.0"
-  resolved "https://registry.yarnpkg.com/zod/-/zod-1.7.0.tgz#841999c57d304cd51bcd09adc67ee8b5ddf3b1da"
-  integrity sha512-VOXbkN/7WPgOiRwaS2y6XajxUEZ0vto5Vz06Hp/v0lIPDturyyou4fNTtZQRao+9wZj31zayBcfJoKvByxK3lA==
+zod@^1.7.1:
+  version "1.7.1"
+  resolved "https://registry.yarnpkg.com/zod/-/zod-1.7.1.tgz#983e4ae8e2f032420960288ea7c54a5afc50c011"
+  integrity sha512-EqtwN5PJTgg/iOxMvjezNcha8xDcrcUr2V4oYZ8GMzxzFGfZV+LFI+ey2sBs2mGWSF8qZE8gHIquApWa7jiTYg==

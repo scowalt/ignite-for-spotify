@@ -59,7 +59,7 @@
         "spotify-web-api-js": "^1.2.0",
         "spotify-web-api-node": "^4.0.0",
         "winston": "^3.2.1",
-        "zod": "^1.5.0"
+        "zod": "^1.7.1"
     },
     "devDependencies": {
         "@types/bluebird": "^3.5.30",
