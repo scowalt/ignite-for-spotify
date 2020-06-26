@@ -1,8 +1,9 @@
 import { ListGroup, Image } from "react-bootstrap";
 import React, { ReactNode } from "react";
+import { SimplifiedPlaylist } from "spotify-web-api-ts/types/types/SpotifyObjects";
 
 interface PlaylistListItemProps extends React.Props<{}> {
-	playlist: SpotifyApi.PlaylistObjectSimplified;
+	playlist: SimplifiedPlaylist;
 	onClick: () => void;
 	selected: boolean;
 	disabled?: boolean;

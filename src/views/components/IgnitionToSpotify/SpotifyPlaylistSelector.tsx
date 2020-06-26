@@ -1,12 +1,13 @@
 import { connect, FormikProps } from "formik";
 import React, { ReactNode } from "react";
 import { SpotifyPlaylistListLoader } from "../shared/SpotifyPlaylistListLoader";
-import SpotifyWebApi from "spotify-web-api-js";
+import { SpotifyWebApi } from "spotify-web-api-ts";
 import { SpotifyAuthInfo } from "../shared/SpotifyAuthInfo";
 import { FaSpotify } from "react-icons/fa";
 import update from 'immutability-helper';
 import { IgnitionToSpotifyData } from "../../../types/IgnitionToSpotifyData";
 import { Row, Col, Alert, Nav, TabContent, TabPane } from "react-bootstrap";
+import { SimplifiedPlaylist } from "spotify-web-api-ts/types/types/SpotifyObjects";
 
 interface Props {
 	auth: SpotifyAuthInfo;
@@ -14,7 +15,7 @@ interface Props {
 	formik: FormikProps<IgnitionToSpotifyData>;
 }
 interface State {
-	readonly spotify: SpotifyWebApi.SpotifyWebApiJs;
+	readonly spotify: SpotifyWebApi;
 	playlistName: string;
 	playlistId?: string;
 }
@@ -51,7 +52,7 @@ class SpotifyPlaylistSelector extends React.Component<Props, State> {
 		});
 	}
 
-	onPlaylistClicked(playlist: SpotifyApi.PlaylistObjectSimplified): void {
+	onPlaylistClicked(playlist: SimplifiedPlaylist): void {
 		this.setState(update(this.state, {
 			playlistId: { $set: playlist.id }
 		}));

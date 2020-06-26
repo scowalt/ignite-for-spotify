@@ -13,6 +13,7 @@ import { QueueManager, SpotifyUpdateJobData, IgnitionJobData, UserPlaylistCreati
 import { Database } from './db/Database';
 import { Song } from './db/models/Song';
 import { RateLimitedSpotifyWebApi } from './shared/RateLimitedSpotifyWebApi';
+import { PrivateUser, Playlist } from 'spotify-web-api-ts/types/types/SpotifyObjects';
 
 function spotifyProcessFunction(job: Bull.Job<SpotifyUpdateJobData>): Promise<void> {
 	Logger.getInstance().info(`Started Spotify job ${job.id}`);
@@ -60,9 +61,9 @@ async function userPlaylistCreationFunction(job: Bull.Job<UserPlaylistCreationJo
 
 	let playlistId: string = job.data.query.playlistInfo.playlistDescriptor;
 	if (!job.data.query.playlistInfo.havePlaylistId) {
-		const user = await spotify.getMe();
-		const playlistCreationResponse = await spotify.createPlaylist(user.body.id, job.data.query.playlistInfo.playlistDescriptor);
-		playlistId = playlistCreationResponse.body.id;
+		const user: PrivateUser = await spotify.getMe();
+		const playlistCreationResponse: Playlist = await spotify.createPlaylist(user.id, job.data.query.playlistInfo.playlistDescriptor);
+		playlistId = playlistCreationResponse.id;
 	}
 
 	let songs: Song[];
