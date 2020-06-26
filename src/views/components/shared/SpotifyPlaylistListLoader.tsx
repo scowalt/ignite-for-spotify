@@ -1,19 +1,20 @@
 import React, { ReactNode } from "react";
 import update from 'immutability-helper';
 import { handleExpiredSpotifyToken } from "../../common/SpotifyHelpers";
-import SpotifyWebApi from "spotify-web-api-js";
+import { SpotifyWebApi } from "spotify-web-api-ts";
 import { SpotifyPlaylistList } from "./SpotifyPlaylistList";
+import { SimplifiedPlaylist, Paging } from "spotify-web-api-ts/types/types/SpotifyObjects";
 
 interface SpotifyPlaylistListLoaderProps extends React.Props<{}> {
-	onPlaylistClicked: (playlist: SpotifyApi.PlaylistObjectSimplified) => void;
-	spotify: SpotifyWebApi.SpotifyWebApiJs;
+	onPlaylistClicked: (playlist: SimplifiedPlaylist) => void;
+	spotify: SpotifyWebApi;
 	playlistsPerRequest: number;
 	disabled?: boolean;
 }
 
 interface State {
 	downloadAbort: AbortController;
-	playlists?: SpotifyApi.ListOfUsersPlaylistsResponse;
+	playlists?: Paging<SimplifiedPlaylist>;
 	loading: boolean;
 }
 export class SpotifyPlaylistListLoader extends React.Component<SpotifyPlaylistListLoaderProps, State> {
@@ -38,17 +39,17 @@ export class SpotifyPlaylistListLoader extends React.Component<SpotifyPlaylistLi
 				loading: { $set: true }
 			}));
 		}
-		return this.props.spotify.getUserPlaylists({
+		return this.props.spotify.playlists.getMyPlaylists({
 			offset,
 			limit: this.props.playlistsPerRequest
 		}).catch(handleExpiredSpotifyToken(
 			this.state.downloadAbort.signal,
 			this.props.spotify,
-			() => { return this.props.spotify.getUserPlaylists({
+			() => { return this.props.spotify.playlists.getMyPlaylists({
 				offset,
 				limit: this.props.playlistsPerRequest
 			}); }
-		)).then((value: SpotifyApi.ListOfUsersPlaylistsResponse) => {
+		)).then((value: Paging<SimplifiedPlaylist>) => {
 			if (!this.state.downloadAbort.signal.aborted) {
 				this.setState(update(this.state, {
 					playlists: { $set: value }
