@@ -8,13 +8,13 @@ import { Track } from 'spotify-web-api-ts/types/types/SpotifyObjects';
 
 const CHUNK_SIZE: number = 25;
 export class SpotifyUpdater {
-	static update(accessToken: string, refreshToken: string, redirectUri: string): Promise<any> {
+	static update(accessToken: string, refreshToken: string): Promise<any> {
 		if (SpotifyUpdater.singleton !== null) {
 			return Promise.reject("SpotifyUpdater already running");
 		}
 
 		SpotifyUpdater.singleton = new SpotifyUpdater();
-		return SpotifyUpdater.singleton.initAndStart(accessToken, refreshToken, redirectUri).finally(() => {
+		return SpotifyUpdater.singleton.initAndStart(accessToken, refreshToken).finally(() => {
 			Logger.getInstance().info(`SpotifyUpdater.initAndStart() DONE`);
 			SpotifyUpdater.singleton = null;
 		});
@@ -38,9 +38,9 @@ export class SpotifyUpdater {
 
 	private constructor() { }
 
-	private async initAndStart(accessToken: string, refreshToken: string, redirectUri: string): Promise<any> {
+	private async initAndStart(accessToken: string, refreshToken: string): Promise<any> {
 		Logger.getInstance().info(`SpotifyUpdater.initAndStart()`);
-		this.spotify = await RateLimitedSpotifyWebApi.createInstance(accessToken, refreshToken, redirectUri);
+		this.spotify = await RateLimitedSpotifyWebApi.createInstance(accessToken, refreshToken);
 		this.db = await Database.getInstance();
 
 		const promises: Promise<any>[] = [];

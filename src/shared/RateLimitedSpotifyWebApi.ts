@@ -15,8 +15,8 @@ enum Priority {
 }
 
 export class RateLimitedSpotifyWebApi {
-	public static async createInstance(accessToken: string, refreshToken: string, redirectUri: string): Promise<RateLimitedSpotifyWebApi> {
-		const instance: RateLimitedSpotifyWebApi = new RateLimitedSpotifyWebApi(accessToken, refreshToken, redirectUri);
+	public static async createInstance(accessToken: string, refreshToken: string): Promise<RateLimitedSpotifyWebApi> {
+		const instance: RateLimitedSpotifyWebApi = new RateLimitedSpotifyWebApi(accessToken, refreshToken);
 		await instance.init();
 		return instance;
 	}
@@ -30,11 +30,10 @@ export class RateLimitedSpotifyWebApi {
 		intervalCap: 7
 	});;
 
-	private constructor(accessToken: string, refreshToken: string, redirectUri: string) {
+	private constructor(accessToken: string, refreshToken: string) {
 		this.spotify = new SpotifyWebApi({
 			clientId: process.env.SPOTIFY_CLIENT_ID,
 			clientSecret: process.env.SPOTIFY_CLIENT_SECRET,
-			redirectUri
 		});
 		this.spotify.setAccessToken(accessToken);
 		this.refreshToken = refreshToken;
@@ -48,7 +47,10 @@ export class RateLimitedSpotifyWebApi {
 				Logger.getInstance().debug(`this.spotify.searchTracks("${searchQuery}") SUCCEEDED`);
 				return Promise.resolve(value.items);
 			});
-		}, Priority.SpotifyUpdate);
+		}, Priority.SpotifyUpdate).catch((error: Error) => {
+			Logger.getInstance().error(`this.spotify.searchTracks("${searchQuery.toString()}") failed with error ${error}`);
+			return Promise.reject(error);
+		});
 	}
 
 	// Create a playlist for the "entire-library constantly-updated" feature
@@ -130,14 +132,14 @@ export class RateLimitedSpotifyWebApi {
 	private enqueue<T>(task: () => Promise<T>, priority: Priority): Promise<T> {
 		return RateLimitedSpotifyWebApi.queue.add(task, {
 			priority
-		}).catch((reason: any) => {
+		}).catch((error: Error) => {
 			let restartCondition: Promise<void>|undefined;
-			if (reason && reason.name === "WebapiError" && reason.statusCode === 401 && reason.message === "Unauthorized") {
+			if (error.message.includes("401")) {
 				// This action likely failed because the access token expired. Pause execution of tasks in the queue while
 				// the auth token updates to avoid other failures. Retry this task, since it likely only failed due to the
 				// expired token, and return the new result;
 				restartCondition = this.updateAccessToken();
-			} else if (reason && reason.name === `WebapiError` && reason.statusCode === 429 && reason.message === "Too Many Requests") {
+			} else if (error.message.includes("429")) {
 				Logger.getInstance().warn(`Spotify API error 429: Too many requests`);
 
 				// The Spotify API returns a "Retry-After" header that prescribes the exact amount of time that should pass before more requests are sent.
@@ -146,7 +148,7 @@ export class RateLimitedSpotifyWebApi {
 				restartCondition = wait(4 * 1000);
 			} else {
 				// TODO Retry requests that give a 500 error. There seems to be some flakiness in the Spotify APIs
-				Logger.getInstance().error(`Unrecognized Spotify API error ${JSON.stringify(reason)}`);
+				Logger.getInstance().error(`Unrecognized Spotify API error ${JSON.stringify(error)}`);
 			}
 
 			if (restartCondition) {
@@ -158,7 +160,7 @@ export class RateLimitedSpotifyWebApi {
 			}
 
 			// If the failure was anything else, no need to catch it here.
-			return Promise.reject(reason);
+			return Promise.reject(error);
 		});
 	}
 }

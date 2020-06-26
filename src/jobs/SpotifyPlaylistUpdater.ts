@@ -6,13 +6,13 @@ import { Logger } from "../shared/Logger";
 
 const SPOTIFY_MAX_PLAYLIST_SIZE: number = 10 * 1000;
 export class SpotifyPlaylistUpdater {
-	static update(accessToken: string, refreshToken: string, redirectUri: string): Promise<void> {
+	static update(accessToken: string, refreshToken: string): Promise<void> {
 		if (SpotifyPlaylistUpdater.singleton !== null) {
 			return Promise.reject("Updater is already running");
 		}
 
 		SpotifyPlaylistUpdater.singleton = new SpotifyPlaylistUpdater();
-		return SpotifyPlaylistUpdater.singleton.run(accessToken, refreshToken, redirectUri).finally(() => {
+		return SpotifyPlaylistUpdater.singleton.run(accessToken, refreshToken).finally(() => {
 			SpotifyPlaylistUpdater.singleton = null;
 		});
 	}
@@ -26,9 +26,9 @@ export class SpotifyPlaylistUpdater {
 	private spotify!: RateLimitedSpotifyWebApi;
 
 	private constructor() { }
-	private async run(accessToken: string, refreshToken: string, redirectUri: string): Promise<void> {
+	private async run(accessToken: string, refreshToken: string): Promise<void> {
 		Logger.getInstance().info(`SpotifyPlaylistUpdater.run(...)`);
-		this.spotify = await RateLimitedSpotifyWebApi.createInstance(accessToken, refreshToken, redirectUri);
+		this.spotify = await RateLimitedSpotifyWebApi.createInstance(accessToken, refreshToken);
 		this.db = await Database.getInstance();
 		return this.ensureTracksInPlaylist();
 	}

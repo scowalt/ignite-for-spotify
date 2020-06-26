@@ -17,27 +17,25 @@ import { PrivateUser, Playlist } from 'spotify-web-api-ts/types/types/SpotifyObj
 
 function spotifyProcessFunction(job: Bull.Job<SpotifyUpdateJobData>): Promise<void> {
 	Logger.getInstance().info(`Started Spotify job ${job.id}`);
-	const redirectUri: string = "";
 	if (!process.env.SPOTIFY_ACCOUNT_ACCESS_TOKEN ||
 		!process.env.SPOTIFY_ACCOUNT_REFRESH_TOKEN) {
 		assert(false, "Spotify access and refresh tokens must be set as environment variables");
 		return Promise.reject(new Error("Spotify access and refresh tokens must be set as environment variables"));
 	}
 
-	return SpotifyUpdater.update(process.env.SPOTIFY_ACCOUNT_ACCESS_TOKEN, process.env.SPOTIFY_ACCOUNT_REFRESH_TOKEN, redirectUri).finally(() => {
+	return SpotifyUpdater.update(process.env.SPOTIFY_ACCOUNT_ACCESS_TOKEN, process.env.SPOTIFY_ACCOUNT_REFRESH_TOKEN).finally(() => {
 		Logger.getInstance().info(`SpotifyUpdater.update(...) finished`);
 	});
 }
 
 function playlistProcessFunction(): Promise<void> {
-	const redirectUri: string = "";
 	if (!process.env.SPOTIFY_ACCOUNT_ACCESS_TOKEN ||
 		!process.env.SPOTIFY_ACCOUNT_REFRESH_TOKEN) {
 		assert(false, "Spotify access and refresh tokens must be set as environment variables");
 		return Promise.reject(new Error("Spotify access and refresh tokens must be set as environment variables"));
 	}
 
-	return SpotifyPlaylistUpdater.update(process.env.SPOTIFY_ACCOUNT_ACCESS_TOKEN, process.env.SPOTIFY_ACCOUNT_REFRESH_TOKEN, redirectUri).catch((reason: any) => {
+	return SpotifyPlaylistUpdater.update(process.env.SPOTIFY_ACCOUNT_ACCESS_TOKEN, process.env.SPOTIFY_ACCOUNT_REFRESH_TOKEN).catch((reason: any) => {
 		Logger.getInstance().error(`SpotifyPlaylistUpdater failed with reason ${reason.toString()}`);
 		return Promise.reject(reason);
 	});
@@ -46,8 +44,7 @@ function playlistProcessFunction(): Promise<void> {
 async function userPlaylistCreationFunction(job: Bull.Job<UserPlaylistCreationJobData>): Promise<any> {
 	const spotify: RateLimitedSpotifyWebApi = await RateLimitedSpotifyWebApi.createInstance(
 		job.data.auth.spotifyAccessToken,
-		job.data.auth.spotifyRefreshToken,
-		'' // redirectUri
+		job.data.auth.spotifyRefreshToken
 	);
 	await spotify.updateAccessToken();
 
