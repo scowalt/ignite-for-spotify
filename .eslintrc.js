@@ -95,6 +95,9 @@ module.exports = {
 		"@typescript-eslint/no-parameter-properties": "error",
 		"@typescript-eslint/no-require-imports": "error",
 		"@typescript-eslint/no-use-before-define": "error",
+		"@typescript-eslint/no-unsafe-member-access": "off", // Probably want to turn this on eventually, but my code is too much of a mess
+		"@typescript-eslint/no-unsafe-assignment": "off", // Probably want to turn this on eventually, but my code is too much of a mess
+		"@typescript-eslint/ban-types": "off", // Probably want to turn this on eventually, but right now I use {} a lot
 		"@typescript-eslint/prefer-for-of": "error",
 		"@typescript-eslint/prefer-function-type": "error",
 		"@typescript-eslint/prefer-readonly": "error",

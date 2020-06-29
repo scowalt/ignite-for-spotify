@@ -14,7 +14,7 @@ import { Database } from './db/Database';
 import { Song } from './db/models/Song';
 import { RateLimitedSpotifyWebApi } from './shared/RateLimitedSpotifyWebApi';
 
-function spotifyProcessFunction(job: Bull.Job<SpotifyUpdateJobData>): Promise<void> {
+function spotifyProcessFunction(job: Bull.Job<SpotifyUpdateJobData>): Promise<any> {
 	Logger.getInstance().info(`Started Spotify job ${job.id}`);
 	const redirectUri: string = "";
 	if (!process.env.SPOTIFY_ACCOUNT_ACCESS_TOKEN ||
@@ -36,7 +36,7 @@ function playlistProcessFunction(): Promise<void> {
 		return Promise.reject(new Error("Spotify access and refresh tokens must be set as environment variables"));
 	}
 
-	return SpotifyPlaylistUpdater.update(process.env.SPOTIFY_ACCOUNT_ACCESS_TOKEN, process.env.SPOTIFY_ACCOUNT_REFRESH_TOKEN, redirectUri).catch((reason: any) => {
+	return SpotifyPlaylistUpdater.update(process.env.SPOTIFY_ACCOUNT_ACCESS_TOKEN, process.env.SPOTIFY_ACCOUNT_REFRESH_TOKEN, redirectUri).catch((reason: Error) => {
 		Logger.getInstance().error(`SpotifyPlaylistUpdater failed with reason ${reason.toString()}`);
 		return Promise.reject(reason);
 	});
@@ -96,4 +96,4 @@ queues.playlistUpdateQueue.process(playlistProcessFunction).finally(() => {
 	Logger.getInstance().info(`Playlist job finished`);
 });
 
-queues.userPlaylistCreationQueue.process(userPlaylistCreationFunction);
+void queues.userPlaylistCreationQueue.process(userPlaylistCreationFunction);

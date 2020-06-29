@@ -155,7 +155,7 @@ export class SpotifyUpdater {
 	private getTrackIdForSearchQuery(searchQuery: Query): Promise<string> {
 		return this.spotify.searchTracks(searchQuery).then((tracks?: SpotifyApi.PagingObject<SpotifyApi.TrackObjectFull>) => {
 			if (!tracks || tracks.total === 0) {
-				return Promise.reject(`Spotify has no track for ${searchQuery}`);
+				return Promise.reject(`Spotify has no track for ${searchQuery.toString()}`);
 			} else {
 				return Promise.resolve(tracks.items[0].id);
 			}

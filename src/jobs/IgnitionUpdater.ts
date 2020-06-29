@@ -86,7 +86,7 @@ export class IgnitionUpdater {
 			headers: {
 				"Accept": "application/json",
 				"Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
-				"Cookie": `${process.env.IGNITION_COOKIE_KEY}=${process.env.IGNITION_COOKIE_VALUE}`,
+				"Cookie": `${process.env.IGNITION_COOKIE_KEY!}=${process.env.IGNITION_COOKIE_VALUE!}`,
 			},
 			body: new URLSearchParams({
 				"draw": "5",
@@ -258,7 +258,7 @@ export class IgnitionUpdater {
 	}
 
 	private addIgnitionTracksToDatabase(ignitionResult: IgnitionApiResponse): Promise<boolean[]> {
-		Logger.getInstance().info(`addIgnitionTracksToDatabase(${ignitionResult})`);
+		Logger.getInstance().info(`addIgnitionTracksToDatabase(${ignitionResult.toString()})`);
 		const trackAdditionPromises: Promise<boolean>[] = [];
 		ignitionResult.data.forEach((entry: dlcEntry) => {
 			trackAdditionPromises.push(this.tryAddEntry(entry));

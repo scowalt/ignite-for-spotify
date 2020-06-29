@@ -14,7 +14,7 @@ export class StaticPlaylists extends React.Component<{}, PlaylistsState> {
 		this.state = {
 			downloadAbort: new AbortController(),
 		};
-		this.getPlaylists();
+		void this.getPlaylists();
 	}
 
 	componentWillUnmount(): void {
