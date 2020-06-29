@@ -55,7 +55,7 @@
         "sequelize-typescript": "^1.1.0",
         "serve-favicon": "^2.5.0",
         "spotify-web-api-ts": "^1.4.2",
-        "winston": "^3.3.2",
+        "winston": "^3.3.3",
         "zod": "^1.7.1"
     },
     "devDependencies": {
