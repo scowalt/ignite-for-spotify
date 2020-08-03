@@ -12,7 +12,7 @@
         "lint": "(eslint \"./src/**/*.{ts,tsx,html}\") && (stylelint \"./src/**/*.scss\")",
         "run": "concurrently \"node ./dist/server.js\" \"node ./dist/worker.js\" \"node ./dist/cronJobs.js\"",
         "fix": "eslint --fix \"./src/**/*.{ts,tsx,html}\"",
-        "upgradeDependencies": "yarn "
+        "upgradeDependencies": "yarn upgrade --latest"
     },
     "engines": {
         "node": "^14.3.0"
