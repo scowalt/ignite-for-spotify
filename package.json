@@ -86,7 +86,7 @@
         "@typescript-eslint/parser": "^3.7.0",
         "concurrently": "^5.1.0",
         "csp-html-webpack-plugin": "^4.0.0",
-        "css-loader": "^3.6.0",
+        "css-loader": "^4.2.0",
         "del": "^5.1.0",
         "eslint": "^7.5.0",
         "eslint-plugin-html": "^6.0.2",
