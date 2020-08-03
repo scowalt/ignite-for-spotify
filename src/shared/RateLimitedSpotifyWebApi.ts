@@ -26,7 +26,7 @@ export class RateLimitedSpotifyWebApi {
 		interval: 1 * 1000, // one second
 		// Spotify doesn't prescribe how many requests are allowed per second. In my testing, I've found that 10/s is too many.
 		intervalCap: 7
-	});;
+	});
 
 	private constructor(accessToken: string, refreshToken: string, redirectUri: string) {
 		this.spotify = new SpotifyWebApi({
@@ -43,7 +43,7 @@ export class RateLimitedSpotifyWebApi {
 		return this.enqueue(() => {
 			Logger.getInstance().debug(`Calling this.spotify.searchTracks("${searchQuery.toString()}")`);
 			return this.spotify.searchTracks(searchQuery.toString()).then((value: SpotifyWebApi.Response<SpotifyApi.SearchResponse>) => {
-				Logger.getInstance().debug(`this.spotify.searchTracks("${searchQuery}") SUCCEEDED`);
+				Logger.getInstance().debug(`this.spotify.searchTracks("${searchQuery.toString()}") SUCCEEDED`);
 				return Promise.resolve(value.body.tracks);
 			});
 		}, Priority.SpotifyUpdate);
@@ -98,7 +98,7 @@ export class RateLimitedSpotifyWebApi {
 			} else {
 				return Promise.resolve(playlistResponse);
 			}
-		}, Priority.PlaylistUpdate).catch((reason: any) => {
+		}, Priority.PlaylistUpdate).catch((reason: Error) => {
 			Logger.getInstance().error(`Spotify API error ${reason.toString()}`);
 			Logger.getInstance().error(`Failure at removePlaylistTracksAtPosition("${playlistId}", ${playlistOffset}, ${count})`);
 			return Promise.reject(reason);

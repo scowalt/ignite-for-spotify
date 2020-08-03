@@ -1,0 +1,27 @@
+name: Pull Request and Push validation
+on: [pull_request, push]
+
+jobs:
+  buildAndLint:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [^14.3.0]
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v1
+      with:
+        node-version: ${{ matrix.node-version }}
+
+    - name: Install dependencies
+      run: yarn install
+
+    - name: Run linting
+      run: yarn lint
+
+    - name: Run build
+      run: yarn build

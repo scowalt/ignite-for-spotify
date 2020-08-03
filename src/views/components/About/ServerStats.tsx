@@ -14,7 +14,7 @@ export class ServerStats extends React.Component<React.Props<{}>, State> {
 			downloadAbort: new AbortController()
 		};
 
-		this.fetchServerStats();
+		void this.fetchServerStats();
 	}
 
 	private async fetchServerStats(): Promise<void> {

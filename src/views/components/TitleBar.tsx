@@ -21,7 +21,7 @@ export class TitleBar extends React.Component<{}, {}> {
 	}
 
 	render(): ReactNode {
-		return <Navbar bg="dark" expand="lg">
+		return <Navbar bg="dark" variant="dark" expand="lg">
 			<Container fluid>
 				<Navbar.Brand href="/">
 					<img src={Icon} className="brandIcon"></img>

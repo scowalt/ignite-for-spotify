@@ -7,19 +7,23 @@ import { Logger } from '../shared/Logger';
 function getRedirectUri(request: Request): string {
 	// Since this is an auth callback, the `referer` header will be Spotify's server.
 	// Use other parts of the request to get the current deployment's baseUri.
-	const redirectUri: string = `${request.protocol}://${request.header('host')}/spotifyAuthCallback`;
+	const redirectUri: string = `${request.protocol}://${request.header('host')!}/spotifyAuthCallback`;
 	Logger.getInstance().debug(`Spotify auth using redirectUri '${redirectUri}'`);
 	return redirectUri;
 }
 
 export async function SpotifyAuthCallbackRoute(request: Request, response: Response): Promise<void> {
 	// Request refresh and state tokens
-	const code: string = request.query.code || null;
-	const state: string|null = request.query.state || null;
+	const code = request.query.code;
+	const state = request.query.state;
 	const storedState: string|null = request.cookies ? request.cookies[StateKey] : null;
 
-	if (state === null || state !== storedState) {
+	if (code === null || state === null || state !== storedState) {
 		return response.status(HttpStatus.INTERNAL_SERVER_ERROR).send("Invalid auth state").end();
+	}
+
+	if (typeof code !== 'string') {
+		return response.status(HttpStatus.INTERNAL_SERVER_ERROR).send("Invalid code type").end();
 	}
 
 	// Since the authentication has been finished, state is no longer necessary

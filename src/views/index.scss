@@ -5,10 +5,6 @@
 	margin-left: 5px;
 }
 
-.spotifyPlaylistEmbed {
-	@extend .embed-responsive-item;
-}
-
 .SpotifyPlaylistList {
 	width: 100%;
 }
@@ -33,13 +29,6 @@ div > .row {
 		@extend .col-12;
 		@extend .col-lg-9;
 	}
-}
-
-// This must come after the bootstrap imports to correctly override. See https://stackoverflow.com/a/50343665/1222411
-.spotifyPlaylistEmbedWrapper {
-	@extend .embed-responsive;
-
-	padding-bottom: 141.42%; // https://gordonlesti.com/bootstrap-responsive-embed-aspect-ratio/
 }
 
 .selectedPlaylist {

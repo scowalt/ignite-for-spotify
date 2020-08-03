@@ -14,9 +14,9 @@ new CronJob(
 	`0 0 0 * * *`, // every day at 00:00:00 (midnight)
 	() => {
 		Logger.getInstance().info(`Started Ignition, Spotify, Playlist jobs`);
-		queues.ignitionQueue.add({ });
-		queues.spotifyUpdateQueue.add({ });
-		queues.playlistUpdateQueue.add({ });
+		void queues.ignitionQueue.add({ });
+		void queues.spotifyUpdateQueue.add({ });
+		void queues.playlistUpdateQueue.add({ });
 	},
 	null, // onComplete
 	true, // start
@@ -28,8 +28,8 @@ new CronJob(
 	() => {
 		Logger.getInstance().debug(`Started queue cleanup`);
 		queues.forEach((queue: Queue<any>): void => {
-			queue.clean(5 * 60 * 1000 /* 5 minutes */, "completed");
-			queue.clean(5 * 60 * 1000 /* 5 minutes */, "failed");
+			void queue.clean(5 * 60 * 1000 /* 5 minutes */, "completed");
+			void queue.clean(5 * 60 * 1000 /* 5 minutes */, "failed");
 		});
 	},
 	null, // onComplete

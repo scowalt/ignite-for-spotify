@@ -6,7 +6,7 @@ import { StateKey } from '../server';
 function getRedirectUri(request: Request): string {
 	// If this page is accessed directly, the `referer` header won't be set.
 	// Use other parts of the request to get the current deployment's baseUri.
-	return `${request.protocol}://${request.header('host')}/spotifyAuthCallback`;
+	return `${request.protocol}://${request.header('host')!}/spotifyAuthCallback`;
 }
 
 export function LoginRoute(request: Request, response: Response): void {

@@ -7,6 +7,7 @@ import { SpotifyToIgnition } from "./SpotifyToIgnition/SpotifyToIgnition";
 import { IgnitionSearchForm } from "./IgnitionToSpotify/IgnitionSearchForm";
 import { Container, Row, Col, TabContent, Nav, TabPane, Fade } from "react-bootstrap";
 import ReactGA from 'react-ga';
+import { TransitionComponent } from "react-bootstrap/esm/helpers";
 
 export class Home extends React.Component<{}, {}> {
 	componentDidMount(): void {
@@ -30,9 +31,10 @@ export class Home extends React.Component<{}, {}> {
 	private createTabContent(id: string, content: ReactNode, active?: boolean): ReactNode {
 		return <TabPane
 			active={active}
-			transition={Fade}
 			id={`v-pills-${id}`}
 			role="tabpanel"
+			// HACK: Workaround react-bootstrap bug where it thinks `Fade` isn't a valid TransitionComponent
+			transition={Fade as TransitionComponent}
 			aria-labelledby={`v-pills-${id}-tab`}>
 			{content}
 		</TabPane>;

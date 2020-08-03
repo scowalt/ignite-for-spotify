@@ -25,7 +25,7 @@ export class SpotifyPlaylistListLoader extends React.Component<SpotifyPlaylistLi
 			loading: true
 		};
 
-		this.getUserSpotifyPlaylists(0);
+		void this.getUserSpotifyPlaylists(0);
 	}
 
 	componentWillUnmount(): void {

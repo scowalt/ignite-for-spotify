@@ -53,7 +53,7 @@ async function getSpotifyClient(request: Request, cookies: Cookies): Promise<Spo
 		refreshToken: cookies.spotifyRefreshToken,
 		clientId: process.env.SPOTIFY_CLIENT_ID,
 		clientSecret: process.env.SPOTIFY_CLIENT_SECRET,
-		redirectUri: `${request.header('Referer')}spotifyAuthCallback` // TODO don't know if I need a redirect URI here
+		redirectUri: `${request.header('Referer')!}spotifyAuthCallback` // TODO don't know if I need a redirect URI here
 	});
 	const refreshResponse: SpotifyWebApi.Response<SpotifyWebApi.RefreshAccessTokenResponse> = await spotify.refreshAccessToken();
 	spotify.setAccessToken(refreshResponse.body.access_token);
