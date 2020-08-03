@@ -5,7 +5,7 @@ import { FaSpotify } from 'react-icons/fa';
 import { RequireSpotifyAuth } from "./shared/RequireSpotifyAuth";
 import { SpotifyToIgnition } from "./SpotifyToIgnition/SpotifyToIgnition";
 import { IgnitionSearchForm } from "./IgnitionToSpotify/IgnitionSearchForm";
-import { Container, Row, Col, TabContent, Nav, TabPane, Fade } from "react-bootstrap";
+import { Container, Row, Col, TabContent, Nav, TabPane } from "react-bootstrap";
 import ReactGA from 'react-ga';
 
 export class Home extends React.Component<{}, {}> {
@@ -30,7 +30,6 @@ export class Home extends React.Component<{}, {}> {
 	private createTabContent(id: string, content: ReactNode, active?: boolean): ReactNode {
 		return <TabPane
 			active={active}
-			transition={Fade}
 			id={`v-pills-${id}`}
 			role="tabpanel"
 			aria-labelledby={`v-pills-${id}-tab`}>
