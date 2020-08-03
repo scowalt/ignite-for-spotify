@@ -178,6 +178,13 @@ export class IgnitionSearchForm extends React.Component<Props, State> {
 		return result;
 	}
 
+	localHandleSubmit(formikProps: FormikProps<IgnitionToSpotifyData>): (event: React.FormEvent<HTMLElement>) => void{
+		return (event: React.FormEvent<HTMLElement>): void => {
+			// HACK: React Typescript thinks that this is just a generic HTMLElement, but we know it's actually a HTMLFormElement
+			formikProps.handleSubmit(event as React.FormEvent<HTMLFormElement>);
+		};
+	}
+
 	render(): ReactNode {
 		const dialog: ReactElement = this.getDialog();
 		return <>
@@ -190,7 +197,7 @@ export class IgnitionSearchForm extends React.Component<Props, State> {
 					validateOnBlur={false}
 					validate={this.validate.bind(this)}>
 					{( formikProps: FormikProps<IgnitionToSpotifyData> ): ReactNode => (
-						<Form onSubmit={formikProps.handleSubmit}>
+						<Form onSubmit={this.localHandleSubmit(formikProps)}>
 							<Row className="formRow">
 								<Col>
 									<Row>

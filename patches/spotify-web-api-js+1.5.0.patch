@@ -1,5 +1,5 @@
 diff --git a/node_modules/spotify-web-api-js/src/typings/spotify-web-api.d.ts b/node_modules/spotify-web-api-js/src/typings/spotify-web-api.d.ts
-index 542c982..c1aa613 100644
+index f7f8dbb..24e99e2 100644
 --- a/node_modules/spotify-web-api-js/src/typings/spotify-web-api.d.ts
 +++ b/node_modules/spotify-web-api-js/src/typings/spotify-web-api.d.ts
 @@ -464,7 +464,11 @@ declare namespace SpotifyWebApi {
