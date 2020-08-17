@@ -41,7 +41,7 @@
         "mysql2": "^2.1.0",
         "node-cache": "^5.1.0",
         "node-fetch": "^2.6.0",
-        "p-queue": "^6.6.0",
+        "p-queue": "^6.6.1",
         "patch-package": "^6.2.2",
         "popper.js": "^1.16.1",
         "postinstall-postinstall": "^2.1.0",
