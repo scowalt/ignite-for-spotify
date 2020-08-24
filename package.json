@@ -64,7 +64,7 @@
     },
     "devDependencies": {
         "@types/bluebird": "^3.5.30",
-        "@types/bull": "^3.14.0",
+        "@types/bull": "^3.14.2",
         "@types/chance": "^1.0.10",
         "@types/cookie-parser": "^1.4.2",
         "@types/cron": "^1.7.2",
