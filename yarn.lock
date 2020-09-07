@@ -8052,7 +8052,7 @@ yn@3.1.1:
   resolved "https://registry.yarnpkg.com/yn/-/yn-3.1.1.tgz#1e87401a09d767c1d5eab26a6e4c185182d2eb50"
   integrity sha512-Ux4ygGWsu2c7isFWe8Yu1YluJmqVhxqK2cLXNQA5AcC3QfbGNpM7fu0Y8b/z16pXLnFxZYvWhd3fhBY9DLmC6Q==
 
-zod@^1.10.3:
-  version "1.10.3"
-  resolved "https://registry.yarnpkg.com/zod/-/zod-1.10.3.tgz#a69e60a96115d8968020e42aa0d7d1903e3e50c7"
-  integrity sha512-TxvLXUx7red0MKzx85sOwcoAWSsO+ChnYIsPzV/rWouS57yagZZlPp2bBTaXOu685lZE8H9vQK2nJs1vxleQTA==
+zod@^1.11.5:
+  version "1.11.5"
+  resolved "https://registry.yarnpkg.com/zod/-/zod-1.11.5.tgz#7e415474ff691289e8d714a68b69ac9a285f2864"
+  integrity sha512-wtVHhYZi9OTvnokOy9dv1x6lI1mn+fntcr8vB5+9DOPkWbKA3nkcaVnDaMrRpMrulW1y47Nf0iJ1q63u6xPuyg==
