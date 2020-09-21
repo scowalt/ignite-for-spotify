@@ -1,8 +1,8 @@
-name: Stable CI and deploy
+name: Staging CI and deploy
 on:
   push:
     branches:
-      - stable
+      - staging
 
 jobs:
   build:
@@ -41,8 +41,9 @@ jobs:
     - name: Deploy to self-hosted dokku instance
       uses: thadeu/easily-dokku-action@v1.0.8
       env:
-        BRANCH: stable
-        PROJECT: spotify-ignition
+        BRANCH: staging
+        PROJECT: spotify-ignition-beta
+        FLAGS: --force
         PORT: 22
         SSH_PRIVATE_KEY: ${{ secrets.DOKKU_PRIVATE_KEY }}
         SSH_PUBLIC_KEY: ${{ secrets.DOKKU_PUBLIC_KEY }}
