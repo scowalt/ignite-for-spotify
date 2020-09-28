@@ -93,7 +93,7 @@
         "eslint-plugin-html": "^6.1.0",
         "eslint-plugin-react": "^7.21.2",
         "file-loader": "^6.1.0",
-        "html-webpack-plugin": "^4.4.1",
+        "html-webpack-plugin": "^4.5.0",
         "nodemon": "^2.0.3",
         "sass": "^1.26.11",
         "sass-loader": "^10.0.2",
