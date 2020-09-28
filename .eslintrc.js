@@ -159,7 +159,7 @@ module.exports = {
 		"no-unused-expressions": "error",
 		"no-unused-labels": "error",
 		"object-shorthand": "error",
-		"@typescript-eslint/no-unused-vars": "warn",
+		"@typescript-eslint/no-unused-vars": "off", // This is bugged when the variable is used for a type
 		"one-var": [ "error", "never" ],
 		"radix": "error",
 		"spaced-comment": "error",
