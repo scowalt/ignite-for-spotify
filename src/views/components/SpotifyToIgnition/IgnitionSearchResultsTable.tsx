@@ -13,7 +13,7 @@ export class IgnitionSearchResultsTable extends React.Component<Props> {
 		// TODO make this table sortable
 		const results: ReactNode[] = this.props.songs.map((song: Song, index: number) => {
 			return <tr key={index}>
-				<td><a href={`https://ignition4.customsforge.com/user/collectedcdlc/store/${song.id}`} target="_blank" rel="noopener noreferrer">Download</a></td>
+				<td><a href={`http://customsforge.com/process.php?id=${song.id}`} target="_blank" rel="noopener noreferrer">Download</a></td>
 				<td>{song.title}</td>
 				<td>{song.artist}</td>
 				<td>{song.album}</td>
