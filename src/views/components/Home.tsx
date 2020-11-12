@@ -67,7 +67,7 @@ export class Home extends React.Component<{}, State> {
 			element = <Row>
 				<Col>
 					<Alert variant="danger" dismissible
-						onClose={closeAction}><b>November 12, 2020</b>: Site is broken due to Ignition 4 update. Have knowledge of Node.js/TypeScript and want to help out with the project? <a href="mailto:ignite-for-spotify@scowalt.com"><FaEnvelope />Email me</a></Alert>
+						onClose={closeAction}><b>November 12, 2020</b>: Ignite for Spotify is broken due to the Ignition 4 update. Do you have knowledge of Node.js/TypeScript/React and want to help out with Ignite for Spotify? <a href="mailto:ignite-for-spotify@scowalt.com"><FaEnvelope /> Email me</a></Alert>
 				</Col>
 			</Row>;
 		}
