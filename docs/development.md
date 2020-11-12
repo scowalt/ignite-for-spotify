@@ -28,3 +28,9 @@ This app uses a MySQL server to store its data. It's possible to setup a docker 
 ### Redis
 
 [Redis](https://redis.io/) is used by [bull](https://optimalbits.github.io/bull/) to queue packages. Fortunately, Redis is simple to get up and running. On Windows, use [this chocolatey package](https://chocolatey.org/packages/redis-64) to install the server binaries, then run `redis-server`. If you want to avoid setting up anything locally, [redislabs](https://redislabs.com/redis-enterprise-cloud/pricing/) offers a free tier.
+
+#### Docker server
+
+- Install `docker-desktop` and `docker-cli`
+- `docker pull redis`
+- `docker run --name=redis1 -p 6379:6379 -d redis redis-server`
