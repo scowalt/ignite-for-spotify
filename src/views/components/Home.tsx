@@ -19,7 +19,7 @@ export class Home extends React.Component<{}, State> {
 	constructor(props: {}) {
 		super(props);
 		this.state = {
-			showBanner: Cookies.get('201112Ignition4BrokeMeAlertDismissed') === undefined
+			showBanner: Cookies.get('201112Ignition4BrokeMeAlertDismissed2') === undefined
 		};
 	}
 
@@ -55,7 +55,7 @@ export class Home extends React.Component<{}, State> {
 
 	private getWarningBanner() : ReactNode {
 		const closeAction = ():void => {
-			Cookies.set('201112Ignition4BrokeMeAlertDismissed', "true");
+			Cookies.set('201112Ignition4BrokeMeAlertDismissed2', "true");
 			this.setState(update(this.state, {
 				showBanner: { $set: false }
 			}));
@@ -66,8 +66,8 @@ export class Home extends React.Component<{}, State> {
 		{
 			element = <Row>
 				<Col>
-					<Alert variant="danger" dismissible
-						onClose={closeAction}><b>November 12, 2020</b>: Ignite for Spotify is broken due to the Ignition 4 update. Do you have knowledge of Node.js/TypeScript/React and want to help out with Ignite for Spotify? <a href="mailto:ignite-for-spotify@scowalt.com"><FaEnvelope /> Email me</a></Alert>
+					<Alert variant="warning" dismissible
+						onClose={closeAction}><b>November 12, 2020</b>: Ignite for Spotify isn&apos;t updating new songs due to the Ignition 4 update. Do you have knowledge of Node.js/TypeScript/React and want to help out with Ignite for Spotify? <a href="mailto:ignite-for-spotify@scowalt.com"><FaEnvelope /> Email me</a></Alert>
 				</Col>
 			</Row>;
 		}
