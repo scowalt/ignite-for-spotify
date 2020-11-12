@@ -19,7 +19,7 @@ export class Home extends React.Component<{}, State> {
 	constructor(props: {}) {
 		super(props);
 		this.state = {
-			showBanner: Cookies.get('Ignition4BrokeMeAlertDismissed') === undefined
+			showBanner: Cookies.get('201112Ignition4BrokeMeAlertDismissed') === undefined
 		};
 	}
 
@@ -55,7 +55,7 @@ export class Home extends React.Component<{}, State> {
 
 	private getWarningBanner() : ReactNode {
 		const closeAction = ():void => {
-			Cookies.set('Ignition4BrokeMeAlertDismissed', "true");
+			Cookies.set('201112Ignition4BrokeMeAlertDismissed', "true");
 			this.setState(update(this.state, {
 				showBanner: { $set: false }
 			}));
@@ -66,8 +66,8 @@ export class Home extends React.Component<{}, State> {
 		{
 			element = <Row>
 				<Col>
-					<Alert variant="warning" dismissible
-						onClose={closeAction}>Site is currently not updating due to Ignition 4 update. Have knowledge of Node.js/TypeScript and want to help out with the project? <a href="mailto:ignite-for-spotify@scowalt.com"><FaEnvelope />Email me</a></Alert>
+					<Alert variant="danger" dismissible
+						onClose={closeAction}><b>November 12, 2020</b>: Site is broken due to Ignition 4 update. Have knowledge of Node.js/TypeScript and want to help out with the project? <a href="mailto:ignite-for-spotify@scowalt.com"><FaEnvelope />Email me</a></Alert>
 				</Col>
 			</Row>;
 		}
