@@ -1,15 +1,28 @@
 import React, { ReactNode } from "react";
 import { StaticPlaylists } from "./StaticPlaylists/StaticPlaylists";
 import { SpotifyAuthInfo } from "./shared/SpotifyAuthInfo";
-import { FaSpotify } from 'react-icons/fa';
+import { FaEnvelope, FaSpotify } from 'react-icons/fa';
 import { RequireSpotifyAuth } from "./shared/RequireSpotifyAuth";
 import { SpotifyToIgnition } from "./SpotifyToIgnition/SpotifyToIgnition";
 import { IgnitionSearchForm } from "./IgnitionToSpotify/IgnitionSearchForm";
-import { Container, Row, Col, TabContent, Nav, TabPane, Fade } from "react-bootstrap";
+import { Container, Row, Col, TabContent, Nav, TabPane, Fade, Alert } from "react-bootstrap";
 import ReactGA from 'react-ga';
 import { TransitionComponent } from "react-bootstrap/esm/helpers";
+import Cookies from 'js-cookie';
+import update from 'immutability-helper';
 
-export class Home extends React.Component<{}, {}> {
+interface State {
+	showBanner: boolean;
+}
+
+export class Home extends React.Component<{}, State> {
+	constructor(props: {}) {
+		super(props);
+		this.state = {
+			showBanner: Cookies.get('Ignition4BrokeMeAlertDismissed') === undefined
+		};
+	}
+
 	componentDidMount(): void {
 		ReactGA.pageview('/');
 	}
@@ -40,8 +53,32 @@ export class Home extends React.Component<{}, {}> {
 		</TabPane>;
 	}
 
+	private getWarningBanner() : ReactNode {
+		const closeAction = ():void => {
+			Cookies.set('Ignition4BrokeMeAlertDismissed', "true");
+			this.setState(update(this.state, {
+				showBanner: { $set: false }
+			}));
+		};
+
+		let element: ReactNode = <></>;
+		if (this.state.showBanner)
+		{
+			element = <Row>
+				<Col>
+					<Alert variant="warning" dismissible
+						onClose={closeAction}>Site is currently not updating due to Ignition 4 update. Have knowledge of Node.js/TypeScript and want to help out with the project? <a href="mailto:ignite-for-spotify@scowalt.com"><FaEnvelope />Email me</a></Alert>
+				</Col>
+			</Row>;
+		}
+
+		return element;
+	}
+
 	render(): ReactNode {
+		const warningBanner = this.getWarningBanner();
 		return <Container fluid>
+			{ warningBanner }
 			<Row>
 				<Col className="pillColumn">
 					<Nav variant="pills" className="flex-column" id="v-pills-tab">
