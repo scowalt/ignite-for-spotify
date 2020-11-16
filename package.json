@@ -80,7 +80,7 @@
         "@types/react-dom": "^16.9.9",
         "@types/react-router-dom": "^5.1.6",
         "@types/serve-favicon": "^2.5.1",
-        "@types/spotify-api": "^0.0.4",
+        "@types/spotify-api": "^0.0.5",
         "@types/spotify-web-api-node": "^4.0.2",
         "@types/validator": "^13.0.0",
         "@typescript-eslint/eslint-plugin": "^4.0.0",
