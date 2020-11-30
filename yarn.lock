@@ -7970,10 +7970,10 @@ yn@3.1.1:
   resolved "https://registry.yarnpkg.com/yn/-/yn-3.1.1.tgz#1e87401a09d767c1d5eab26a6e4c185182d2eb50"
   integrity sha512-Ux4ygGWsu2c7isFWe8Yu1YluJmqVhxqK2cLXNQA5AcC3QfbGNpM7fu0Y8b/z16pXLnFxZYvWhd3fhBY9DLmC6Q==
 
-zod@^1.11.10:
-  version "1.11.10"
-  resolved "https://registry.yarnpkg.com/zod/-/zod-1.11.10.tgz#dbc4e70e2d0622ce58f8162d76ea2606d821cf4a"
-  integrity sha512-wtoLthqFeFawiQWMVtjpL9DwggpXHNlygYlSitjTtZeagb04ODIECj5iYGu28+K3ht4lVmrBTfX6M7G9d1Eo6Q==
+zod@^1.11.11:
+  version "1.11.11"
+  resolved "https://registry.yarnpkg.com/zod/-/zod-1.11.11.tgz#1cc937e0b4ce08693de01b5bcd7c4d1a37d83993"
+  integrity sha512-q1YeBpu+c7eUX5fDFMyfP97sD74TUQ+UN8va/nvbxnArr5euYsNO6fjiY0SdDkHKNZ+xBR2ZQToaeLgJ6fsB2A==
 
 zwitch@^1.0.0:
   version "1.0.5"
