@@ -18,7 +18,6 @@
         "node": "^14.3.0"
     },
     "author": "Scott Walters",
-    "license": "",
     "dependencies": {
         "body-parser": "^1.19.0",
         "bootstrap": "^4.5.3",

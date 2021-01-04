@@ -13,8 +13,7 @@ const queues: QueueManager = new QueueManager();
 new CronJob(
 	`0 0 0 * * *`, // every day at 00:00:00 (midnight)
 	() => {
-		Logger.getInstance().info(`Started Ignition, Spotify, Playlist jobs`);
-		void queues.ignitionQueue.add({ });
+		Logger.getInstance().info(`Started Spotify and Playlist jobs`);
 		void queues.spotifyUpdateQueue.add({ });
 		void queues.playlistUpdateQueue.add({ });
 	},

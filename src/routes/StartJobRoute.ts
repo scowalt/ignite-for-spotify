@@ -15,8 +15,6 @@ export function StartJobRoute(queues: QueueManager): (request: Request, response
 		let job: Bull.Job;
 		if (type === JobType.SpotifyUpdate) {
 			job = await queues.spotifyUpdateQueue.add({ });
-		} else if (type === JobType.IgnitionUpdate) {
-			job = await queues.ignitionQueue.add({ });
 		} else if (type === JobType.PlaylistUpdate) {
 			job = await queues.playlistUpdateQueue.add({ });
 		} else if (type === JobType.UserPlaylistCreate) {

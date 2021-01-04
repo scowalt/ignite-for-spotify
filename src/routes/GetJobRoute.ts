@@ -36,8 +36,6 @@ export function GetJobRoute(queues: QueueManager): (request: Request, response: 
 
 		if (type === JobType.SpotifyUpdate) {
 			job = await queues.spotifyUpdateQueue.getJob(id);
-		} else if (type === JobType.IgnitionUpdate) {
-			job = await queues.ignitionQueue.getJob(id);
 		} else if (type === JobType.PlaylistUpdate) {
 			job = await queues.playlistUpdateQueue.getJob(id);
 		} else if (type === JobType.UserPlaylistCreate) {

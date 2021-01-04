@@ -5,11 +5,10 @@ dotenvexpand(environment);
 
 import assert from 'assert';
 import { SpotifyUpdater } from './jobs/SpotifyUpdater';
-import { IgnitionUpdater } from './jobs/IgnitionUpdater';
 import { Logger } from './shared/Logger';
 import Bull from 'bull';
 import { SpotifyPlaylistUpdater } from './jobs/SpotifyPlaylistUpdater';
-import { QueueManager, SpotifyUpdateJobData, IgnitionJobData, UserPlaylistCreationJobData } from './shared/QueueManager';
+import { QueueManager, SpotifyUpdateJobData, UserPlaylistCreationJobData } from './shared/QueueManager';
 import { Database } from './db/Database';
 import { Song } from './db/models/Song';
 import { RateLimitedSpotifyWebApi } from './shared/RateLimitedSpotifyWebApi';
@@ -80,14 +79,6 @@ async function userPlaylistCreationFunction(job: Bull.Job<UserPlaylistCreationJo
 }
 
 const queues: QueueManager = new QueueManager();
-queues.ignitionQueue.process((job: Bull.Job<IgnitionJobData>) => {
-	Logger.getInstance().info(`Started Ignition job ${job.id}`);
-
-	// This will have a high failure rate, because job success relies on all ~1700 requests to the CustomsForge server completing successfully.
-	return IgnitionUpdater.update();
-}).finally(() => {
-	Logger.getInstance().info(`Ignition job finished`);
-});
 queues.spotifyUpdateQueue.process(spotifyProcessFunction).finally(() => {
 	Logger.getInstance().info(`Spotify job finished`);
 });
