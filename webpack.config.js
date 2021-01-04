@@ -109,7 +109,9 @@ module.exports = (env) => {
 					'script-src': ["'unsafe-inline'", "'self'", "'unsafe-eval'", "www.google-analytics.com"],
 					'style-src': ["'unsafe-inline'", "'self'", "'unsafe-eval'", "fonts.googleapis.com"]
 				}),
-				new webpack.EnvironmentPlugin(['GA_TRACKING_ID']),
+				new webpack.EnvironmentPlugin({
+					'GA_TRACKING_ID': '' // default to a blank tracking ID (for CI and local development)
+				}),
 			]
 		}
 	];
