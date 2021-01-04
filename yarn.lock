@@ -560,10 +560,10 @@
   resolved "https://registry.yarnpkg.com/@types/source-list-map/-/source-list-map-0.1.2.tgz#0078836063ffaf17412349bba364087e0ac02ec9"
   integrity sha512-K5K+yml8LTo9bWJI/rECfIPrGgxdpeNbj+d53lwN4QjW1MCwlkhUms+gtdzigTeUyBr09+u8BwOIY3MXvHdcsA==
 
-"@types/spotify-api@*", "@types/spotify-api@^0.0.5":
-  version "0.0.5"
-  resolved "https://registry.yarnpkg.com/@types/spotify-api/-/spotify-api-0.0.5.tgz#243254a754c0c60eff79603737d0f997216c7e77"
-  integrity sha512-Z+FvB+LVRaeX6HDpPDYo1NwNQbUsjugZ8cgob2Qw2e42bgMJheDBXMiO5KFzftsDdtHUsamR3u9fMw0dAsYojQ==
+"@types/spotify-api@*", "@types/spotify-api@^0.0.6":
+  version "0.0.6"
+  resolved "https://registry.yarnpkg.com/@types/spotify-api/-/spotify-api-0.0.6.tgz#29fd987aa3b8b6a392e5928881fe2b72209431d3"
+  integrity sha512-44WK9Mx0WOEsGg6xWlhOhgGROm0rIfDbrLOWTPBQMIx1amOxt559UnSEm95TH+IJUy0P/sr0QvrHivq44QDlgQ==
 
 "@types/spotify-web-api-node@^4.0.2":
   version "4.0.2"
