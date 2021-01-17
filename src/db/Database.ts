@@ -86,7 +86,7 @@ export class Database {
 		};
 	}
 
-	tryAddSong(song: object): Promise<boolean> {
+	tryAddSong(song: object): Promise<[Song, boolean | null]> {
 		return Song.upsert(song);
 	}
 
