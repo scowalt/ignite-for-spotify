@@ -71,7 +71,7 @@
         "@types/js-cookie": "^2.2.5",
         "@types/lodash": "^4.14.167",
         "@types/mysql": "^2.15.17",
-        "@types/node": "^14.14.20",
+        "@types/node": "^14.14.21",
         "@types/node-fetch": "^2.5.5",
         "@types/qs": "^6.9.5",
         "@types/react": "^17.0.0",
