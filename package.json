@@ -45,7 +45,7 @@
         "popper.js": "^1.16.1",
         "postinstall-postinstall": "^2.1.0",
         "prop-types": "^15.7.2",
-        "qs": "^6.9.3",
+        "qs": "^6.9.6",
         "react": "^17.0.1",
         "react-bootstrap": "^1.4.0",
         "react-dom": "^17.0.1",
