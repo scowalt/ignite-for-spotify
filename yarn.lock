@@ -5909,10 +5909,10 @@ spotify-web-api-js@^1.5.1:
   resolved "https://registry.yarnpkg.com/spotify-web-api-js/-/spotify-web-api-js-1.5.1.tgz#dcdd80f3975cd79c1c1278c56b2071453b190699"
   integrity sha512-KyeYpfPY5bWc5geb0Lmw96oqydxrby36vkmN33q4xrY7oWwoz3634Ya7qHndq2eOqCfI1GS3a5CjimYe7RQdtg==
 
-spotify-web-api-node@^5.0.0:
-  version "5.0.0"
-  resolved "https://registry.yarnpkg.com/spotify-web-api-node/-/spotify-web-api-node-5.0.0.tgz#e3cc927300e1580ec6ae369ac52cd97ad82b1c0d"
-  integrity sha512-UbGp9LsydVX0EJSZMdJQmWGcBTbAK8Ei3uctAOGMuPtadRhj1zxvEwljtevoOqDTLAlyrm8VUdsswQ4l5j+E8Q==
+spotify-web-api-node@^5.0.2:
+  version "5.0.2"
+  resolved "https://registry.yarnpkg.com/spotify-web-api-node/-/spotify-web-api-node-5.0.2.tgz#683669b3ccc046a5a357300f151df93a2b3539fe"
+  integrity sha512-r82dRWU9PMimHvHEzL0DwEJrzFk+SMCVfq249SLt3I7EFez7R+jeoKQd+M1//QcnjqlXPs2am4DFsGk8/GCsrA==
   dependencies:
     superagent "^6.1.0"
 
