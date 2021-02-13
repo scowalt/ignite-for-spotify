@@ -7,6 +7,7 @@ import { FaSpotify } from "react-icons/fa";
 import update from 'immutability-helper';
 import { IgnitionToSpotifyData } from "../../../types/IgnitionToSpotifyData";
 import { Row, Col, Alert, Nav, TabContent, TabPane } from "react-bootstrap";
+import { SimplifiedPlaylist } from "spotify-web-api-ts/types/types/SpotifyObjects";
 
 interface Props {
 	auth: SpotifyAuthInfo;
@@ -51,7 +52,7 @@ class SpotifyPlaylistSelector extends React.Component<Props, State> {
 		});
 	}
 
-	onPlaylistClicked(playlist: SpotifyApi.PlaylistObjectSimplified): void {
+	onPlaylistClicked(playlist: SimplifiedPlaylist): void {
 		this.setState(update(this.state, {
 			playlistId: { $set: playlist.id }
 		}));

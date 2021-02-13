@@ -27,7 +27,7 @@ export function LoginRoute(request: Request, response: Response): void {
 	// Have non-alphanumeric characters in the state string can cause issues, since the string is passed as a URL query parameter
 	const chance: Chance.Chance = new Chance();
 	const state: string = chance.string({ length: 16, alpha: true, numeric: true });
-	const authorizeUrl: string = spotifyApi.getRefreshableAuthorizationUrl({scope, state});
+	const authorizeUrl: string = spotifyApi.getRefreshableAuthorizationUrl({ scope, state });
 	response.cookie(StateKey, state);
 
 	// Redirect to Spotify to auth. Spotify will respond to redirectUri
