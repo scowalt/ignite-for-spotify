@@ -4,6 +4,7 @@ import { Logger } from '../shared/Logger';
 import { RateLimitedSpotifyWebApi } from '../shared/RateLimitedSpotifyWebApi';
 import nlp from 'compromise';
 import { Query } from '../shared/Query';
+import { Paging, Track } from 'spotify-web-api-ts/types/types/SpotifyObjects';
 
 const CHUNK_SIZE: number = 25;
 export class SpotifyUpdater {
@@ -153,7 +154,7 @@ export class SpotifyUpdater {
 	}
 
 	private getTrackIdForSearchQuery(searchQuery: Query): Promise<string> {
-		return this.spotify.searchTracks(searchQuery).then((tracks?: SpotifyApi.PagingObject<SpotifyApi.TrackObjectFull>) => {
+		return this.spotify.searchTracks(searchQuery).then((tracks?: Paging<Track>) => {
 			if (!tracks || tracks.total === 0) {
 				return Promise.reject(`Spotify has no track for ${searchQuery.toString()}`);
 			} else {
