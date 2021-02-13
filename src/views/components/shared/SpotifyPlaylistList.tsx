@@ -7,7 +7,7 @@ import { SimplifiedPlaylist } from "spotify-web-api-ts/types/types/SpotifyObject
 interface SpotifyPlaylistListProps {
 	loading: boolean;
 	playlists?: SpotifyApi.ListOfUsersPlaylistsResponse;
-	onPlaylistClicked: (playlist: SpotifyApi.PlaylistObjectSimplified) => void;
+	onPlaylistClicked: (playlist: SimplifiedPlaylist) => void;
 	onPageSwitch: (offset: number) => void;
 	playlistsPerRequest: number;
 	disabled?: boolean;
@@ -54,7 +54,7 @@ export class SpotifyPlaylistList extends React.Component<SpotifyPlaylistListProp
 	render(): ReactNode {
 		let playlists: ReactNode[] = [];
 		if (!this.props.loading && this.props.playlists) {
-			playlists = this.props.playlists.items.map((playlist: SpotifyApi.PlaylistObjectSimplified, index: number) => {
+			playlists = this.props.playlists.items.map((playlist: SimplifiedPlaylist, index: number) => {
 				return <PlaylistListItem
 					disabled={this.props.disabled}
 					key={index}
