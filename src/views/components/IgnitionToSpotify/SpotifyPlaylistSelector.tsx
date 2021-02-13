@@ -1,7 +1,7 @@
 import { connect, FormikProps } from "formik";
 import React, { ReactNode } from "react";
 import { SpotifyPlaylistListLoader } from "../shared/SpotifyPlaylistListLoader";
-import SpotifyWebApi from "spotify-web-api-js";
+import { SpotifyWebApi } from "spotify-web-api-ts";
 import { SpotifyAuthInfo } from "../shared/SpotifyAuthInfo";
 import { FaSpotify } from "react-icons/fa";
 import update from 'immutability-helper';
@@ -14,7 +14,7 @@ interface Props {
 	formik: FormikProps<IgnitionToSpotifyData>;
 }
 interface State {
-	readonly spotify: SpotifyWebApi.SpotifyWebApiJs;
+	readonly spotify: SpotifyWebApi;
 	playlistName: string;
 	playlistId?: string;
 }
