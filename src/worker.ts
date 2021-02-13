@@ -60,8 +60,8 @@ async function userPlaylistCreationFunction(job: Bull.Job<UserPlaylistCreationJo
 	let playlistId: string = job.data.query.playlistInfo.playlistDescriptor;
 	if (!job.data.query.playlistInfo.havePlaylistId) {
 		const user = await spotify.getMe();
-		const playlistCreationResponse = await spotify.createPlaylist(user.body.id, job.data.query.playlistInfo.playlistDescriptor);
-		playlistId = playlistCreationResponse.body.id;
+		const playlistCreationResponse = await spotify.createPlaylist(user.id, job.data.query.playlistInfo.playlistDescriptor);
+		playlistId = playlistCreationResponse.id;
 	}
 
 	let songs: Song[];
