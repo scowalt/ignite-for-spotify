@@ -2,11 +2,11 @@ import React, { ReactNode } from "react";
 import { Row, Pagination, ListGroup, Spinner, Col } from "react-bootstrap";
 import { PlaylistListItem } from "./PlaylistListItem";
 import update from 'immutability-helper';
-import { SimplifiedPlaylist } from "spotify-web-api-ts/types/types/SpotifyObjects";
+import { Paging, SimplifiedPlaylist } from "spotify-web-api-ts/types/types/SpotifyObjects";
 
 interface SpotifyPlaylistListProps {
 	loading: boolean;
-	playlists?: SpotifyApi.ListOfUsersPlaylistsResponse;
+	playlists?: Paging<SimplifiedPlaylist>;
 	onPlaylistClicked: (playlist: SimplifiedPlaylist) => void;
 	onPageSwitch: (offset: number) => void;
 	playlistsPerRequest: number;
@@ -24,11 +24,11 @@ export class SpotifyPlaylistList extends React.Component<SpotifyPlaylistListProp
 	}
 
 	// Zero-based page number for playlists
-	private getCurrentPageNumber(playlists: SpotifyApi.ListOfUsersPlaylistsResponse): number {
+	private getCurrentPageNumber(playlists: Paging<SimplifiedPlaylist>): number {
 		return Math.floor(playlists.offset / this.props.playlistsPerRequest);
 	}
 
-	private getTotalPages(playlists: SpotifyApi.ListOfUsersPlaylistsResponse): number {
+	private getTotalPages(playlists: Paging<SimplifiedPlaylist>): number {
 		return Math.max(Math.ceil(playlists.total / this.props.playlistsPerRequest), 1);
 	}
 

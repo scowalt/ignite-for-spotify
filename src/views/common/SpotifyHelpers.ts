@@ -1,4 +1,4 @@
-import {SpotifyWebApi} from "spotify-web-api-ts";
+import { SpotifyWebApi } from "spotify-web-api-ts";
 import { RegularError } from "spotify-web-api-ts/types/types/SpotifyObjects";
 
 export function handleExpiredSpotifyToken<T>(signal: AbortSignal, spotify: SpotifyWebApi, resume: () => Promise<T>): ((error: RegularError) => Promise<T>) {

@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import {SpotifyWebApi} from 'spotify-web-api-ts';
+import { SpotifyWebApi } from 'spotify-web-api-ts';
 import HttpStatus from 'http-status-codes';
 import * as zod from 'zod';
 import _ from 'lodash';
@@ -8,7 +8,7 @@ import { Database } from '../db/Database';
 import { Song } from '../db/models/Song';
 import { Logger } from '../shared/Logger';
 import { GetRefreshedAccessTokenResponse } from 'spotify-web-api-ts/types/types/SpotifyAuthorization';
-import { Episode, Paging, PlaylistItem, SimplifiedArtist } from 'spotify-web-api-ts/types/types/SpotifyObjects';
+import { Paging, PlaylistItem, SimplifiedArtist } from 'spotify-web-api-ts/types/types/SpotifyObjects';
 
 const HEARTBEAT_INTERVAL_MS: number = 15 * 1000;
 

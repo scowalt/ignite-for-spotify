@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import {SpotifyWebApi} from 'spotify-web-api-ts';
+import { SpotifyWebApi } from 'spotify-web-api-ts';
 import HttpStatus from 'http-status-codes';
 import { StateKey } from '../server';
 import { Logger } from '../shared/Logger';

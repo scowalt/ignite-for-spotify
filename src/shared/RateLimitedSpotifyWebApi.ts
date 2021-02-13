@@ -1,4 +1,4 @@
-import {SpotifyWebApi} from "spotify-web-api-ts";
+import { SpotifyWebApi } from "spotify-web-api-ts";
 import PromiseQueue from "p-queue";
 import { Logger } from "./Logger";
 import { Song } from "../db/models/Song";
@@ -88,25 +88,26 @@ export class RateLimitedSpotifyWebApi {
 		}, Priority.PlaylistUpdate);
 	}
 
-	public async removePlaylistTracksAtPosition(playlistId: string, playlistOffset: number, count: number): Promise<string | Playlist> {
-		return this.enqueue(async () => {
-			const playlistResponse: Playlist = await this.spotify.playlists.getPlaylist(playlistId);
-			const positions: number[] = [];
-			const limit: number = Math.min(playlistOffset + count, playlistResponse.tracks.total);
-			for (let position: number = playlistOffset; position < limit; position++) {
-				positions.push(position);
-			}
-			if (positions.length !== 0) {
-				return this.spotify.playlists.removePlaylistItemsByPosition(playlistId, positions, {'snapshot_id': playlistResponse.snapshot_id});
-			} else {
-				return Promise.resolve(playlistResponse);
-			}
-		}, Priority.PlaylistUpdate).catch((reason: Error) => {
-			Logger.getInstance().error(`Spotify API error ${reason.toString()}`);
-			Logger.getInstance().error(`Failure at removePlaylistTracksAtPosition("${playlistId}", ${playlistOffset}, ${count})`);
-			return Promise.reject(reason);
-		});
-	}
+	// public async removePlaylistTracksAtPosition(playlistId: string, playlistOffset: number, count: number): Promise<string | Playlist> {
+	// 	return this.enqueue(async () => {
+	// 		const playlistResponse: Playlist = await this.spotify.playlists.getPlaylist(playlistId);
+	// 		const positions: { uri: string; positions: number[] }[] = [];
+	// 		const limit: number = Math.min(playlistOffset + count, playlistResponse.tracks.total);
+	// 		for (let position: number = playlistOffset; position < limit; position++) {
+	// 			playlistResponse.tracks.next
+	// 			positions.push({position, playlistResponse});
+	// 		}
+	// 		if (positions.length !== 0) {
+	// 			return this.spotify.playlists.removePlaylistItemsByPosition(playlistId, positions, {'snapshot_id': playlistResponse.snapshot_id});
+	// 		} else {
+	// 			return Promise.resolve(playlistResponse);
+	// 		}
+	// 	}, Priority.PlaylistUpdate).catch((reason: Error) => {
+	// 		Logger.getInstance().error(`Spotify API error ${reason.toString()}`);
+	// 		Logger.getInstance().error(`Failure at removePlaylistTracksAtPosition("${playlistId}", ${playlistOffset}, ${count})`);
+	// 		return Promise.reject(reason);
+	// 	});
+	// }
 
 	private init(): Promise<any> {
 		return this.updateAccessToken();

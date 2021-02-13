@@ -1,5 +1,5 @@
 import React, { ReactNode } from "react";
-import {SpotifyWebApi} from 'spotify-web-api-ts';
+import { SpotifyWebApi } from 'spotify-web-api-ts';
 import { SpotifyAuthInfo } from "../shared/SpotifyAuthInfo";
 import { Col, Row } from "react-bootstrap";
 import update from 'immutability-helper';
