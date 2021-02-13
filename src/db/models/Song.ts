@@ -1,7 +1,7 @@
 import { Table, Column, Model, PrimaryKey, UpdatedAt, CreatedAt } from 'sequelize-typescript';
 
 @Table
-export class Song extends Model<Song> {
+export class Song extends Model {
 	@PrimaryKey
 	@Column
 	id!: number;

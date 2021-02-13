@@ -1,7 +1,8 @@
 import { Request, Response } from 'express';
-import SpotifyWebApi from 'spotify-web-api-node';
+import { SpotifyWebApi } from 'spotify-web-api-ts';
 import Chance from 'chance';
 import { StateKey } from '../server';
+import { AuthorizationScope } from 'spotify-web-api-ts/types/types/SpotifyAuthorization';
 
 function getRedirectUri(request: Request): string {
 	// If this page is accessed directly, the `referer` header won't be set.
@@ -15,7 +16,7 @@ export function LoginRoute(request: Request, response: Response): void {
 		clientId: process.env.SPOTIFY_CLIENT_ID
 	});
 
-	const scopes: string[] = [
+	const scope: AuthorizationScope[] = [
 		'user-read-private',
 		'user-read-email',
 		'playlist-read-private',
@@ -26,7 +27,7 @@ export function LoginRoute(request: Request, response: Response): void {
 	// Have non-alphanumeric characters in the state string can cause issues, since the string is passed as a URL query parameter
 	const chance: Chance.Chance = new Chance();
 	const state: string = chance.string({ length: 16, alpha: true, numeric: true });
-	const authorizeUrl: string = spotifyApi.createAuthorizeURL(scopes, state);
+	const authorizeUrl: string = spotifyApi.getRefreshableAuthorizationUrl({ scope, state });
 	response.cookie(StateKey, state);
 
 	// Redirect to Spotify to auth. Spotify will respond to redirectUri

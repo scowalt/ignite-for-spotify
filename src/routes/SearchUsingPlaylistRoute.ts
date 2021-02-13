@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import SpotifyWebApi from 'spotify-web-api-node';
+import { SpotifyWebApi } from 'spotify-web-api-ts';
 import HttpStatus from 'http-status-codes';
 import * as zod from 'zod';
 import _ from 'lodash';
@@ -7,6 +7,8 @@ import { BasicTrackInfo } from '../types/BasicTrackInfo';
 import { Database } from '../db/Database';
 import { Song } from '../db/models/Song';
 import { Logger } from '../shared/Logger';
+import { GetRefreshedAccessTokenResponse } from 'spotify-web-api-ts/types/types/SpotifyAuthorization';
+import { Paging, PlaylistItem, SimplifiedArtist } from 'spotify-web-api-ts/types/types/SpotifyObjects';
 
 const HEARTBEAT_INTERVAL_MS: number = 15 * 1000;
 
@@ -50,13 +52,12 @@ function setupEventStreamConnection(response: Response): NodeJS.Timeout {
 async function getSpotifyClient(request: Request, cookies: Cookies): Promise<SpotifyWebApi> {
 	const spotify: SpotifyWebApi = new SpotifyWebApi({
 		accessToken: cookies.spotifyAccessToken,
-		refreshToken: cookies.spotifyRefreshToken,
 		clientId: process.env.SPOTIFY_CLIENT_ID,
 		clientSecret: process.env.SPOTIFY_CLIENT_SECRET,
 		redirectUri: `${request.header('Referer')!}spotifyAuthCallback` // TODO don't know if I need a redirect URI here
 	});
-	const refreshResponse: SpotifyWebApi.Response<SpotifyWebApi.RefreshAccessTokenResponse> = await spotify.refreshAccessToken();
-	spotify.setAccessToken(refreshResponse.body.access_token);
+	const refreshResponse: GetRefreshedAccessTokenResponse = await spotify.getRefreshedAccessToken(cookies.spotifyRefreshToken);
+	spotify.setAccessToken(refreshResponse.access_token);
 	return spotify;
 }
 
@@ -83,12 +84,12 @@ export async function SearchUsingPlaylistRoute(request: Request, response: Respo
 
 	let offset: number = 0;
 	do {
-		const playlistTracks: SpotifyWebApi.Response<SpotifyApi.PlaylistTrackResponse> = await unlimitedSpotify.getPlaylistTracks(cookies.playlistId, { offset });
-		if (playlistTracks.body.items.length === 0) {
+		const playlistTracks: Paging<PlaylistItem> = await unlimitedSpotify.playlists.getPlaylistItems(cookies.playlistId, { offset });
+		if (playlistTracks.items.length === 0) {
 			break;
 		}
 
-		for (const value of playlistTracks.body.items) {
+		for (const value of playlistTracks.items) {
 			if (value.track === null) {
 				// It's possible to have a null playlist track.
 				continue;
@@ -100,9 +101,14 @@ export async function SearchUsingPlaylistRoute(request: Request, response: Respo
 				continue;
 			}
 
+			if (value.track.type === 'episode') {
+				// Can't do anything with podcast episodes
+				continue;
+			}
+
 			const basicTrack: BasicTrackInfo = {
 				album: value.track.album.name,
-				artists: value.track.artists.map((artist: SpotifyApi.ArtistObjectSimplified) => { return artist.name; }),
+				artists: value.track.artists.map((artist: SimplifiedArtist) => { return artist.name; }),
 				title: value.track.name,
 				spotifyId: value.track.id
 			};
@@ -118,7 +124,7 @@ export async function SearchUsingPlaylistRoute(request: Request, response: Respo
 			}
 		}
 
-		offset += playlistTracks.body.items.length;
+		offset += playlistTracks.items.length;
 	// eslint-disable-next-line no-constant-condition
 	} while (!closed);
 

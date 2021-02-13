@@ -2,11 +2,12 @@ import React, { ReactNode } from "react";
 import { Row, Pagination, ListGroup, Spinner, Col } from "react-bootstrap";
 import { PlaylistListItem } from "./PlaylistListItem";
 import update from 'immutability-helper';
+import { Paging, SimplifiedPlaylist } from "spotify-web-api-ts/types/types/SpotifyObjects";
 
-interface SpotifyPlaylistListProps extends React.Props<{}> {
+interface SpotifyPlaylistListProps {
 	loading: boolean;
-	playlists?: SpotifyApi.ListOfUsersPlaylistsResponse;
-	onPlaylistClicked: (playlist: SpotifyApi.PlaylistObjectSimplified) => void;
+	playlists?: Paging<SimplifiedPlaylist>;
+	onPlaylistClicked: (playlist: SimplifiedPlaylist) => void;
 	onPageSwitch: (offset: number) => void;
 	playlistsPerRequest: number;
 	disabled?: boolean;
@@ -23,15 +24,15 @@ export class SpotifyPlaylistList extends React.Component<SpotifyPlaylistListProp
 	}
 
 	// Zero-based page number for playlists
-	private getCurrentPageNumber(playlists: SpotifyApi.ListOfUsersPlaylistsResponse): number {
+	private getCurrentPageNumber(playlists: Paging<SimplifiedPlaylist>): number {
 		return Math.floor(playlists.offset / this.props.playlistsPerRequest);
 	}
 
-	private getTotalPages(playlists: SpotifyApi.ListOfUsersPlaylistsResponse): number {
+	private getTotalPages(playlists: Paging<SimplifiedPlaylist>): number {
 		return Math.max(Math.ceil(playlists.total / this.props.playlistsPerRequest), 1);
 	}
 
-	onPlaylistSelected(playlist: SpotifyApi.PlaylistObjectSimplified, index: number): () => void {
+	onPlaylistSelected(playlist: SimplifiedPlaylist, index: number): () => void {
 		return (): void => {
 			this.setState(update(this.state, {
 				selected: { $set: index }
@@ -53,7 +54,7 @@ export class SpotifyPlaylistList extends React.Component<SpotifyPlaylistListProp
 	render(): ReactNode {
 		let playlists: ReactNode[] = [];
 		if (!this.props.loading && this.props.playlists) {
-			playlists = this.props.playlists.items.map((playlist: SpotifyApi.PlaylistObjectSimplified, index: number) => {
+			playlists = this.props.playlists.items.map((playlist: SimplifiedPlaylist, index: number) => {
 				return <PlaylistListItem
 					disabled={this.props.disabled}
 					key={index}

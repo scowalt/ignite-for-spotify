@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
-import SpotifyWebApi from 'spotify-web-api-node';
+import { SpotifyWebApi } from 'spotify-web-api-ts';
 import HttpStatus from 'http-status-codes';
+import { GetRefreshedAccessTokenResponse } from 'spotify-web-api-ts/types/types/SpotifyAuthorization';
 
 export function RefreshSpotifyAuthRoute(request: Request, response: Response): any {
 	const accessToken: string|null = request.cookies ? request.cookies.spotifyAccessToken : null;
@@ -16,9 +17,8 @@ export function RefreshSpotifyAuthRoute(request: Request, response: Response): a
 	}
 
 	spotifyApi.setAccessToken(accessToken);
-	spotifyApi.setRefreshToken(refreshToken);
-	void spotifyApi.refreshAccessToken().then((value: SpotifyWebApi.Response<SpotifyWebApi.RefreshAccessTokenResponse>) => {
-		response.cookie("spotifyAccessToken", value.body.access_token);
-		return response.status(HttpStatus.OK).json(value.body.access_token).send();
+	void spotifyApi.getRefreshedAccessToken(refreshToken).then((value: GetRefreshedAccessTokenResponse) => {
+		response.cookie("spotifyAccessToken", value.access_token);
+		return response.status(HttpStatus.OK).json(value.access_token).send();
 	});
 }

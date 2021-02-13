@@ -1,8 +1,9 @@
 import { Request, Response } from 'express';
-import SpotifyWebApi, { AuthorizationCodeGrantResponse } from 'spotify-web-api-node';
+import { SpotifyWebApi } from 'spotify-web-api-ts';
 import HttpStatus from 'http-status-codes';
 import { StateKey } from '../server';
 import { Logger } from '../shared/Logger';
+import { GetRefreshableUserTokensResponse } from 'spotify-web-api-ts/types/types/SpotifyAuthorization';
 
 function getRedirectUri(request: Request): string {
 	// Since this is an auth callback, the `referer` header will be Spotify's server.
@@ -36,9 +37,9 @@ export async function SpotifyAuthCallbackRoute(request: Request, response: Respo
 	});
 
 	try {
-		const authCodeResponse: SpotifyWebApi.Response<AuthorizationCodeGrantResponse> = await spotifyApi.authorizationCodeGrant(code);
-		response.cookie("spotifyAccessToken", authCodeResponse.body.access_token);
-		response.cookie("spotifyRefreshToken", authCodeResponse.body.refresh_token);
+		const authCodeResponse: GetRefreshableUserTokensResponse = await spotifyApi.getRefreshableUserTokens(code);
+		response.cookie("spotifyAccessToken", authCodeResponse.access_token);
+		response.cookie("spotifyRefreshToken", authCodeResponse.refresh_token);
 		return response.redirect("/");
 	} catch (reason) {
 		return response.status(HttpStatus.INTERNAL_SERVER_ERROR).send(JSON.stringify(reason)).end();

@@ -69,7 +69,7 @@ export class SpotifyPlaylistUpdater {
 	}
 
 	private async ensurePlaylistUpdated(playlistId: string, songs: Song[], playlistOffset: number): Promise<any> {
-		await this.spotify.removePlaylistTracksAtPosition(playlistId, playlistOffset, songs.length);
+		// await this.spotify.removePlaylistTracksAtPosition(playlistId, playlistOffset, songs.length);
 		return this.spotify.addSongsToPlaylist(playlistId, songs, playlistOffset);
 	}
 
