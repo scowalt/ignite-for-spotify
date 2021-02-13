@@ -1,8 +1,9 @@
 import {SpotifyWebApi} from "spotify-web-api-ts";
+import { RegularError } from "spotify-web-api-ts/types/types/SpotifyObjects";
 
-export function handleExpiredSpotifyToken<T>(signal: AbortSignal, spotify: SpotifyWebApi, resume: () => Promise<T>): ((xhr: XMLHttpRequest) => Promise<T>) {
-	return async (xhr: XMLHttpRequest): Promise<any> => {
-		if (!signal.aborted && xhr.status === 401 && xhr.responseText.includes("The access token expired")) {
+export function handleExpiredSpotifyToken<T>(signal: AbortSignal, spotify: SpotifyWebApi, resume: () => Promise<T>): ((error: RegularError) => Promise<T>) {
+	return async (error: RegularError): Promise<any> => {
+		if (!signal.aborted && error.error.status === 401 && error.error.message.includes("The access token expired")) {
 			const response: Response = await fetch('/refreshSpotifyAuth', {
 				signal
 			});
@@ -12,6 +13,6 @@ export function handleExpiredSpotifyToken<T>(signal: AbortSignal, spotify: Spoti
 				return resume();
 			}
 		}
-		return Promise.reject(xhr);
+		return Promise.reject(error);
 	};
 }
