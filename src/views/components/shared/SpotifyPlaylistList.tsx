@@ -2,8 +2,9 @@ import React, { ReactNode } from "react";
 import { Row, Pagination, ListGroup, Spinner, Col } from "react-bootstrap";
 import { PlaylistListItem } from "./PlaylistListItem";
 import update from 'immutability-helper';
+import { SimplifiedPlaylist } from "spotify-web-api-ts/types/types/SpotifyObjects";
 
-interface SpotifyPlaylistListProps extends React.Props<{}> {
+interface SpotifyPlaylistListProps {
 	loading: boolean;
 	playlists?: SpotifyApi.ListOfUsersPlaylistsResponse;
 	onPlaylistClicked: (playlist: SpotifyApi.PlaylistObjectSimplified) => void;
@@ -31,7 +32,7 @@ export class SpotifyPlaylistList extends React.Component<SpotifyPlaylistListProp
 		return Math.max(Math.ceil(playlists.total / this.props.playlistsPerRequest), 1);
 	}
 
-	onPlaylistSelected(playlist: SpotifyApi.PlaylistObjectSimplified, index: number): () => void {
+	onPlaylistSelected(playlist: SimplifiedPlaylist, index: number): () => void {
 		return (): void => {
 			this.setState(update(this.state, {
 				selected: { $set: index }
