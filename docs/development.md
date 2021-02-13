@@ -15,9 +15,9 @@ This app uses a MySQL server to store its data. It's possible to setup a docker 
 
 - Install `docker-desktop` and `docker-cli`
 - `docker pull mysql/mysql-server`
-- `docker run --name=mysql1 -d mysql/mysql-server -p 6603:3306`
-- `docker logs mysql1` to find the password
-- `docker exec -it mysql1 mysql -uroot -p`, enter the password
+- `docker run --name=igniteForSpotifyMySQL -p 6603:3306 -d mysql/mysql-server`
+- `docker logs igniteForSpotifyMySQL` to find the password
+- `docker exec -it igniteForSpotifyMySQL mysql -uroot -p`, enter the password
 - `mysql> ALTER USER 'root'@'localhost' IDENTIFIED BY '[newpassword]';`
 - `mysql> CREATE USER 'myuser'@'localhost' IDENTIFIED BY 'mypass';`
 - `mysql> CREATE USER 'myuser'@'%' IDENTIFIED BY 'mypass';`
@@ -33,4 +33,4 @@ This app uses a MySQL server to store its data. It's possible to setup a docker 
 
 - Install `docker-desktop` and `docker-cli`
 - `docker pull redis`
-- `docker run --name=redis1 -p 6379:6379 -d redis redis-server`
+- `docker run --name=igniteForSpotifyRedis -p 16379:6379 -d redis redis-server`
