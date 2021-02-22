@@ -87,7 +87,7 @@
         "csp-html-webpack-plugin": "^5.1.0",
         "css-loader": "^5.0.2",
         "del": "^6.0.0",
-        "eslint": "^7.19.0",
+        "eslint": "^7.20.0",
         "eslint-plugin-html": "^6.1.1",
         "eslint-plugin-react": "^7.22.0",
         "file-loader": "^6.2.0",
