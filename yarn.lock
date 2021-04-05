@@ -1478,10 +1478,10 @@ component-emitter@^1.2.0:
   resolved "https://registry.yarnpkg.com/component-emitter/-/component-emitter-1.3.0.tgz#16e4070fba8ae29b679f2215853ee181ab2eabc0"
   integrity sha512-Rd3se6QB+sO1TwqZjscQrurpEPIfO0/yYnSin6Q/rD3mOutHvUrCAhJub3r90uNb+SESBuE0QYoB90YdfatsRg==
 
-compromise@^13.10.4:
-  version "13.10.4"
-  resolved "https://registry.yarnpkg.com/compromise/-/compromise-13.10.4.tgz#4282ac04841f6f7220eb7556fcb7b5c0b1688807"
-  integrity sha512-gnrsXbJuYBnqEr9aSnkNebT6rYshYQGoDba3jSs3tzRD21rXB0OuWWaWdhjRyx+GpSvqgUMRP/BjOSehRaeUxA==
+compromise@^13.10.5:
+  version "13.10.5"
+  resolved "https://registry.yarnpkg.com/compromise/-/compromise-13.10.5.tgz#163cc63869561a320c730d6b855c0adde16ff286"
+  integrity sha512-je5+lMKnQWmWfYZiO9IXtxWHr3KA4dQiyzVHsZskfNgGVHlSFK2sWreosoBYeRmP9/JrHiggSdDWE1lqPejvmA==
   dependencies:
     efrt-unpack "2.2.0"
 
