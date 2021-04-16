@@ -19,7 +19,7 @@ export class About extends React.PureComponent {
 	render(): ReactNode {
 		return <Container><Row><Col>
 			Made by <a href="mailto:ignite-for-spotify@scowalt.com">Scott Walters</a><br />
-			If you like this app, please consider <a href="https://customsforge.com/index.php?/donate/make-donation" onClick={this.onDonationClick.bind(this)}>supporting CustomsForge</a>, which makes Ignite for Spotify possible.<br />
+			If you like this app, please consider <a href="https://www.patreon.com/CustomsForge" onClick={this.onDonationClick.bind(this)}>supporting CustomsForge</a>, which makes Ignite for Spotify possible.<br />
 			<ServerStats />
 		</Col></Row></Container>;
 	}
