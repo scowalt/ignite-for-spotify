@@ -24,7 +24,7 @@
         "bootswatch": "^4.6.0",
         "bull": "^3.22.0",
         "chance": "^1.1.7",
-        "compromise": "^13.10.6",
+        "compromise": "^13.11.1",
         "cookie-parser": "^1.4.5",
         "cron": "^1.8.2",
         "dotenv": "^8.2.0",
