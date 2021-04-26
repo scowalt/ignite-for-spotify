@@ -62,7 +62,7 @@
         "zod": "^1.11.16"
     },
     "devDependencies": {
-        "@types/bull": "^3.15.0",
+        "@types/bull": "^3.15.1",
         "@types/chance": "^1.1.1",
         "@types/cookie-parser": "^1.4.2",
         "@types/cron": "^1.7.2",
