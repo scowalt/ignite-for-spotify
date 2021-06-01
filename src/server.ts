@@ -35,6 +35,7 @@ app.use(cookieParser());
 app.use(BodyParser.json());
 
 // __dirname must be inaccurate here in order for webpack to work, but this is a bad work-around since it depends on "dist" naming
+// eslint-disable-next-line @typescript-eslint/no-unsafe-call
 app.use(express.static(path.join(__dirname, '..', 'dist', 'views')));
 
 app.post('/startJob', StartJobRoute(queues));
