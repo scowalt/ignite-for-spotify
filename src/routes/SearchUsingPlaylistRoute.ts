@@ -19,8 +19,9 @@ type Cookies = zod.infer<typeof CookiesSchema>;
 
 function parseCookies(request: Request): Cookies|null {
 	const subset: any = _.pick(request.cookies, Object.keys(CookiesSchema.shape));
-	if (CookiesSchema.check(subset)) {
-		return subset;
+	const result = CookiesSchema.safeParse(subset);
+	if (result.success) {
+		return result.data;
 	}
 
 	return null;
