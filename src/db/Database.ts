@@ -7,6 +7,7 @@ import { BasicTrackInfo } from '../types/BasicTrackInfo';
 import { IgnitionToSpotifyData } from '../types/IgnitionToSpotifyData';
 import _ from 'lodash';
 import { ServerStatsData } from '../types/ServerStatsData';
+import mysql2 from 'mysql2';
 
 export class Database {
 	public static async getInstance(): Promise<Database> {
@@ -135,6 +136,7 @@ export class Database {
 				max: Number(process.env.MYSQL_POOL_CONNECTION_LIMIT)
 			},
 			dialect: "mysql",
+			dialectModule: mysql2,
 			define: { // Use case-insensitive collation to allow for case-insensitive searching of database
 				charset: 'utf8',
 				collate: 'utf8_general_ci'
