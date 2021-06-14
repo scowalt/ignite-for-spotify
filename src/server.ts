@@ -3,6 +3,18 @@ import dotenvexpand from 'dotenv-expand';
 const environment: dotenv.DotenvConfigOutput = dotenv.config();
 dotenvexpand(environment);
 
+import * as Sentry from '@sentry/node';
+
+Sentry.init({
+	// TODO move this to an environment variable
+	dsn: "https://ec65c9471196443599be9bdf65b8ec1d@o848917.ingest.sentry.io/5815871",
+
+	// Set tracesSampleRate to 1.0 to capture 100%
+	// of transactions for performance monitoring.
+	// We recommend adjusting this value in production
+	tracesSampleRate: 1.0,
+});
+
 import express, { Express, Request, Response } from 'express';
 import BodyParser from 'body-parser';
 import cookieParser from 'cookie-parser';
@@ -30,11 +42,15 @@ const cache: NodeCache = new NodeCache();
 // See https://stackoverflow.com/a/46475726/1222411
 app.enable('trust proxy');
 
+// Sentry must be the first middleware. See https://docs.sentry.io/platforms/node/guides/express/
+// NOTE: By default, this will only capture 500 errors. In the future, maybe add 400 errors?
+app.use(Sentry.Handlers.requestHandler());
 app.use(favicon(path.join(__dirname, '..', 'res', 'icon', 'favicon.ico')));
 app.use(cookieParser());
 app.use(BodyParser.json());
 
 // __dirname must be inaccurate here in order for webpack to work, but this is a bad work-around since it depends on "dist" naming
+// eslint-disable-next-line @typescript-eslint/no-unsafe-call
 app.use(express.static(path.join(__dirname, '..', 'dist', 'views')));
 
 app.post('/startJob', StartJobRoute(queues));
@@ -71,6 +87,12 @@ app.get('/getStats', async (_request: Request, response: Response) => {
 });
 
 app.get('/searchUsingPlaylist', SearchUsingPlaylistRoute);
+
+// Check to see that Sentry this is working
+// TODO Remove this test code
+app.get("/debug-sentry", () => {
+	throw new Error("My first Sentry error!");
+});
 
 // Catch-all to support react-router-dom processing
 app.get('*', (_request: Request, response: Response) => {

@@ -86,6 +86,12 @@ module.exports = {
 				"constructors", // needed to make default constructors private for singleton classes
 			]
 		}],
+		"@typescript-eslint/no-misused-promises": [
+			"error",
+			{
+				"checksVoidReturn": false
+			}
+		],
 		"@typescript-eslint/no-inferrable-types": "off", // This rule clashes for "typdef" rule(s), see https://github.com/typescript-eslint/typescript-eslint/issues/902
 		"@typescript-eslint/explicit-function-return-type": "error",
 		"@typescript-eslint/no-non-null-assertion": "off", // Leaving this off makes integrating environment variables more simple
