@@ -136,7 +136,7 @@ export class Database {
 				max: Number(process.env.MYSQL_POOL_CONNECTION_LIMIT)
 			},
 			dialect: "mysql",
-			dialectModule: mysql2,
+			dialectModule: mysql2, // https://github.com/sequelize/sequelize/issues/9489
 			define: { // Use case-insensitive collation to allow for case-insensitive searching of database
 				charset: 'utf8',
 				collate: 'utf8_general_ci'
