@@ -44,10 +44,10 @@ app.enable('trust proxy');
 
 // Sentry must be the first middleware. See https://docs.sentry.io/platforms/node/guides/express/
 // NOTE: By default, this will only capture 500 errors. In the future, maybe add 400 errors?
-app.use(Sentry.Handlers.requestHandler());
+app.use(Sentry.Handlers.requestHandler() as express.RequestHandler);
 app.use(favicon(path.join(__dirname, '..', 'res', 'icon', 'favicon.ico')));
 app.use(cookieParser());
-app.use(BodyParser.json());
+app.use(BodyParser.json() as express.RequestHandler);
 
 // __dirname must be inaccurate here in order for webpack to work, but this is a bad work-around since it depends on "dist" naming
 // eslint-disable-next-line @typescript-eslint/no-unsafe-call
