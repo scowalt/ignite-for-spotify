@@ -20,7 +20,7 @@
     },
     "author": "Scott Walters",
     "dependencies": {
-        "@sentry/node": "^6.7.0",
+        "@sentry/node": "^6.7.1",
         "body-parser": "^1.19.0",
         "bootstrap": "^4.6.0",
         "bootswatch": "^5.0.1",
