@@ -16,7 +16,7 @@
         "upgradeDependencies": "yarn upgrade --latest"
     },
     "engines": {
-        "node": "^14.17.0"
+        "node": "^14.17.1"
     },
     "author": "Scott Walters",
     "dependencies": {
