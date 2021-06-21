@@ -663,10 +663,10 @@
     "@types/express-serve-static-core" "*"
     "@types/mime" "*"
 
-"@types/spotify-api@*", "@types/spotify-api@^0.0.9":
-  version "0.0.9"
-  resolved "https://registry.yarnpkg.com/@types/spotify-api/-/spotify-api-0.0.9.tgz#4e738d06f3bd646b65bf5ceaf23676c964e1d4b3"
-  integrity sha512-vq/NXuJOkhwDidAHxscgdoqp/v7ajujv/W80RTAU8ynz3D5d/zWAhJhJYz/hxQchI6GQJPhx/jvz/z9UTtf3JQ==
+"@types/spotify-api@*", "@types/spotify-api@^0.0.10":
+  version "0.0.10"
+  resolved "https://registry.yarnpkg.com/@types/spotify-api/-/spotify-api-0.0.10.tgz#fea56cc3370bce961c03a17f2cf28d397ae064c2"
+  integrity sha512-jR/iIZVfCDjk4QEoGpOYcVFUw2LQi9EGKNpLwUf7iIkhss/t4c3FpwT9qRPeNme6mEzCGMYr1LdP3c1nSvBzDw==
 
 "@types/spotify-web-api-node@4.0.2":
   version "4.0.2"
