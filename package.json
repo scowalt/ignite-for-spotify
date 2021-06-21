@@ -59,7 +59,7 @@
         "sequelize-typescript": "v2",
         "serve-favicon": "^2.5.0",
         "spotify-web-api-js": "^1.5.1",
-        "spotify-web-api-node": "v4",
+        "spotify-web-api-node": "v5",
         "winston": "^3.3.2",
         "zod": "^3.2"
     },
