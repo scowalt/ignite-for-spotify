@@ -173,6 +173,7 @@ module.exports = {
 		"valid-typeof": "error",
 		"keyword-spacing": "warn",
 		"eol-last": ["warn", "always"],
-		"space-infix-ops": "warn"
+		"space-infix-ops": "warn",
+		"no-shadow": "off"
 	}
 };
