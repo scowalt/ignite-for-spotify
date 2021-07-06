@@ -686,10 +686,15 @@
     "@types/express-serve-static-core" "*"
     "@types/mime" "*"
 
-"@types/spotify-api@*", "@types/spotify-api@0.0.10":
+"@types/spotify-api@*":
   version "0.0.10"
   resolved "https://registry.yarnpkg.com/@types/spotify-api/-/spotify-api-0.0.10.tgz#fea56cc3370bce961c03a17f2cf28d397ae064c2"
   integrity sha512-jR/iIZVfCDjk4QEoGpOYcVFUw2LQi9EGKNpLwUf7iIkhss/t4c3FpwT9qRPeNme6mEzCGMYr1LdP3c1nSvBzDw==
+
+"@types/spotify-api@0.0.11":
+  version "0.0.11"
+  resolved "https://registry.yarnpkg.com/@types/spotify-api/-/spotify-api-0.0.11.tgz#5cc45ad6341b5233f4617601dc4826b9e6370473"
+  integrity sha512-ZSEpG22JPMcN+tR0+U3wvmGHF4L+jyh1N+8aFbT6WzdXwPuTgH2iL+wKASkMN79CEntHQTPgBwpywZVDhll0Eg==
 
 "@types/spotify-web-api-node@4.0.2":
   version "4.0.2"
