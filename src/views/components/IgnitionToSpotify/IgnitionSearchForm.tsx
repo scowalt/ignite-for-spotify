@@ -218,7 +218,7 @@ export class IgnitionSearchForm extends React.Component<Props, State> {
 								</Col>
 							</Row>
 							<Row><Col>
-								<Button type="submit" disabled={formikProps.isSubmitting} block>
+								<Button type="submit" disabled={formikProps.isSubmitting}>
 									{(formikProps.isSubmitting) ? <Spinner animation="border" /> : <></>}
 									Submit
 								</Button>
