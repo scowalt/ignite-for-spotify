@@ -1,0 +1,13 @@
+{
+  "extends": [
+    "config:base"
+  ],
+  "packageRules": [
+    {
+      "matchPackagePatterns": [ "@types" ],
+      "groupName": "types",
+      "automerge": true,
+      "automergeType": "branch"
+    }
+  ]
+}
