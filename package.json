@@ -84,7 +84,7 @@
         "@types/serve-favicon": "2.5.3",
         "@types/spotify-api": "0.0.11",
         "@types/spotify-web-api-node": "4.0.2",
-        "@types/validator": "13.6.3",
+        "@types/validator": "13.6.4",
         "@typescript-eslint/eslint-plugin": "4.33.0",
         "@typescript-eslint/parser": "4.33.0",
         "concurrently": "6.3.0",
