@@ -1,5 +1,11 @@
 name: Pull Request and Push validation
-on: [pull_request, push]
+on:
+  push:
+    branches:
+      - master
+      - staging
+      - production
+  pull_request:
 
 jobs:
   buildAndLint:
