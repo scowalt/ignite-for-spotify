@@ -23,7 +23,7 @@
         "@sentry/node": "^6.7.1",
         "@sentry/react": "^6.9.0",
         "@sentry/tracing": "^6.9.0",
-        "body-parser": "^1.19.0",
+        "body-parser": "^1.20.3",
         "bootstrap": "4.6",
         "bootswatch": "^5.0.1",
         "bull": "^3.22.8",
