@@ -41,7 +41,7 @@
         "jquery": "^3.6.0",
         "js-cookie": "^3.0.0",
         "lodash": "^4.17.21",
-        "mysql2": "^2.2.5",
+        "mysql2": "^3.0.0",
         "node-cache": "^5.1.0",
         "node-fetch": "^3.0.0",
         "p-queue": "^7.1.0",
